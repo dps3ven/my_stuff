@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CryptoJS from 'crypto-js';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isSignup, setIsSignup] = useState(false);
   const [name, setName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -21,7 +23,8 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = async () => {
     try {
       const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
-      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+      const hashedPassword = CryptoJS.SHA256(password).toString();
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && (u.password === hashedPassword || u.password === password));
       
       if (user) {
         await AsyncStorage.setItem('currentUser', JSON.stringify(user));
@@ -43,7 +46,8 @@ export default function LoginScreen({ navigation }) {
         return;
       }
       
-      const newUser = { name, username: username.toLowerCase(), password, id: Date.now() };
+      const hashedPassword = CryptoJS.SHA256(password).toString();
+      const newUser = { name, username: username.toLowerCase(), password: hashedPassword, id: Date.now() };
       users.push(newUser);
       await AsyncStorage.setItem('users', JSON.stringify(users));
       await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
@@ -81,13 +85,21 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setUsername}
       />
       
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity 
+          style={styles.eyeButton}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+        </TouchableOpacity>
+      </View>
       
       <TouchableOpacity 
         style={styles.button} 
@@ -131,6 +143,25 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    marginBottom: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 15,
+  },
+  eyeButton: {
+    padding: 15,
+  },
+  eyeIcon: {
+    fontSize: 18,
   },
   button: {
     backgroundColor: '#007bff',
