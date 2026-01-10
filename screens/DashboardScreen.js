@@ -42,7 +42,7 @@ export default function DashboardScreen({ navigation }) {
         </TouchableOpacity>
       </View>
       
-      <Text style={styles.welcome}>Welcome back, {user?.name}!</Text>
+      <Text style={styles.welcome}>Hello, {user?.name}!</Text>
       <Text style={styles.subtitle}>Manage your musical instrument inventory</Text>
       
       <View style={styles.statsContainer}>
