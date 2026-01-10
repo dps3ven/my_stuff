@@ -36,6 +36,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
     notes: editItem?.notes || '',
     image: editItem?.image || null,
   });
+  const [showTypePicker, setShowTypePicker] = useState(false);
+  const [showConditionPicker, setShowConditionPicker] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -90,25 +92,33 @@ export default function AddInstrumentScreen({ navigation, route }) {
     }
   };
 
-  const renderPicker = (items, selectedValue, onValueChange, placeholder) => (
-    <View style={styles.pickerContainer}>
-      {items.map((item) => (
-        <TouchableOpacity
-          key={item.value}
-          style={[
-            styles.pickerItem,
-            selectedValue === item.value && styles.pickerItemSelected
-          ]}
-          onPress={() => onValueChange(item.value)}
-        >
-          <Text style={[
-            styles.pickerText,
-            selectedValue === item.value && styles.pickerTextSelected
-          ]}>
-            {item.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+  const renderCollapsiblePicker = (items, selectedValue, onValueChange, isVisible, setVisible) => (
+    <View>
+      <TouchableOpacity 
+        style={styles.pickerButton}
+        onPress={() => setVisible(!isVisible)}
+      >
+        <Text style={styles.pickerButtonText}>
+          {selectedValue || items[0].label}
+        </Text>
+        <Text style={styles.pickerArrow}>{isVisible ? '▲' : '▼'}</Text>
+      </TouchableOpacity>
+      {isVisible && (
+        <View style={styles.pickerContainer}>
+          {items.map((item) => (
+            <TouchableOpacity
+              key={item.value}
+              style={styles.pickerItem}
+              onPress={() => {
+                onValueChange(item.value);
+                setVisible(false);
+              }}
+            >
+              <Text style={styles.pickerText}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </View>
   );
 
@@ -125,10 +135,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
       <Text style={styles.title}>Add Instrument</Text>
       
       <Text style={styles.label}>Instrument Type *</Text>
-      {renderPicker(
+      {renderCollapsiblePicker(
         INSTRUMENT_TYPES,
         instrument.type,
-        (value) => setInstrument({ ...instrument, type: value })
+        (value) => setInstrument({ ...instrument, type: value }),
+        showTypePicker,
+        setShowTypePicker
       )}
       
       <Text style={styles.label}>Make *</Text>
@@ -156,10 +168,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
       />
       
       <Text style={styles.label}>Condition *</Text>
-      {renderPicker(
+      {renderCollapsiblePicker(
         CONDITIONS,
         instrument.condition,
-        (value) => setInstrument({ ...instrument, condition: value })
+        (value) => setInstrument({ ...instrument, condition: value }),
+        showConditionPicker,
+        setShowConditionPicker
       )}
       
       <Text style={styles.label}>Estimated Value ($)</Text>
@@ -234,28 +248,41 @@ const styles = StyleSheet.create({
     height: 80,
     textAlignVertical: 'top',
   },
+  pickerButton: {
+    backgroundColor: 'white',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  pickerArrow: {
+    fontSize: 16,
+    color: '#666',
+  },
   pickerContainer: {
     backgroundColor: 'white',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
     marginBottom: 15,
+    marginTop: -15,
   },
   pickerItem: {
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  pickerItemSelected: {
-    backgroundColor: '#007bff',
-  },
   pickerText: {
     fontSize: 16,
     color: '#333',
-  },
-  pickerTextSelected: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   imageButton: {
     backgroundColor: '#6c757d',
