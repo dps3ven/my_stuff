@@ -1,0 +1,36 @@
+{
+    "users": [
+        {
+            "username": "admin",
+            "password": "guitar123",
+            "userId": "admin",
+            "name": "Administrator",
+            "inventoryType": "guitars",
+            "guitarIds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+        },
+        {
+            "username": "john",
+            "password": "rock123",
+            "userId": "john",
+            "name": "John Smith",
+            "inventoryType": "guitars",
+            "guitarIds": [1, 7, 8, 9, 10]
+        },
+        {
+            "username": "drummer",
+            "password": "beats123",
+            "userId": "drummer",
+            "name": "Dave Drummer",
+            "inventoryType": "percussion",
+            "percussionIds": [1, 2, 3, 4, 5]
+        },
+        {
+            "username": "percussionist",
+            "password": "rhythm456",
+            "userId": "percussionist",
+            "name": "Maria Rhythm",
+            "inventoryType": "percussion",
+            "percussionIds": [6, 7, 8, 9, 10]
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+th {
+    background-color: azure;
+    padding: 20px;
+    font-style: oblique;
+}
+
+tr {
+    background-color: whitesmoke;
+}
+td {
+    padding: 5px;
+}
+body {
+    background-image: url("/static/images/guitar_background.jpeg");
+    background-size: cover; 
+    background-color: whitesmoke;
+
+
+}
+h1 {
+    color: whitesmoke;
+}
+
+img {
+    height: 100px;
+    width: 100px;
+}
