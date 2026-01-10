@@ -215,13 +215,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965ff',
+    height: Platform.OS === 'web' ? '100vh' : undefined,
   },
   scrollView: {
     flex: 1,
+    maxHeight: Platform.OS === 'web' ? '100vh' : undefined,
   },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
+    minHeight: Platform.OS === 'web' ? '100vh' : undefined,
   },
   title: {
     fontSize: 24,
