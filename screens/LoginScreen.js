@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -7,6 +7,16 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [isSignup, setIsSignup] = useState(false);
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setUsername('');
+      setPassword('');
+      setName('');
+      setIsSignup(false);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const handleLogin = async () => {
     try {

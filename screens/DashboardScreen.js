@@ -30,7 +30,10 @@ export default function DashboardScreen({ navigation }) {
 
   const logout = async () => {
     await AsyncStorage.removeItem('currentUser');
-    navigation.navigate('Login');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   };
 
   return (
