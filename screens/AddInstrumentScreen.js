@@ -214,13 +214,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
-    color: '#333',
+    color: '#fff',
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#555',
+    color: '#fff',
   },
   input: {
     backgroundColor: 'white',
