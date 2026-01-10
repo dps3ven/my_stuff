@@ -99,7 +99,7 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#133965ff',
   },
   scrollContent: {
     flexGrow: 1,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 40,
-    color: '#333',
+    color: '#fff',
   },
   input: {
     backgroundColor: 'white',

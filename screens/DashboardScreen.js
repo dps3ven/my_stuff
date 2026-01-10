@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#133965ff',
   },
   header: {
     flexDirection: 'row',
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   logoutButton: {
     backgroundColor: '#6c757d',
@@ -105,11 +105,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     marginBottom: 10,
-    color: '#333',
+    color: '#fff',
   },
   subtitle: {
     textAlign: 'center',
-    color: '#666',
+    color: '#fff',
     marginBottom: 40,
   },
   statsContainer: {

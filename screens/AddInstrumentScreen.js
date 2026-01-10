@@ -200,7 +200,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#133965ff',
   },
   scrollView: {
     flex: 1,

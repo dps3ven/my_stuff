@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#133965ff',
   },
   header: {
     flexDirection: 'row',
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   addButton: {
     backgroundColor: '#28a745',
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: '#666',
+    color: '#fff',
     marginBottom: 20,
   },
   primaryButton: {
