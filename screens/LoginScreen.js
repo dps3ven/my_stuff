@@ -11,7 +11,7 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = async () => {
     try {
       const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
-      const user = users.find(u => u.username === username && u.password === password);
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
       
       if (user) {
         await AsyncStorage.setItem('currentUser', JSON.stringify(user));
@@ -28,12 +28,12 @@ export default function LoginScreen({ navigation }) {
     try {
       const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
       
-      if (users.find(u => u.username === username)) {
+      if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
         Alert.alert('Error', 'Username already exists');
         return;
       }
       
-      const newUser = { name, username, password, id: Date.now() };
+      const newUser = { name, username: username.toLowerCase(), password, id: Date.now() };
       users.push(newUser);
       await AsyncStorage.setItem('users', JSON.stringify(users));
       await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
