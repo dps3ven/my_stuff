@@ -1,20 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function AddInstrumentScreen({ navigation }) {
+const INSTRUMENT_TYPES = [
+  { label: 'Select Type', value: '' },
+  { label: 'Guitar', value: 'Guitar' },
+  { label: 'Bass', value: 'Bass' },
+  { label: 'Drums', value: 'Drums' },
+  { label: 'Piano', value: 'Piano' },
+  { label: 'Violin', value: 'Violin' },
+  { label: 'Other', value: 'Other' },
+];
+
+const CONDITIONS = [
+  { label: 'Select Condition', value: '' },
+  { label: 'New', value: 'New' },
+  { label: 'Excellent', value: 'Excellent' },
+  { label: 'Good', value: 'Good' },
+  { label: 'Fair', value: 'Fair' },
+  { label: 'Poor', value: 'Poor' },
+];
+
+export default function AddInstrumentScreen({ navigation, route }) {
+  const editItem = route?.params?.editItem;
+  const isEditing = !!editItem;
+  
   const [instrument, setInstrument] = useState({
-    type: '',
-    brand: '',
-    model: '',
-    serialNumber: '',
-    condition: '',
-    value: '',
-    notes: '',
-    image: null,
+    type: editItem?.type || '',
+    brand: editItem?.brand || '',
+    model: editItem?.model || '',
+    serialNumber: editItem?.serialNumber || '',
+    condition: editItem?.condition || '',
+    value: editItem?.value || '',
+    notes: editItem?.notes || '',
+    image: editItem?.image || null,
   });
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: isEditing ? 'Edit Instrument' : 'Add Instrument'
+    });
+  }, [navigation, isEditing]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -39,40 +66,62 @@ export default function AddInstrumentScreen({ navigation }) {
       const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
       const inventory = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
       
-      const newInstrument = {
-        ...instrument,
-        id: Date.now(),
-      };
-      
-      inventory.push(newInstrument);
-      await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
-      
-      Alert.alert('Success', 'Instrument added to inventory', [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      if (isEditing) {
+        const updatedInventory = inventory.map(item => 
+          item.id === editItem.id ? { ...instrument, id: editItem.id } : item
+        );
+        await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updatedInventory));
+        Alert.alert('Success', 'Instrument updated successfully', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      } else {
+        const newInstrument = {
+          ...instrument,
+          id: Date.now(),
+        };
+        inventory.push(newInstrument);
+        await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
+        Alert.alert('Success', 'Instrument added to inventory', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to save instrument');
     }
   };
+
+  const renderPicker = (items, selectedValue, onValueChange, placeholder) => (
+    <View style={styles.pickerContainer}>
+      {items.map((item) => (
+        <TouchableOpacity
+          key={item.value}
+          style={[
+            styles.pickerItem,
+            selectedValue === item.value && styles.pickerItemSelected
+          ]}
+          onPress={() => onValueChange(item.value)}
+        >
+          <Text style={[
+            styles.pickerText,
+            selectedValue === item.value && styles.pickerTextSelected
+          ]}>
+            {item.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Add Instrument</Text>
       
       <Text style={styles.label}>Instrument Type *</Text>
-      <Picker
-        selectedValue={instrument.type}
-        onValueChange={(value) => setInstrument({ ...instrument, type: value })}
-        style={styles.picker}
-      >
-        <Picker.Item label="Select Type" value="" />
-        <Picker.Item label="Guitar" value="Guitar" />
-        <Picker.Item label="Bass" value="Bass" />
-        <Picker.Item label="Drums" value="Drums" />
-        <Picker.Item label="Piano" value="Piano" />
-        <Picker.Item label="Violin" value="Violin" />
-        <Picker.Item label="Other" value="Other" />
-      </Picker>
+      {renderPicker(
+        INSTRUMENT_TYPES,
+        instrument.type,
+        (value) => setInstrument({ ...instrument, type: value })
+      )}
       
       <Text style={styles.label}>Make *</Text>
       <TextInput
@@ -99,18 +148,11 @@ export default function AddInstrumentScreen({ navigation }) {
       />
       
       <Text style={styles.label}>Condition *</Text>
-      <Picker
-        selectedValue={instrument.condition}
-        onValueChange={(value) => setInstrument({ ...instrument, condition: value })}
-        style={styles.picker}
-      >
-        <Picker.Item label="Select Condition" value="" />
-        <Picker.Item label="New" value="New" />
-        <Picker.Item label="Excellent" value="Excellent" />
-        <Picker.Item label="Good" value="Good" />
-        <Picker.Item label="Fair" value="Fair" />
-        <Picker.Item label="Poor" value="Poor" />
-      </Picker>
+      {renderPicker(
+        CONDITIONS,
+        instrument.condition,
+        (value) => setInstrument({ ...instrument, condition: value })
+      )}
       
       <Text style={styles.label}>Estimated Value ($)</Text>
       <TextInput
@@ -140,7 +182,7 @@ export default function AddInstrumentScreen({ navigation }) {
       )}
       
       <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-        <Text style={styles.saveButtonText}>Add to Inventory</Text>
+        <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -177,10 +219,28 @@ const styles = StyleSheet.create({
     height: 80,
     textAlignVertical: 'top',
   },
-  picker: {
+  pickerContainer: {
     backgroundColor: 'white',
-    marginBottom: 15,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 15,
+  },
+  pickerItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  pickerItemSelected: {
+    backgroundColor: '#007bff',
+  },
+  pickerText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  pickerTextSelected: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   imageButton: {
     backgroundColor: '#6c757d',

@@ -7,8 +7,11 @@ export default function InventoryScreen({ navigation }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    loadInventory();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadInventory();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const loadInventory = async () => {
     try {
@@ -19,6 +22,10 @@ export default function InventoryScreen({ navigation }) {
     } catch (error) {
       console.error('Error loading inventory:', error);
     }
+  };
+
+  const editItem = (item) => {
+    navigation.navigate('AddInstrument', { editItem: item });
   };
 
   const deleteItem = async (id) => {
@@ -62,12 +69,20 @@ export default function InventoryScreen({ navigation }) {
         {item.notes && <Text style={styles.itemNotes}>Notes: {item.notes}</Text>}
       </View>
       
-      <TouchableOpacity 
-        style={styles.deleteButton} 
-        onPress={() => deleteItem(item.id)}
-      >
-        <Text style={styles.deleteButtonText}>Delete</Text>
-      </TouchableOpacity>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity 
+          style={styles.editButton} 
+          onPress={() => editItem(item)}
+        >
+          <Text style={styles.editButtonText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.deleteButton} 
+          onPress={() => deleteItem(item.id)}
+        >
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -180,15 +195,33 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 5,
   },
+  actionButtons: {
+    flexDirection: 'column',
+    gap: 5,
+  },
+  editButton: {
+    backgroundColor: '#ffc107',
+    padding: 8,
+    borderRadius: 4,
+    minWidth: 50,
+  },
+  editButtonText: {
+    color: '#212529',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   deleteButton: {
     backgroundColor: '#dc3545',
     padding: 8,
     borderRadius: 4,
+    minWidth: 50,
   },
   deleteButtonText: {
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   emptyContainer: {
     flex: 1,

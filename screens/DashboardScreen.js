@@ -7,8 +7,11 @@ export default function DashboardScreen({ navigation }) {
   const [stats, setStats] = useState({ totalItems: 0, totalValue: 0 });
 
   useEffect(() => {
-    loadUserAndStats();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadUserAndStats();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const loadUserAndStats = async () => {
     try {
