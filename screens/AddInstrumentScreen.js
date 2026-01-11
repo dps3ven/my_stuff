@@ -25,7 +25,7 @@ const CONDITIONS = [
 export default function AddInstrumentScreen({ navigation, route }) {
   const editItem = route?.params?.editItem;
   const isEditing = !!editItem;
-  
+
   const [instrument, setInstrument] = useState({
     type: editItem?.type || '',
     brand: editItem?.brand || '',
@@ -67,9 +67,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
     try {
       const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
       const inventory = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
-      
+
       if (isEditing) {
-        const updatedInventory = inventory.map(item => 
+        const updatedInventory = inventory.map(item =>
           item.id === editItem.id ? { ...instrument, id: editItem.id } : item
         );
         await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updatedInventory));
@@ -94,7 +94,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
   const renderCollapsiblePicker = (items, selectedValue, onValueChange, isVisible, setVisible) => (
     <View>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.pickerButton}
         onPress={() => setVisible(!isVisible)}
       >
@@ -124,87 +124,79 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         scrollEnabled={true}
         nestedScrollEnabled={true}
       >
-      <Text style={styles.title}>Add Instrument</Text>
-      
-      <Text style={styles.label}>Instrument Type *</Text>
-      {renderCollapsiblePicker(
-        INSTRUMENT_TYPES,
-        instrument.type,
-        (value) => setInstrument({ ...instrument, type: value }),
-        showTypePicker,
-        setShowTypePicker
-      )}
-      
-      <Text style={styles.label}>Make *</Text>
-      <TextInput
-        style={styles.input}
-        value={instrument.brand}
-        onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
-        placeholder="Enter make/brand"
-      />
-      
-      <Text style={styles.label}>Model *</Text>
-      <TextInput
-        style={styles.input}
-        value={instrument.model}
-        onChangeText={(text) => setInstrument({ ...instrument, model: text })}
-        placeholder="Enter model"
-      />
-      
-      <Text style={styles.label}>Serial Number</Text>
-      <TextInput
-        style={styles.input}
-        value={instrument.serialNumber}
-        onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
-        placeholder="Enter serial number"
-      />
-      
-      <Text style={styles.label}>Condition *</Text>
-      {renderCollapsiblePicker(
-        CONDITIONS,
-        instrument.condition,
-        (value) => setInstrument({ ...instrument, condition: value }),
-        showConditionPicker,
-        setShowConditionPicker
-      )}
-      
-      <Text style={styles.label}>Estimated Value ($)</Text>
-      <TextInput
-        style={styles.input}
-        value={instrument.value}
-        onChangeText={(text) => setInstrument({ ...instrument, value: text })}
-        placeholder="Enter value"
-        keyboardType="numeric"
-      />
-      
-      <Text style={styles.label}>Notes</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        value={instrument.notes}
-        onChangeText={(text) => setInstrument({ ...instrument, notes: text })}
-        placeholder="Additional details, repairs needed, etc."
-        multiline
-        numberOfLines={3}
-      />
-      
-      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-        <Text style={styles.imageButtonText}>Pick Image</Text>
-      </TouchableOpacity>
-      
-      {instrument.image && (
-        <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
-      )}
-      
-      <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-        <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
-      </TouchableOpacity>
+        <Text style={styles.title}>Add Instrument</Text>
+
+        <Text style={styles.label}>Instrument Type *</Text>
+        {renderCollapsiblePicker(
+          INSTRUMENT_TYPES,
+          instrument.type,
+          (value) => setInstrument({ ...instrument, type: value }),
+          showTypePicker,
+          setShowTypePicker
+        )}
+
+        <Text style={styles.label}>Make *</Text>
+        <TextInput
+          style={styles.input}
+          value={instrument.brand}
+          onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
+          placeholder="Enter make/brand"
+        />
+
+        <Text style={styles.label}>Model *</Text>
+        <TextInput
+          style={styles.input}
+          value={instrument.model}
+          onChangeText={(text) => setInstrument({ ...instrument, model: text })}
+          placeholder="Enter model"
+        />
+
+        <Text style={styles.label}>Serial Number</Text>
+        <TextInput
+          style={styles.input}
+          value={instrument.serialNumber}
+          onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
+          placeholder="Enter serial number"
+        />
+
+        <Text style={styles.label}>Condition *</Text>
+        {renderCollapsiblePicker(
+          CONDITIONS,
+          instrument.condition,
+          (value) => setInstrument({ ...instrument, condition: value }),
+          showConditionPicker,
+          setShowConditionPicker
+        )}
+
+        <Text style={styles.label}>Estimated Value ($)</Text>
+        <TextInput
+          style={styles.input}
+          value={instrument.value}
+          onChangeText={(text) => setInstrument({ ...instrument, value: text })}
+          placeholder="Enter value"
+          keyboardType="numeric"
+        />
+
+
+
+        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+          <Text style={styles.imageButtonText}>Pick Image</Text>
+        </TouchableOpacity>
+
+        {instrument.image && (
+          <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
+        )}
+
+        <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
+          <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
