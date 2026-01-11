@@ -123,14 +123,13 @@ export default function AddInstrumentScreen({ navigation, route }) {
   );
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={styles.container}>
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
       >
       <Text style={styles.title}>Add Instrument</Text>
       
@@ -207,7 +206,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
       </TouchableOpacity>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -215,16 +214,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965ff',
-    height: Platform.OS === 'web' ? '100vh' : undefined,
   },
   scrollView: {
     flex: 1,
-    maxHeight: Platform.OS === 'web' ? '100vh' : undefined,
   },
   scrollContent: {
+    flexGrow: 1,
     padding: 20,
-    paddingBottom: 40,
-    minHeight: Platform.OS === 'web' ? '100vh' : undefined,
+    paddingBottom: 100,
   },
   title: {
     fontSize: 24,
