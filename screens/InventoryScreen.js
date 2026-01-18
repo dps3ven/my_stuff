@@ -161,8 +161,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   itemImage: {
-    width: 80,
-    height: 60,
+    width: 120,
+    height: 120,
     borderRadius: 6,
     marginRight: 15,
   },
