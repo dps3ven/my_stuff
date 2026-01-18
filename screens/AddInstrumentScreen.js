@@ -46,160 +46,186 @@ export default function AddInstrumentScreen({ navigation, route }) {
   }, [navigation, isEditing]);
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    // No permissions request is necessary for launching the image library.
+    // Manually request permissions for videos on iOS when `allowsEditing` is set to `false`
+    // and `videoExportPreset` is `'Passthrough'` (the default), ideally before launching the picker
+    // so the app users aren't surprised by a system dialog after picking a video.
+    // See "Invoke permissions for videos" sub section for more details.
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert('Permission required', 'Permission to access the media library is required.');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
+    console.log(result);
+
     if (!result.canceled) {
-      setInstrument({ ...instrument, image: result.assets[0].uri });
+      setImage(result.assets[0].uri);
     }
   };
-
-  const saveInstrument = async () => {
-    if (!instrument.type || !instrument.brand || !instrument.model) {
-      Alert.alert('Error', 'Please fill in required fields');
-      return;
-    }
-
-    try {
-      const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
-      const inventory = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
-
-      if (isEditing) {
-        const updatedInventory = inventory.map(item =>
-          item.id === editItem.id ? { ...instrument, id: editItem.id } : item
-        );
-        await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updatedInventory));
-        Alert.alert('Success', 'Instrument updated successfully', [
-          { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
-      } else {
-        const newInstrument = {
-          ...instrument,
-          id: Date.now(),
-        };
-        inventory.push(newInstrument);
-        await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
-        Alert.alert('Success', 'Instrument added to inventory', [
-          { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save instrument');
-    }
-  };
-
-  const renderCollapsiblePicker = (items, selectedValue, onValueChange, isVisible, setVisible) => (
-    <View>
-      <TouchableOpacity
-        style={styles.pickerButton}
-        onPress={() => setVisible(!isVisible)}
-      >
-        <Text style={styles.pickerButtonText}>
-          {selectedValue || items[0].label}
-        </Text>
-        <Text style={styles.pickerArrow}>{isVisible ? '▲' : '▼'}</Text>
-      </TouchableOpacity>
-      {isVisible && (
-        <View style={styles.pickerContainer}>
-          {items.map((item) => (
-            <TouchableOpacity
-              key={item.value}
-              style={styles.pickerItem}
-              onPress={() => {
-                onValueChange(item.value);
-                setVisible(false);
-              }}
-            >
-              <Text style={styles.pickerText}>{item.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </View>
-  );
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        scrollEnabled={true}
-        nestedScrollEnabled={true}
-      >
-        <Text style={styles.title}>Add Instrument</Text>
-
-        <Text style={styles.label}>Instrument Type *</Text>
-        {renderCollapsiblePicker(
-          INSTRUMENT_TYPES,
-          instrument.type,
-          (value) => setInstrument({ ...instrument, type: value }),
-          showTypePicker,
-          setShowTypePicker
-        )}
-
-        <Text style={styles.label}>Make *</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.brand}
-          onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
-          placeholder="Enter make/brand"
-        />
-
-        <Text style={styles.label}>Model *</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.model}
-          onChangeText={(text) => setInstrument({ ...instrument, model: text })}
-          placeholder="Enter model"
-        />
-
-        <Text style={styles.label}>Serial Number</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.serialNumber}
-          onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
-          placeholder="Enter serial number"
-        />
-
-        <Text style={styles.label}>Condition *</Text>
-        {renderCollapsiblePicker(
-          CONDITIONS,
-          instrument.condition,
-          (value) => setInstrument({ ...instrument, condition: value }),
-          showConditionPicker,
-          setShowConditionPicker
-        )}
-
-        <Text style={styles.label}>Estimated Value ($)</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.value}
-          onChangeText={(text) => setInstrument({ ...instrument, value: text })}
-          placeholder="Enter value"
-          keyboardType="numeric"
-        />
-
-
-
-        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-          <Text style={styles.imageButtonText}>Pick Image</Text>
-        </TouchableOpacity>
-
-        {instrument.image && (
-          <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
-        )}
-
-        <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-          <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      <Button title="Pick an image from camera roll" onPress={pickImage} />
+      {image && <Image source={{ uri: image }} style={styles.image} />}
     </View>
   );
+
+  if (!result.canceled) {
+    setInstrument({ ...instrument, image: result.assets[0].uri });
+  }
+};
+
+const saveInstrument = async () => {
+  if (!instrument.type || !instrument.brand || !instrument.model) {
+    Alert.alert('Error', 'Please fill in required fields');
+    return;
+  }
+
+  try {
+    const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
+    const inventory = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
+
+    if (isEditing) {
+      const updatedInventory = inventory.map(item =>
+        item.id === editItem.id ? { ...instrument, id: editItem.id } : item
+      );
+      await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updatedInventory));
+      Alert.alert('Success', 'Instrument updated successfully', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+    } else {
+      const newInstrument = {
+        ...instrument,
+        id: Date.now(),
+      };
+      inventory.push(newInstrument);
+      await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
+      Alert.alert('Success', 'Instrument added to inventory', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+    }
+  } catch (error) {
+    Alert.alert('Error', 'Failed to save instrument');
+  }
+};
+
+const renderCollapsiblePicker = (items, selectedValue, onValueChange, isVisible, setVisible) => (
+  <View>
+    <TouchableOpacity
+      style={styles.pickerButton}
+      onPress={() => setVisible(!isVisible)}
+    >
+      <Text style={styles.pickerButtonText}>
+        {selectedValue || items[0].label}
+      </Text>
+      <Text style={styles.pickerArrow}>{isVisible ? '▲' : '▼'}</Text>
+    </TouchableOpacity>
+    {isVisible && (
+      <View style={styles.pickerContainer}>
+        {items.map((item) => (
+          <TouchableOpacity
+            key={item.value}
+            style={styles.pickerItem}
+            onPress={() => {
+              onValueChange(item.value);
+              setVisible(false);
+            }}
+          >
+            <Text style={styles.pickerText}>{item.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    )}
+  </View>
+);
+
+return (
+  <View style={styles.container}>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+      scrollEnabled={true}
+      nestedScrollEnabled={true}
+    >
+      <Text style={styles.title}>Add Instrument</Text>
+
+      <Text style={styles.label}>Instrument Type *</Text>
+      {renderCollapsiblePicker(
+        INSTRUMENT_TYPES,
+        instrument.type,
+        (value) => setInstrument({ ...instrument, type: value }),
+        showTypePicker,
+        setShowTypePicker
+      )}
+
+      <Text style={styles.label}>Make *</Text>
+      <TextInput
+        style={styles.input}
+        value={instrument.brand}
+        onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
+        placeholder="Enter make/brand"
+      />
+
+      <Text style={styles.label}>Model *</Text>
+      <TextInput
+        style={styles.input}
+        value={instrument.model}
+        onChangeText={(text) => setInstrument({ ...instrument, model: text })}
+        placeholder="Enter model"
+      />
+
+      <Text style={styles.label}>Serial Number</Text>
+      <TextInput
+        style={styles.input}
+        value={instrument.serialNumber}
+        onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
+        placeholder="Enter serial number"
+      />
+
+      <Text style={styles.label}>Condition *</Text>
+      {renderCollapsiblePicker(
+        CONDITIONS,
+        instrument.condition,
+        (value) => setInstrument({ ...instrument, condition: value }),
+        showConditionPicker,
+        setShowConditionPicker
+      )}
+
+      <Text style={styles.label}>Estimated Value ($)</Text>
+      <TextInput
+        style={styles.input}
+        value={instrument.value}
+        onChangeText={(text) => setInstrument({ ...instrument, value: text })}
+        placeholder="Enter value"
+        keyboardType="numeric"
+      />
+
+
+
+      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+        <Text style={styles.imageButtonText}>Pick Image</Text>
+      </TouchableOpacity>
+
+      {instrument.image && (
+        <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
+      )}
+
+      <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
+        <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
