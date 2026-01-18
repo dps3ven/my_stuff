@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, ScrollView, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function InventoryScreen({ navigation }) {
@@ -87,36 +87,50 @@ export default function InventoryScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Inventory</Text>
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={() => navigation.navigate('AddInstrument')}
-        >
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-      
-      {inventory.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No instruments added yet</Text>
-          <TouchableOpacity 
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('AddInstrument')}
-          >
-            <Text style={styles.buttonText}>Add Your First Instrument</Text>
-          </TouchableOpacity>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Inventory</Text>
+            <TouchableOpacity 
+              style={styles.addButton}
+              onPress={() => navigation.navigate('AddInstrument')}
+            >
+              <Text style={styles.addButtonText}>Add</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {inventory.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No instruments added yet</Text>
+              <TouchableOpacity 
+                style={styles.primaryButton}
+                onPress={() => navigation.navigate('AddInstrument')}
+              >
+                <Text style={styles.buttonText}>Add Your First Instrument</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={inventory}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+
+          {/* Add a TextInput at the bottom to demonstrate scrolling */}
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginTop: 20 }}
+            placeholder="Type here..."
+            onFocus={() => console.log('Focused on the text input')}
+          />
         </View>
-      ) : (
-        <FlatList
-          data={inventory}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -161,8 +175,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   itemImage: {
-    width: 80,
-    height: 60,
+    width: 120,
+    height: 120,
     borderRadius: 6,
     marginRight: 15,
   },
