@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function InventoryScreen({ navigation }) {
@@ -121,13 +121,6 @@ export default function InventoryScreen({ navigation }) {
             contentContainerStyle={{ paddingBottom: 20 }}
           />
         )}
-
-        {/* Add a TextInput at the bottom to demonstrate scrolling */}
-        <TextInput
-          style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginTop: 20 }}
-          placeholder="Type here..."
-          onFocus={() => console.log('Focused on the text input')}
-        />
       </View>
     </KeyboardAvoidingView>
   );
