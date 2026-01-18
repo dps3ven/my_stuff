@@ -17,11 +17,11 @@ export default function DashboardScreen({ navigation }) {
     try {
       const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
       setUser(currentUser);
-      
+
       const inventory = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
       const totalItems = inventory.length;
       const totalValue = inventory.reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
-      
+
       setStats({ totalItems, totalValue });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -38,16 +38,11 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Dashboard</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-      
+
+
       <Text style={styles.welcome}>Hello, {user?.name}!</Text>
       <Text style={styles.subtitle}>Manage your musical instrument inventory</Text>
-      
+
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{stats.totalItems}</Text>
@@ -58,20 +53,26 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.statLabel}>Total Value</Text>
         </View>
       </View>
-      
+
       <View style={styles.actions}>
-        <TouchableOpacity 
-          style={[styles.button, styles.successButton]} 
+        <TouchableOpacity
+          style={[styles.button, styles.successButton]}
           onPress={() => navigation.navigate('AddInstrument')}
         >
           <Text style={styles.buttonText}>Add Instrument</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.button, styles.primaryButton]} 
+
+        <TouchableOpacity
+          style={[styles.button, styles.primaryButton]}
           onPress={() => navigation.navigate('Inventory')}
         >
           <Text style={styles.buttonText}>View Inventory</Text>
+        </TouchableOpacity>
+                <TouchableOpacity
+          style={[styles.button, styles.primaryButton]}
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </View>
