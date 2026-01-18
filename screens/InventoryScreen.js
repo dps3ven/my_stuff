@@ -118,7 +118,7 @@ export default function InventoryScreen({ navigation }) {
               data={inventory}
               renderItem={renderItem}
               keyExtractor={(item) => item.id.toString()}
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={true}
             />
           )}
 
