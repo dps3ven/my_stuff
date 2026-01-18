@@ -123,82 +123,85 @@ export default function AddInstrumentScreen({ navigation, route }) {
   );
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        scrollEnabled={true}
-        nestedScrollEnabled={true}
-      >
-        <Text style={styles.title}>Add Instrument</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
+        >
+          <Text style={styles.title}>Add Instrument</Text>
 
-        <Text style={styles.label}>Instrument Type *</Text>
-        {renderCollapsiblePicker(
-          INSTRUMENT_TYPES,
-          instrument.type,
-          (value) => setInstrument({ ...instrument, type: value }),
-          showTypePicker,
-          setShowTypePicker
-        )}
+          <Text style={styles.label}>Instrument Type *</Text>
+          {renderCollapsiblePicker(
+            INSTRUMENT_TYPES,
+            instrument.type,
+            (value) => setInstrument({ ...instrument, type: value }),
+            showTypePicker,
+            setShowTypePicker
+          )}
 
-        <Text style={styles.label}>Make *</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.brand}
-          onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
-          placeholder="Enter make/brand"
-        />
+          <Text style={styles.label}>Make *</Text>
+          <TextInput
+            style={styles.input}
+            value={instrument.brand}
+            onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
+            placeholder="Enter make/brand"
+          />
 
-        <Text style={styles.label}>Model *</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.model}
-          onChangeText={(text) => setInstrument({ ...instrument, model: text })}
-          placeholder="Enter model"
-        />
+          <Text style={styles.label}>Model *</Text>
+          <TextInput
+            style={styles.input}
+            value={instrument.model}
+            onChangeText={(text) => setInstrument({ ...instrument, model: text })}
+            placeholder="Enter model"
+          />
 
-        <Text style={styles.label}>Serial Number</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.serialNumber}
-          onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
-          placeholder="Enter serial number"
-        />
+          <Text style={styles.label}>Serial Number</Text>
+          <TextInput
+            style={styles.input}
+            value={instrument.serialNumber}
+            onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
+            placeholder="Enter serial number"
+          />
 
-        <Text style={styles.label}>Condition *</Text>
-        {renderCollapsiblePicker(
-          CONDITIONS,
-          instrument.condition,
-          (value) => setInstrument({ ...instrument, condition: value }),
-          showConditionPicker,
-          setShowConditionPicker
-        )}
+          <Text style={styles.label}>Condition *</Text>
+          {renderCollapsiblePicker(
+            CONDITIONS,
+            instrument.condition,
+            (value) => setInstrument({ ...instrument, condition: value }),
+            showConditionPicker,
+            setShowConditionPicker
+          )}
 
-        <Text style={styles.label}>Estimated Value ($)</Text>
-        <TextInput
-          style={styles.input}
-          value={instrument.value}
-          onChangeText={(text) => setInstrument({ ...instrument, value: text })}
-          placeholder="Enter value"
-          keyboardType="numeric"
-        />
+          <Text style={styles.label}>Estimated Value ($)</Text>
+          <TextInput
+            style={styles.input}
+            value={instrument.value}
+            onChangeText={(text) => setInstrument({ ...instrument, value: text })}
+            placeholder="Enter value"
+            keyboardType="numeric"
+          />
 
+          <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+            <Text style={styles.imageButtonText}>Pick Image</Text>
+          </TouchableOpacity>
 
+          {instrument.image && (
+            <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
+          )}
 
-        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-          <Text style={styles.imageButtonText}>Pick Image</Text>
-        </TouchableOpacity>
-
-        {instrument.image && (
-          <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
-        )}
-
-        <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-          <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+          <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
+            <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
