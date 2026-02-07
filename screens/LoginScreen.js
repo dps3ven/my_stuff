@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../utils/storage';
 import CryptoJS from 'crypto-js';
 
 export default function LoginScreen({ navigation }) {
@@ -22,12 +22,12 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
+      const users = JSON.parse(await storage.getItem('users') || '[]');
       const hashedPassword = CryptoJS.SHA256(password).toString();
       const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && (u.password === hashedPassword || u.password === password));
       
       if (user) {
-        await AsyncStorage.setItem('currentUser', JSON.stringify(user));
+        await storage.setItem('currentUser', JSON.stringify(user));
         navigation.navigate('Dashboard');
       } else {
         Alert.alert('Error', 'Invalid username or password');
@@ -39,7 +39,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleSignup = async () => {
     try {
-      const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
+      const users = JSON.parse(await storage.getItem('users') || '[]');
       
       if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
         Alert.alert('Error', 'Username already exists');
@@ -49,8 +49,8 @@ export default function LoginScreen({ navigation }) {
       const hashedPassword = CryptoJS.SHA256(password).toString();
       const newUser = { name, username: username.toLowerCase(), password: hashedPassword, id: Date.now() };
       users.push(newUser);
-      await AsyncStorage.setItem('users', JSON.stringify(users));
-      await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
+      await storage.setItem('users', JSON.stringify(users));
+      await storage.setItem('currentUser', JSON.stringify(newUser));
       navigation.navigate('Dashboard');
     } catch (error) {
       Alert.alert('Error', 'Signup failed');
@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#133965ff',
     height: Platform.OS === 'web' ? '100vh' : undefined,
+    alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
   },
   scrollContent: {
     flexGrow: 1,
@@ -130,9 +131,11 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 100,
     minHeight: Platform.OS === 'web' ? '100vh' : undefined,
+    width: Platform.OS === 'web' ? '100%' : '100%',
+    maxWidth: Platform.OS === 'web' ? 500 : '100%',
   },
   title: {
-    fontSize: 32,
+    fontSize: Platform.OS === 'web' ? 48 : 32,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 40,
@@ -140,11 +143,12 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white',
-    padding: 15,
+    padding: Platform.OS === 'web' ? 18 : 15,
     marginBottom: 15,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
+    fontSize: Platform.OS === 'web' ? 18 : 16,
   },
   passwordContainer: {
     flexDirection: 'row',

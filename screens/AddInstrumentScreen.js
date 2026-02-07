@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../utils/storage';
 
 const INSTRUMENT_TYPES = [
   { label: 'Select Type', value: '' },
@@ -65,14 +65,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
     }
 
     try {
-      const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
-      const inventory = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
+      const currentUser = JSON.parse(await storage.getItem('currentUser'));
+      const inventory = JSON.parse(await storage.getItem(`inventory_${currentUser.id}`) || '[]');
 
       if (isEditing) {
         const updatedInventory = inventory.map(item =>
           item.id === editItem.id ? { ...instrument, id: editItem.id } : item
         );
-        await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updatedInventory));
+        await storage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updatedInventory));
         Alert.alert('Success', 'Instrument updated successfully', [
           { text: 'OK', onPress: () => navigation.goBack() }
         ]);
@@ -82,7 +82,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
           id: Date.now(),
         };
         inventory.push(newInstrument);
-        await AsyncStorage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
+        await storage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
         Alert.alert('Success', 'Instrument added to inventory', [
           { text: 'OK', onPress: () => navigation.goBack() }
         ]);
