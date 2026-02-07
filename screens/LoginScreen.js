@@ -9,6 +9,7 @@ export default function LoginScreen({ navigation }) {
   const [isSignup, setIsSignup] = useState(false);
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -16,11 +17,13 @@ export default function LoginScreen({ navigation }) {
       setPassword('');
       setName('');
       setIsSignup(false);
+      setErrorMessage('');
     });
     return unsubscribe;
   }, [navigation]);
 
   const handleLogin = async () => {
+    setErrorMessage('');
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
       const hashedPassword = CryptoJS.SHA256(password).toString();
@@ -30,19 +33,32 @@ export default function LoginScreen({ navigation }) {
         await storage.setItem('currentUser', JSON.stringify(user));
         navigation.navigate('Dashboard');
       } else {
-        Alert.alert('Error', 'Invalid username or password');
+        if (Platform.OS === 'web') {
+          setErrorMessage('Invalid username or password');
+        } else {
+          Alert.alert('Error', 'Invalid username or password');
+        }
       }
     } catch (error) {
-      Alert.alert('Error', 'Login failed');
+      if (Platform.OS === 'web') {
+        setErrorMessage('Login failed');
+      } else {
+        Alert.alert('Error', 'Login failed');
+      }
     }
   };
 
   const handleSignup = async () => {
+    setErrorMessage('');
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
       
       if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-        Alert.alert('Error', 'Username already exists');
+        if (Platform.OS === 'web') {
+          setErrorMessage('Username already exists');
+        } else {
+          Alert.alert('Error', 'Username already exists');
+        }
         return;
       }
       
@@ -53,7 +69,11 @@ export default function LoginScreen({ navigation }) {
       await storage.setItem('currentUser', JSON.stringify(newUser));
       navigation.navigate('Dashboard');
     } catch (error) {
-      Alert.alert('Error', 'Signup failed');
+      if (Platform.OS === 'web') {
+        setErrorMessage('Signup failed');
+      } else {
+        Alert.alert('Error', 'Signup failed');
+      }
     }
   };
 
@@ -108,10 +128,20 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.buttonText}>{isSignup ? 'Sign Up' : 'Login'}</Text>
       </TouchableOpacity>
       
+      {errorMessage ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      ) : null}
+      
       <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
         <Text style={styles.link}>
           {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign up"}
         </Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity onPress={() => Alert.alert('Login Help', 'To login, enter your username and password.\n\nForgot your password? Contact support or create a new account.\n\nNew user? Click "Sign up" to create an account.')}>
+        <Text style={styles.helpLink}>Need help?</Text>
       </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -185,5 +215,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#007bff',
     textDecorationLine: 'underline',
+  },
+  helpLink: {
+    textAlign: 'center',
+    color: '#ffc107',
+    textDecorationLine: 'underline',
+    marginTop: 15,
+    fontSize: Platform.OS === 'web' ? 16 : 14,
+  },
+  errorContainer: {
+    backgroundColor: '#f8d7da',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#f5c6cb',
+  },
+  errorText: {
+    color: '#721c24',
+    textAlign: 'center',
+    fontSize: Platform.OS === 'web' ? 16 : 14,
+    fontWeight: '600',
   },
 });
