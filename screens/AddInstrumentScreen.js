@@ -209,35 +209,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965ff',
+    alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
   },
   scrollView: {
     flex: 1,
+    width: Platform.OS === 'web' ? '100%' : '100%',
+    maxWidth: Platform.OS === 'web' ? 700 : '100%',
   },
   scrollContent: {
-    flexGrow: 1,
     padding: 20,
     paddingBottom: 100,
   },
   title: {
-    fontSize: 24,
+    fontSize: Platform.OS === 'web' ? 36 : 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
     color: '#fff',
   },
   label: {
-    fontSize: 16,
+    fontSize: Platform.OS === 'web' ? 18 : 16,
     fontWeight: 'bold',
     marginBottom: 5,
     color: '#fff',
   },
   input: {
     backgroundColor: 'white',
-    padding: 15,
+    padding: Platform.OS === 'web' ? 18 : 15,
     marginBottom: 15,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
+    fontSize: Platform.OS === 'web' ? 18 : 16,
   },
   textArea: {
     height: 80,
