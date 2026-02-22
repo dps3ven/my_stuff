@@ -123,6 +123,12 @@ export default function InventoryScreen({ navigation }) {
             >
               <Text style={styles.buttonText}>Add Your First Instrument</Text>
             </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.logoutLink}
+              onPress={() => navigation.navigate('Login')}
+            >
+              <Text style={styles.logoutLinkText}>Logout</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <FlatList
@@ -260,5 +266,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  logoutLink: {
+    marginTop: 15,
+  },
+  logoutLinkText: {
+    color: '#fff',
+    fontSize: 16,
+    textDecorationLine: 'underline',
   },
 });
