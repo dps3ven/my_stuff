@@ -77,9 +77,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
           item.id === editItem.id ? { ...instrument, id: editItem.id } : item
         );
         await storage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updatedInventory));
-        Alert.alert('Success', 'Instrument updated successfully', [
-          { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
+        navigation.navigate('Dashboard');
       } else {
         const newInstrument = {
           ...instrument,
