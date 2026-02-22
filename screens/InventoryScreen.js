@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../utils/storage';
 
 export default function InventoryScreen({ navigation }) {
   const [inventory, setInventory] = useState([]);
@@ -15,9 +15,9 @@ export default function InventoryScreen({ navigation }) {
 
   const loadInventory = async () => {
     try {
-      const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
+      const currentUser = JSON.parse(await storage.getItem('currentUser'));
       setUser(currentUser);
-      const inventoryData = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
+      const inventoryData = JSON.parse(await storage.getItem(`inventory_${currentUser.id}`) || '[]');
       setInventory(inventoryData);
     } catch (error) {
       console.error('Error loading inventory:', error);
@@ -29,26 +29,17 @@ export default function InventoryScreen({ navigation }) {
   };
 
   const deleteItem = async (id) => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const updatedInventory = inventory.filter(item => item.id !== id);
-              setInventory(updatedInventory);
-              await AsyncStorage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete item');
-            }
-          }
-        }
-      ]
-    );
+    try {
+      const updatedInventory = inventory.filter(item => item.id !== id);
+      setInventory(updatedInventory);
+      await storage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
+    } catch (error) {
+      if (Platform.OS === 'web') {
+        alert('Failed to delete item');
+      } else {
+        Alert.alert('Error', 'Failed to delete item');
+      }
+    }
   };
 
   const renderItem = ({ item }) => (
