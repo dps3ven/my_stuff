@@ -106,12 +106,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   welcome: {
-    fontSize: 24,
+    fontSize: 32,
     textAlign: 'center',
     marginBottom: 10,
     color: '#fff',
   },
   subtitle: {
+    fontSize: 18,
     textAlign: 'center',
     color: '#fff',
     marginBottom: 40,
