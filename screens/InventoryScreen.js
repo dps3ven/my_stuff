@@ -29,16 +29,37 @@ export default function InventoryScreen({ navigation }) {
   };
 
   const deleteItem = async (id) => {
-    try {
-      const updatedInventory = inventory.filter(item => item.id !== id);
-      setInventory(updatedInventory);
-      await storage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
-    } catch (error) {
-      if (Platform.OS === 'web') {
-        alert('Failed to delete item');
-      } else {
-        Alert.alert('Error', 'Failed to delete item');
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to delete this item?')) {
+        try {
+          const updatedInventory = inventory.filter(item => item.id !== id);
+          setInventory(updatedInventory);
+          await storage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
+        } catch (error) {
+          alert('Failed to delete item');
+        }
       }
+    } else {
+      Alert.alert(
+        'Delete Item',
+        'Are you sure you want to delete this item?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                const updatedInventory = inventory.filter(item => item.id !== id);
+                setInventory(updatedInventory);
+                await storage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
+              } catch (error) {
+                Alert.alert('Error', 'Failed to delete item');
+              }
+            }
+          }
+        ]
+      );
     }
   };
 
