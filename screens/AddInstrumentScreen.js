@@ -38,6 +38,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   });
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [showConditionPicker, setShowConditionPicker] = useState(false);
+  const [showImageSide, setShowImageSide] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -55,6 +56,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
     if (!result.canceled) {
       setInstrument({ ...instrument, image: result.assets[0].uri });
+      if (Platform.OS === 'web') {
+        setShowImageSide(true);
+      }
     }
   };
 
@@ -83,9 +87,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         };
         inventory.push(newInstrument);
         await storage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
-        Alert.alert('Success', 'Instrument added to inventory', [
-          { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
+        navigation.navigate('Dashboard');
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to save instrument');
@@ -135,7 +137,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
           scrollEnabled={true}
           nestedScrollEnabled={true}
         >
-          <Text style={styles.title}>Add Instrument</Text>
+          <View style={Platform.OS === 'web' && showImageSide ? styles.contentWrapper : null}>
+            <View style={Platform.OS === 'web' && showImageSide ? styles.formColumn : null}>
+              <Text style={styles.title}>Add Instrument</Text>
 
           <Text style={styles.label}>Instrument Type *</Text>
           {renderCollapsiblePicker(
@@ -188,17 +192,25 @@ export default function AddInstrumentScreen({ navigation, route }) {
             keyboardType="numeric"
           />
 
-          <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-            <Text style={styles.imageButtonText}>Pick Image</Text>
-          </TouchableOpacity>
+              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                <Text style={styles.imageButtonText}>Pick Image</Text>
+              </TouchableOpacity>
 
-          {instrument.image && (
-            <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
-          )}
+              {Platform.OS !== 'web' && instrument.image && (
+                <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
+              )}
 
-          <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-            <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
-          </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
+                <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {Platform.OS === 'web' && showImageSide && instrument.image && (
+              <View style={styles.imageColumn}>
+                <Image source={{ uri: instrument.image }} style={styles.imagePreviewWeb} />
+              </View>
+            )}
+          </View>
         </ScrollView>
       </View>
     </KeyboardAvoidingView>
@@ -311,5 +323,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  contentWrapper: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  formColumn: {
+    flex: 1,
+  },
+  imageColumn: {
+    width: 350,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  imagePreviewWeb: {
+    width: 350,
+    height: 350,
+    borderRadius: 8,
   },
 });
