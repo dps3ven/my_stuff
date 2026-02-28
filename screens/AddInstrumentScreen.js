@@ -227,7 +227,6 @@ export default function AddInstrumentScreen({ navigation, route }) {
                     {instrument.images.map((imageUri, index) => (
                       <View key={index} style={styles.imageCard}>
                         <Image source={{ uri: imageUri }} style={styles.cardImage} />
-                        <Text style={styles.cardLabel}>Image {index + 1}</Text>
                         <TouchableOpacity 
                           style={styles.removeButton} 
                           onPress={() => removeImage(index)}
@@ -266,15 +265,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
                     {instrument.images.map((imageUri, index) => (
                       <View key={index} style={styles.imageCardWeb}>
                         <Image source={{ uri: imageUri }} style={styles.cardImageWeb} />
-                        <View style={styles.imageCardFooter}>
-                          <Text style={styles.cardLabelWeb}>Image {index + 1}</Text>
-                          <TouchableOpacity 
-                            style={styles.removeButtonSmall} 
-                            onPress={() => removeImage(index)}
-                          >
-                            <Text style={styles.removeButtonText}>✕</Text>
-                          </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity 
+                          style={styles.removeButtonSmall} 
+                          onPress={() => removeImage(index)}
+                        >
+                          <Text style={styles.removeButtonText}>✕</Text>
+                        </TouchableOpacity>
                       </View>
                     ))}
                   </View>
@@ -350,7 +346,7 @@ const styles = StyleSheet.create({
   },
   pickerButton: {
     backgroundColor: 'white',
-    padding: 15,
+    padding: Platform.OS === 'web' ? 18 : 15,
     marginBottom: 15,
     borderRadius: 8,
     borderWidth: 1,
@@ -360,7 +356,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pickerButtonText: {
-    fontSize: 16,
+    fontSize: Platform.OS === 'web' ? 18 : 16,
     color: '#333',
   },
   pickerArrow: {
