@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import storage from '../utils/storage';
 
 export default function InventoryScreen({ navigation }) {
   const [inventory, setInventory] = useState([]);
   const [user, setUser] = useState(null);
+  const [groupedInventory, setGroupedInventory] = useState({});
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -19,6 +20,18 @@ export default function InventoryScreen({ navigation }) {
       setUser(currentUser);
       const inventoryData = JSON.parse(await storage.getItem(`inventory_${currentUser.id}`) || '[]');
       setInventory(inventoryData);
+      
+      // Group inventory by instrument type
+      const grouped = inventoryData.reduce((acc, item) => {
+        const type = item.type || 'Other';
+        if (!acc[type]) {
+          acc[type] = [];
+        }
+        acc[type].push(item);
+        return acc;
+      }, {});
+      
+      setGroupedInventory(grouped);
     } catch (error) {
       console.error('Error loading inventory:', error);
     }
@@ -63,40 +76,75 @@ export default function InventoryScreen({ navigation }) {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      {item.image ? (
-        <Image source={{ uri: item.image }} style={styles.itemImage} />
-      ) : (
-        <View style={[styles.itemImage, styles.noImage]}>
-          <Text style={styles.noImageText}>No Image</Text>
+  const renderItem = ({ item }) => {
+    // Get images array - handle both new (images) and old (image) format
+    let imagesToShow = [];
+    if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+      imagesToShow = item.images;
+    } else if (item.image) {
+      imagesToShow = [item.image];
+    }
+
+    return (
+      <View key={item.id} style={styles.itemContainer}>
+        {imagesToShow.length > 0 ? (
+          imagesToShow.length === 1 ? (
+            <Image 
+              source={{ uri: imagesToShow[0] }} 
+              style={styles.itemImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={true}
+              style={styles.imageScroll}
+              nestedScrollEnabled={true}
+            >
+              {imagesToShow.map((imageUri, index) => (
+                <Image 
+                  key={index} 
+                  source={{ uri: imageUri }} 
+                  style={styles.itemImage}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+          )
+        ) : (
+          <View style={[styles.itemImage, styles.noImage]}>
+            <Text style={styles.noImageText}>No Image</Text>
+          </View>
+        )}
+        
+        <View style={styles.itemDetails}>
+          <Text style={styles.itemTitle}>{item.type} - {item.brand} {item.model}</Text>
+          <Text style={styles.itemInfo}>Serial: {item.serialNumber || 'N/A'}</Text>
+          <Text style={styles.itemInfo}>Condition: {item.condition}</Text>
+          <Text style={styles.itemInfo}>Value: ${item.value || 'N/A'}</Text>
+          {imagesToShow.length > 1 && (
+            <Text style={styles.itemInfo}>Images: {imagesToShow.length}</Text>
+          )}
+          {item.notes && <Text style={styles.itemNotes}>Notes: {item.notes}</Text>}
         </View>
-      )}
-      
-      <View style={styles.itemDetails}>
-        <Text style={styles.itemTitle}>{item.type} - {item.brand} {item.model}</Text>
-        <Text style={styles.itemInfo}>Serial: {item.serialNumber || 'N/A'}</Text>
-        <Text style={styles.itemInfo}>Condition: {item.condition}</Text>
-        <Text style={styles.itemInfo}>Value: ${item.value || 'N/A'}</Text>
-        {item.notes && <Text style={styles.itemNotes}>Notes: {item.notes}</Text>}
+        
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={styles.editButton} 
+            onPress={() => editItem(item)}
+          >
+            <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.deleteButton} 
+            onPress={() => deleteItem(item.id)}
+          >
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      
-      <View style={styles.actionButtons}>
-        <TouchableOpacity 
-          style={styles.editButton} 
-          onPress={() => editItem(item)}
-        >
-          <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.deleteButton} 
-          onPress={() => deleteItem(item.id)}
-        >
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -104,41 +152,47 @@ export default function InventoryScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Inventory</Text>
-          <TouchableOpacity 
-            style={styles.addButton}
-            onPress={() => navigation.navigate('AddInstrument')}
-          >
-            <Text style={styles.addButtonText}>Add</Text>
-          </TouchableOpacity>
-        </View>
-        
-        {inventory.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No instruments added yet</Text>
+        <View style={styles.contentWrapper}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Inventory</Text>
             <TouchableOpacity 
-              style={styles.primaryButton}
+              style={styles.addButton}
               onPress={() => navigation.navigate('AddInstrument')}
             >
-              <Text style={styles.buttonText}>Add Your First Instrument</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.logoutLink}
-              onPress={() => navigation.navigate('Login')}
-            >
-              <Text style={styles.logoutLinkText}>Logout</Text>
+              <Text style={styles.addButtonText}>Add</Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <FlatList
-            data={inventory}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={true}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
-        )}
+          
+          {inventory.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No instruments added yet</Text>
+              <TouchableOpacity 
+                style={styles.primaryButton}
+                onPress={() => navigation.navigate('AddInstrument')}
+              >
+                <Text style={styles.buttonText}>Add Your First Instrument</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.logoutLink}
+                onPress={() => navigation.navigate('Login')}
+              >
+                <Text style={styles.logoutLinkText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <ScrollView 
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            >
+              {Object.keys(groupedInventory).sort().map((type) => (
+                <View key={type} style={styles.typeSection}>
+                  <Text style={styles.typeHeader}>{type}</Text>
+                  {groupedInventory[type].map((item) => renderItem({ item }))}
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -147,8 +201,14 @@ export default function InventoryScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#133965ff',
+    alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
+  },
+  contentWrapper: {
+    flex: 1,
+    width: '100%',
+    maxWidth: Platform.OS === 'web' ? 1400 : '100%',
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
@@ -157,23 +217,35 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: Platform.OS === 'web' ? 36 : 28,
     fontWeight: 'bold',
     color: '#fff',
   },
+  typeSection: {
+    marginBottom: 30,
+  },
+  typeHeader: {
+    fontSize: Platform.OS === 'web' ? 28 : 22,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 15,
+    paddingBottom: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(255, 255, 255, 0.3)',
+  },
   addButton: {
     backgroundColor: '#28a745',
-    padding: 10,
+    padding: Platform.OS === 'web' ? 15 : 10,
     borderRadius: 6,
   },
   addButtonText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: Platform.OS === 'web' ? 16 : 14,
     fontWeight: 'bold',
   },
   itemContainer: {
     backgroundColor: 'white',
-    padding: 15,
+    padding: Platform.OS === 'web' ? 20 : 15,
     marginBottom: 15,
     borderRadius: 8,
     flexDirection: 'row',
@@ -184,9 +256,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  imageScroll: {
+    width: Platform.OS === 'web' ? 150 : 120,
+    height: Platform.OS === 'web' ? 150 : 120,
+    marginRight: 15,
+  },
   itemImage: {
-    width: 120,
-    height: 120,
+    width: Platform.OS === 'web' ? 150 : 120,
+    height: Platform.OS === 'web' ? 150 : 120,
     borderRadius: 6,
     marginRight: 15,
   },
@@ -203,18 +280,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemTitle: {
-    fontSize: 16,
+    fontSize: Platform.OS === 'web' ? 20 : 16,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
   },
   itemInfo: {
-    fontSize: 14,
+    fontSize: Platform.OS === 'web' ? 16 : 14,
     color: '#666',
     marginBottom: 2,
   },
   itemNotes: {
-    fontSize: 12,
+    fontSize: Platform.OS === 'web' ? 14 : 12,
     color: '#888',
     fontStyle: 'italic',
     marginTop: 5,
@@ -225,25 +302,25 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: '#ffc107',
-    padding: 8,
+    padding: Platform.OS === 'web' ? 10 : 8,
     borderRadius: 4,
-    minWidth: 50,
+    minWidth: Platform.OS === 'web' ? 70 : 50,
   },
   editButtonText: {
     color: '#212529',
-    fontSize: 12,
+    fontSize: Platform.OS === 'web' ? 14 : 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   deleteButton: {
     backgroundColor: '#dc3545',
-    padding: 8,
+    padding: Platform.OS === 'web' ? 10 : 8,
     borderRadius: 4,
-    minWidth: 50,
+    minWidth: Platform.OS === 'web' ? 70 : 50,
   },
   deleteButtonText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: Platform.OS === 'web' ? 14 : 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },

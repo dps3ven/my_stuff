@@ -34,11 +34,10 @@ export default function AddInstrumentScreen({ navigation, route }) {
     condition: editItem?.condition || '',
     value: editItem?.value || '',
     notes: editItem?.notes || '',
-    image: editItem?.image || null,
+    images: editItem?.images || [],
   });
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [showConditionPicker, setShowConditionPicker] = useState(false);
-  const [showImageSide, setShowImageSide] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -49,17 +48,20 @@ export default function AddInstrumentScreen({ navigation, route }) {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true,
-      // aspect: [4, 3],
+      allowsEditing: false,
+      allowsMultipleSelection: true,
       quality: 1,
     });
 
     if (!result.canceled) {
-      setInstrument({ ...instrument, image: result.assets[0].uri });
-      if (Platform.OS === 'web') {
-        setShowImageSide(true);
-      }
+      const newImages = result.assets.map(asset => asset.uri);
+      setInstrument({ ...instrument, images: [...instrument.images, ...newImages] });
     }
+  };
+
+  const removeImage = (index) => {
+    const updatedImages = instrument.images.filter((_, i) => i !== index);
+    setInstrument({ ...instrument, images: updatedImages });
   };
 
   const saveInstrument = async () => {
@@ -135,8 +137,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
           scrollEnabled={true}
           nestedScrollEnabled={true}
         >
-          <View style={Platform.OS === 'web' && showImageSide ? styles.contentWrapper : null}>
-            <View style={Platform.OS === 'web' && showImageSide ? styles.formColumn : null}>
+          <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.contentWrapper : null}>
+            <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.formColumn : null}>
               <Text style={styles.title}>Add Instrument</Text>
 
           <Text style={styles.label}>Instrument Type *</Text>
@@ -191,11 +193,31 @@ export default function AddInstrumentScreen({ navigation, route }) {
           />
 
               <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <Text style={styles.imageButtonText}>Pick Image</Text>
+                <Text style={styles.imageButtonText}>Select Images</Text>
               </TouchableOpacity>
 
-              {Platform.OS !== 'web' && instrument.image && (
-                <Image source={{ uri: instrument.image }} style={styles.imagePreview} />
+              {Platform.OS !== 'web' && instrument.images.length > 0 && (
+                <View style={styles.imageGallery}>
+                  <Text style={styles.galleryTitle}>Selected Images ({instrument.images.length})</Text>
+                  <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={true}
+                    style={styles.horizontalScroll}
+                  >
+                    {instrument.images.map((imageUri, index) => (
+                      <View key={index} style={styles.imageCard}>
+                        <Image source={{ uri: imageUri }} style={styles.cardImage} />
+                        <Text style={styles.cardLabel}>Image {index + 1}</Text>
+                        <TouchableOpacity 
+                          style={styles.removeButton} 
+                          onPress={() => removeImage(index)}
+                        >
+                          <Text style={styles.removeButtonText}>✕ Remove</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
               )}
 
               <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
@@ -203,9 +225,30 @@ export default function AddInstrumentScreen({ navigation, route }) {
               </TouchableOpacity>
             </View>
 
-            {Platform.OS === 'web' && showImageSide && instrument.image && (
+            {Platform.OS === 'web' && instrument.images.length > 0 && (
               <View style={styles.imageColumn}>
-                <Image source={{ uri: instrument.image }} style={styles.imagePreviewWeb} />
+                <Text style={styles.galleryTitle}>Selected Images ({instrument.images.length})</Text>
+                <ScrollView 
+                  style={styles.verticalScroll}
+                  showsVerticalScrollIndicator={true}
+                >
+                  <View style={styles.imageGrid}>
+                    {instrument.images.map((imageUri, index) => (
+                      <View key={index} style={styles.imageCardWeb}>
+                        <Image source={{ uri: imageUri }} style={styles.cardImageWeb} />
+                        <View style={styles.imageCardFooter}>
+                          <Text style={styles.cardLabelWeb}>Image {index + 1}</Text>
+                          <TouchableOpacity 
+                            style={styles.removeButtonSmall} 
+                            onPress={() => removeImage(index)}
+                          >
+                            <Text style={styles.removeButtonText}>✕</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </ScrollView>
               </View>
             )}
           </View>
@@ -224,7 +267,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     width: Platform.OS === 'web' ? '100%' : '100%',
-    maxWidth: Platform.OS === 'web' ? 700 : '100%',
+    maxWidth: Platform.OS === 'web' ? 1200 : '100%',
   },
   scrollContent: {
     padding: 20,
@@ -325,18 +368,122 @@ const styles = StyleSheet.create({
   contentWrapper: {
     flexDirection: 'row',
     gap: 20,
+    alignItems: 'flex-start',
   },
   formColumn: {
     flex: 1,
+    minWidth: 0,
   },
   imageColumn: {
-    width: 350,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  imagePreviewWeb: {
-    width: 350,
-    height: 350,
+    width: 400,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 8,
+    padding: 15,
+  },
+  verticalScroll: {
+    maxHeight: 600,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  imageGallery: {
+    marginBottom: 20,
+  },
+  galleryTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 10,
+  },
+  horizontalScroll: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    padding: 10,
+  },
+  imageCard: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 10,
+    marginRight: 15,
+    alignItems: 'center',
+    width: 150,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardImage: {
+    width: 130,
+    height: 130,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+  cardLabel: {
+    fontSize: 12,
+    color: '#333',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  removeButton: {
+    backgroundColor: '#dc3545',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  removeButtonText: {
+    color: 'white',
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  imageCardWeb: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    width: '48%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardImageWeb: {
+    width: '100%',
+    height: 150,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+  imageCardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardLabelWeb: {
+    fontSize: 12,
+    color: '#333',
+    fontWeight: '500',
+  },
+  removeButtonSmall: {
+    backgroundColor: '#dc3545',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    alignItems: 'center',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });
