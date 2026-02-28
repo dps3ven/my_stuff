@@ -38,17 +38,27 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.appTitle}>My Stuff</Text>
+      </View>
 
-
-      <Text style={styles.welcome}>Hello, {user?.name}!</Text>
-      <Text style={styles.subtitle}>Manage your musical instrument inventory</Text>
+      <View style={styles.welcomeCard}>
+        <Text style={styles.welcome}>Hello, {user?.name}!</Text>
+        <Text style={styles.subtitle}>Manage your musical instrument inventory</Text>
+      </View>
 
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
+          <View style={styles.statIcon}>
+            <Text style={styles.iconText}>🎸</Text>
+          </View>
           <Text style={styles.statNumber}>{stats.totalItems}</Text>
-          <Text style={styles.statLabel}>Total Instruments</Text>
+          <Text style={styles.statLabel}>Instruments</Text>
         </View>
         <View style={styles.statCard}>
+          <View style={styles.statIcon}>
+            <Text style={styles.iconText}>💰</Text>
+          </View>
           <Text style={styles.statNumber}>${stats.totalValue.toFixed(2)}</Text>
           <Text style={styles.statLabel}>Total Value</Text>
         </View>
@@ -59,6 +69,7 @@ export default function DashboardScreen({ navigation }) {
           style={[styles.button, styles.successButton]}
           onPress={() => navigation.navigate('AddInstrument')}
         >
+          <Text style={styles.buttonIcon}>➕</Text>
           <Text style={styles.buttonText}>Add Instrument</Text>
         </TouchableOpacity>
 
@@ -66,12 +77,15 @@ export default function DashboardScreen({ navigation }) {
           style={[styles.button, styles.primaryButton]}
           onPress={() => navigation.navigate('Inventory')}
         >
+          <Text style={styles.buttonIcon}>📋</Text>
           <Text style={styles.buttonText}>View Inventory</Text>
         </TouchableOpacity>
-                <TouchableOpacity
-          style={[styles.button, styles.primaryButton]}
+
+        <TouchableOpacity
+          style={[styles.button, styles.logoutButton]}
           onPress={() => navigation.navigate('Login')}
         >
+          <Text style={styles.buttonIcon}>🚪</Text>
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -86,66 +100,87 @@ const styles = StyleSheet.create({
     backgroundColor: '#133965ff',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 30,
+    marginTop: 20,
   },
-  title: {
-    fontSize: 28,
+  appTitle: {
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#fff',
+    textAlign: 'center',
+    letterSpacing: 1,
   },
-  logoutButton: {
-    backgroundColor: '#6c757d',
-    padding: 10,
-    borderRadius: 6,
-  },
-  logoutText: {
-    color: 'white',
-    fontSize: 14,
+  welcomeCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 25,
+    borderRadius: 15,
+    marginBottom: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   welcome: {
-    fontSize: 32,
+    fontSize: 28,
     textAlign: 'center',
     marginBottom: 10,
     color: '#fff',
+    fontWeight: '600',
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
-    color: '#fff',
-    marginBottom: 40,
+    color: 'rgba(255, 255, 255, 0.8)',
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 40,
+    gap: 15,
   },
   statCard: {
     backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 8,
+    padding: 25,
+    borderRadius: 15,
     alignItems: 'center',
-    minWidth: 120,
+    flex: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  statIcon: {
+    marginBottom: 10,
+  },
+  iconText: {
+    fontSize: 40,
   },
   statNumber: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#007bff',
+    marginBottom: 5,
   },
   statLabel: {
     color: '#666',
-    marginTop: 5,
+    fontSize: 14,
+    fontWeight: '500',
   },
   actions: {
     alignItems: 'center',
+    gap: 15,
   },
   button: {
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    minWidth: 200,
+    padding: 18,
+    borderRadius: 12,
+    minWidth: 280,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   successButton: {
     backgroundColor: '#28a745',
@@ -153,10 +188,17 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: '#007bff',
   },
+  logoutButton: {
+    backgroundColor: '#dc3545',
+  },
+  buttonIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
   buttonText: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });
