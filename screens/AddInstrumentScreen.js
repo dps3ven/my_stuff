@@ -38,6 +38,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   });
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [showConditionPicker, setShowConditionPicker] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     navigation.setOptions({
@@ -65,10 +66,19 @@ export default function AddInstrumentScreen({ navigation, route }) {
   };
 
   const saveInstrument = async () => {
-    if (!instrument.type || !instrument.brand || !instrument.model) {
-      Alert.alert('Error', 'Please fill in required fields');
+    // Validate required fields
+    const missingFields = [];
+    if (!instrument.type) missingFields.push('Instrument Type');
+    if (!instrument.brand) missingFields.push('Make');
+    if (!instrument.model) missingFields.push('Model');
+    if (!instrument.condition) missingFields.push('Condition');
+
+    if (missingFields.length > 0) {
+      setErrorMessage(`Please fill in the following required fields: ${missingFields.join(', ')}`);
       return;
     }
+
+    setErrorMessage('');
 
     try {
       const currentUser = JSON.parse(await storage.getItem('currentUser'));
@@ -238,6 +248,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
                   </ScrollView>
                 </View>
               )}
+
+              {errorMessage ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errorMessage}</Text>
+                </View>
+              ) : null}
 
               <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
                 <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
@@ -409,6 +425,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  errorContainer: {
+    backgroundColor: '#f8d7da',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderWidth: 2,
+    borderColor: '#f5c6cb',
+  },
+  errorText: {
+    color: '#721c24',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
   },
   dashboardButton: {
     backgroundColor: '#007bff',
