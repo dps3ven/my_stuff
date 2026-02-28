@@ -172,18 +172,28 @@ export default function InventoryScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         ) : (
-          <SectionList
-            sections={inventory}
-            renderItem={renderItem}
-            renderSectionHeader={({ section: { title } }) => (
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionHeaderText}>{title}</Text>
-              </View>
-            )}
-            keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={true}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
+          <>
+            <SectionList
+              sections={inventory}
+              renderItem={renderItem}
+              renderSectionHeader={({ section: { title } }) => (
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionHeaderText}>{title}</Text>
+                </View>
+              )}
+              keyExtractor={(item) => item.id.toString()}
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            />
+            <View style={styles.footer}>
+              <TouchableOpacity 
+                style={styles.footerButton}
+                onPress={() => navigation.navigate('Dashboard')}
+              >
+                <Text style={styles.footerText}>Back to Dashboard</Text>
+              </TouchableOpacity>
+            </View>
+          </>
         )}
       </View>
     </KeyboardAvoidingView>
@@ -340,5 +350,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  footer: {
+    backgroundColor: '#1e4976',
+    padding: 20,
+    borderRadius: 8,
+    marginTop: 20,
+    marginBottom: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  footerButton: {
+    padding: 10,
+  },
+  footerText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
 });
