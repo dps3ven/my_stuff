@@ -143,56 +143,74 @@ export default function AddInstrumentScreen({ navigation, route }) {
             <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.formColumn : null}>
               <Text style={styles.title}>Add Instrument</Text>
 
-              <Text style={styles.label}>Instrument Type *</Text>
-              {renderCollapsiblePicker(
-                INSTRUMENT_TYPES,
-                instrument.type,
-                (value) => setInstrument({ ...instrument, type: value }),
-                showTypePicker,
-                setShowTypePicker
-              )}
+              <View style={styles.formRow}>
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Instrument Type *</Text>
+                  {renderCollapsiblePicker(
+                    INSTRUMENT_TYPES,
+                    instrument.type,
+                    (value) => setInstrument({ ...instrument, type: value }),
+                    showTypePicker,
+                    setShowTypePicker
+                  )}
+                </View>
 
-              <Text style={styles.label}>Make *</Text>
-              <TextInput
-                style={styles.input}
-                value={instrument.brand}
-                onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
-                placeholder="Enter make/brand"
-              />
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Make *</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={instrument.brand}
+                    onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
+                    placeholder="Enter make/brand"
+                  />
+                </View>
+              </View>
 
-              <Text style={styles.label}>Model *</Text>
-              <TextInput
-                style={styles.input}
-                value={instrument.model}
-                onChangeText={(text) => setInstrument({ ...instrument, model: text })}
-                placeholder="Enter model"
-              />
+              <View style={styles.formRow}>
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Model *</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={instrument.model}
+                    onChangeText={(text) => setInstrument({ ...instrument, model: text })}
+                    placeholder="Enter model"
+                  />
+                </View>
 
-              <Text style={styles.label}>Serial Number</Text>
-              <TextInput
-                style={styles.input}
-                value={instrument.serialNumber}
-                onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
-                placeholder="Enter serial number"
-              />
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Serial Number</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={instrument.serialNumber}
+                    onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
+                    placeholder="Enter serial number"
+                  />
+                </View>
+              </View>
 
-              <Text style={styles.label}>Condition *</Text>
-              {renderCollapsiblePicker(
-                CONDITIONS,
-                instrument.condition,
-                (value) => setInstrument({ ...instrument, condition: value }),
-                showConditionPicker,
-                setShowConditionPicker
-              )}
+              <View style={styles.formRow}>
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Condition *</Text>
+                  {renderCollapsiblePicker(
+                    CONDITIONS,
+                    instrument.condition,
+                    (value) => setInstrument({ ...instrument, condition: value }),
+                    showConditionPicker,
+                    setShowConditionPicker
+                  )}
+                </View>
 
-              <Text style={styles.label}>Estimated Value ($)</Text>
-              <TextInput
-                style={styles.input}
-                value={instrument.value}
-                onChangeText={(text) => setInstrument({ ...instrument, value: text })}
-                placeholder="Enter value"
-                keyboardType="numeric"
-              />
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Estimated Value ($)</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={instrument.value}
+                    onChangeText={(text) => setInstrument({ ...instrument, value: text })}
+                    placeholder="Enter value"
+                    keyboardType="numeric"
+                  />
+                </View>
+              </View>
 
               <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
                 <Text style={styles.imageButtonText}>Select Images</Text>
@@ -292,7 +310,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 200,
+    paddingBottom: 120,
     flexGrow: 1,
   },
   title: {
@@ -301,6 +319,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 30,
     color: '#fff',
+  },
+  formRow: {
+    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    gap: 15,
+    marginBottom: 0,
+  },
+  formField: {
+    flex: 1,
+    minWidth: Platform.OS === 'web' ? 0 : '100%',
   },
   label: {
     fontSize: Platform.OS === 'web' ? 18 : 16,
@@ -358,7 +385,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   imageButton: {
-    backgroundColor: '#6c757d',
+    backgroundColor: '#007bff',
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
@@ -391,15 +418,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#007bff',
     padding: 15,
     borderRadius: 8,
-    marginBottom: 50,
-    borderWidth: 2,
-    borderColor: '#fff',
+    width: '100%',
+    maxWidth: 400,
   },
   dashboardButtonText: {
     color: 'white',
     textAlign: 'center',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  fixedFooter: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#133965ff',
+    padding: 15,
+    alignItems: 'center',
+    borderTopWidth: 2,
+    borderTopColor: '#1e4976',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 10,
   },
   contentWrapper: {
     flexDirection: 'row',
