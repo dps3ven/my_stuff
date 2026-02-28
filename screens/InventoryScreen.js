@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, SectionList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import storage from '../utils/storage';
 
 export default function InventoryScreen({ navigation }) {
@@ -18,7 +18,31 @@ export default function InventoryScreen({ navigation }) {
       const currentUser = JSON.parse(await storage.getItem('currentUser'));
       setUser(currentUser);
       const inventoryData = JSON.parse(await storage.getItem(`inventory_${currentUser.id}`) || '[]');
-      setInventory(inventoryData);
+      
+      // Group inventory by instrument type
+      const grouped = inventoryData.reduce((acc, item) => {
+        const type = item.type || 'Other';
+        if (!acc[type]) {
+          acc[type] = [];
+        }
+        acc[type].push(item);
+        return acc;
+      }, {});
+      
+      // Pluralize instrument types
+      const pluralize = (type) => {
+        if (type === 'Other') return 'Other';
+        if (type.endsWith('s')) return type;
+        return type + 's';
+      };
+      
+      // Convert to array format for SectionList
+      const sections = Object.keys(grouped).sort().map(type => ({
+        title: pluralize(type),
+        data: grouped[type]
+      }));
+      
+      setInventory(sections);
     } catch (error) {
       console.error('Error loading inventory:', error);
     }
@@ -32,9 +56,10 @@ export default function InventoryScreen({ navigation }) {
     if (Platform.OS === 'web') {
       if (window.confirm('Are you sure you want to delete this item?')) {
         try {
-          const updatedInventory = inventory.filter(item => item.id !== id);
-          setInventory(updatedInventory);
+          const currentInventory = JSON.parse(await storage.getItem(`inventory_${user.id}`) || '[]');
+          const updatedInventory = currentInventory.filter(item => item.id !== id);
           await storage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
+          loadInventory();
         } catch (error) {
           alert('Failed to delete item');
         }
@@ -50,9 +75,10 @@ export default function InventoryScreen({ navigation }) {
             style: 'destructive',
             onPress: async () => {
               try {
-                const updatedInventory = inventory.filter(item => item.id !== id);
-                setInventory(updatedInventory);
+                const currentInventory = JSON.parse(await storage.getItem(`inventory_${user.id}`) || '[]');
+                const updatedInventory = currentInventory.filter(item => item.id !== id);
                 await storage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
+                loadInventory();
               } catch (error) {
                 Alert.alert('Error', 'Failed to delete item');
               }
@@ -146,9 +172,14 @@ export default function InventoryScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         ) : (
-          <FlatList
-            data={inventory}
+          <SectionList
+            sections={inventory}
             renderItem={renderItem}
+            renderSectionHeader={({ section: { title } }) => (
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>{title}</Text>
+              </View>
+            )}
             keyExtractor={(item) => item.id.toString()}
             showsVerticalScrollIndicator={true}
             contentContainerStyle={{ paddingBottom: 20 }}
@@ -296,5 +327,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textDecorationLine: 'underline',
+  },
+  sectionHeader: {
+    backgroundColor: '#1e4976',
+    padding: 12,
+    marginBottom: 10,
+    borderRadius: 6,
+  },
+  sectionHeaderText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 });
