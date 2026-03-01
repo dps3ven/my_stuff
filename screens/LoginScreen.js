@@ -24,6 +24,17 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     setErrorMessage('');
+    
+    // Validate required fields
+    if (!username.trim() || !password.trim()) {
+      if (Platform.OS === 'web') {
+        setErrorMessage('Username and password are required');
+      } else {
+        Alert.alert('Error', 'Username and password are required');
+      }
+      return;
+    }
+    
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
       const hashedPassword = CryptoJS.SHA256(password).toString();
@@ -50,6 +61,17 @@ export default function LoginScreen({ navigation }) {
 
   const handleSignup = async () => {
     setErrorMessage('');
+    
+    // Validate required fields
+    if (!name.trim() || !username.trim() || !password.trim()) {
+      if (Platform.OS === 'web') {
+        setErrorMessage('All fields are required');
+      } else {
+        Alert.alert('Error', 'All fields are required');
+      }
+      return;
+    }
+    
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
       
