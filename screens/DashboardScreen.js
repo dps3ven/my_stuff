@@ -48,13 +48,16 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
+        <TouchableOpacity 
+          style={styles.statCard}
+          onPress={() => navigation.navigate('Inventory')}
+        >
           <View style={styles.statIcon}>
             <Text style={styles.iconText}>🎸</Text>
           </View>
           <Text style={styles.statNumber}>{stats.totalItems}</Text>
           <Text style={styles.statLabel}>Instruments</Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.statCard}>
           <View style={styles.statIcon}>
             <Text style={styles.iconText}>💰</Text>

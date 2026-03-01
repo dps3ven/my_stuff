@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   verticalScroll: {
-    maxHeight: 600,
+    maxHeight: 400,
   },
   imageGrid: {
     flexDirection: 'row',
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
   },
   cardImageWeb: {
     width: '100%',
-    height: 150,
+    height: 100,
     borderRadius: 6,
     marginBottom: 8,
   },

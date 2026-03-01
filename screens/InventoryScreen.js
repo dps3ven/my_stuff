@@ -247,9 +247,17 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginRight: 15,
     width: 120,
+    ...(Platform.OS === 'web' && {
+      maxWidth: 380,
+      width: 'auto',
+    }),
   },
   imageScroll: {
     width: 120,
+    ...(Platform.OS === 'web' && {
+      maxWidth: 380,
+      width: 'auto',
+    }),
   },
   itemImage: {
     width: 120,
