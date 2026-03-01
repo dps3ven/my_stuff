@@ -114,13 +114,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965ff',
+    alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
   },
   scrollView: {
     flex: 1,
+    width: '100%',
+    maxWidth: Platform.OS === 'web' ? 1000 : '100%',
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 180,
+    alignItems: 'center',
   },
   title: {
     fontSize: Platform.OS === 'web' ? 32 : 28,
@@ -128,20 +132,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     marginBottom: 20,
+    width: '100%',
   },
   imageGallery: {
     marginBottom: 20,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 800,
   },
   imageScroll: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
+    maxWidth: Platform.OS === 'web' ? 800 : '100%',
   },
   largeImage: {
-    width: Platform.OS === 'web' ? 600 : 350,
-    height: Platform.OS === 'web' ? 450 : 300,
+    width: Platform.OS === 'web' ? 400 : 300,
+    height: Platform.OS === 'web' ? 300 : 250,
     borderRadius: 12,
     backgroundColor: '#fff',
     marginBottom: 10,
+    marginHorizontal: Platform.OS === 'web' ? 10 : 0,
+    alignSelf: 'center',
   },
   noImage: {
     justifyContent: 'center',
@@ -168,6 +179,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    width: '100%',
+    maxWidth: 800,
   },
   detailRow: {
     flexDirection: 'row',
@@ -195,8 +208,28 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 24,
   },
+  fixedFooter: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#133965ff',
+    padding: 15,
+    alignItems: 'center',
+    borderTopWidth: 2,
+    borderTopColor: '#1e4976',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 10,
+    zIndex: 1000,
+  },
   actionButtons: {
+    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
     gap: 15,
+    width: '100%',
+    maxWidth: Platform.OS === 'web' ? 800 : '100%',
   },
   editButton: {
     backgroundColor: '#ffc107',
@@ -207,6 +240,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    flex: Platform.OS === 'web' ? 1 : 0,
   },
   backButton: {
     backgroundColor: '#007bff',
@@ -217,6 +251,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    flex: Platform.OS === 'web' ? 1 : 0,
   },
   buttonText: {
     color: 'white',
