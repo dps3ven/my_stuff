@@ -6,6 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import InventoryScreen from './screens/InventoryScreen';
 import AddInstrumentScreen from './screens/AddInstrumentScreen';
+import InstrumentDetailScreen from './screens/InstrumentDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ export default function App() {
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
           <Stack.Screen name="Inventory" component={InventoryScreen} />
           <Stack.Screen name="AddInstrument" component={AddInstrumentScreen} />
+          <Stack.Screen name="InstrumentDetail" component={InstrumentDetailScreen} options={{ title: 'Instrument Details' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

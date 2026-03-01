@@ -90,22 +90,33 @@ export default function InventoryScreen({ navigation }) {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <TouchableOpacity 
+      style={styles.itemContainer}
+      onPress={() => navigation.navigate('InstrumentDetail', { item })}
+      activeOpacity={0.7}
+    >
       <View style={styles.imageContainer}>
         {item.images && item.images.length > 0 ? (
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={true}
-            style={styles.imageScroll}
-          >
-            {item.images.map((imageUri, index) => (
-              <Image 
-                key={index} 
-                source={{ uri: imageUri }} 
-                style={styles.itemImage} 
-              />
-            ))}
-          </ScrollView>
+          <View style={styles.imageWrapper}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={true}
+              style={styles.imageScroll}
+            >
+              {item.images.map((imageUri, index) => (
+                <Image 
+                  key={index} 
+                  source={{ uri: imageUri }} 
+                  style={styles.itemImage} 
+                />
+              ))}
+            </ScrollView>
+            {item.images.length > 3 && (
+              <View style={styles.scrollHint}>
+                <Text style={styles.scrollHintText}>→</Text>
+              </View>
+            )}
+          </View>
         ) : item.image ? (
           <Image source={{ uri: item.image }} style={styles.itemImage} />
         ) : (
@@ -124,23 +135,30 @@ export default function InventoryScreen({ navigation }) {
           <Text style={styles.itemInfo}>Images: {item.images.length}</Text>
         )}
         {item.notes && <Text style={styles.itemNotes}>Notes: {item.notes}</Text>}
+        <Text style={styles.tapHint}>Tap for details</Text>
       </View>
       
       <View style={styles.actionButtons}>
         <TouchableOpacity 
           style={styles.editButton} 
-          onPress={() => editItem(item)}
+          onPress={(e) => {
+            e.stopPropagation();
+            editItem(item);
+          }}
         >
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.deleteButton} 
-          onPress={() => deleteItem(item.id)}
+          onPress={(e) => {
+            e.stopPropagation();
+            deleteItem(item.id);
+          }}
         >
           <Text style={styles.deleteButtonText}>Delete</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -293,6 +311,12 @@ const styles = StyleSheet.create({
     color: '#888',
     fontStyle: 'italic',
     marginTop: 5,
+  },
+  tapHint: {
+    fontSize: 12,
+    color: '#007bff',
+    fontStyle: 'italic',
+    marginTop: 8,
   },
   actionButtons: {
     flexDirection: 'column',
