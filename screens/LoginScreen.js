@@ -87,7 +87,7 @@ export default function LoginScreen({ navigation }) {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-      <Text style={styles.title}>My Stuff</Text>
+      <Text style={styles.title}>My Inventory</Text>
       
       {isSignup && (
         <TextInput

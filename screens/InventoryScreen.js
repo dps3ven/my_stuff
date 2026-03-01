@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, SectionList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, SectionList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import storage from '../utils/storage';
 
 export default function InventoryScreen({ navigation }) {
@@ -93,7 +93,11 @@ export default function InventoryScreen({ navigation }) {
     <View style={styles.itemContainer}>
       <View style={styles.imageContainer}>
         {item.images && item.images.length > 0 ? (
-          <View style={styles.imagesRow}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={true}
+            style={styles.imageScroll}
+          >
             {item.images.map((imageUri, index) => (
               <Image 
                 key={index} 
@@ -101,7 +105,7 @@ export default function InventoryScreen({ navigation }) {
                 style={styles.itemImage} 
               />
             ))}
-          </View>
+          </ScrollView>
         ) : item.image ? (
           <Image source={{ uri: item.image }} style={styles.itemImage} />
         ) : (
@@ -242,10 +246,10 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginRight: 15,
+    width: 120,
   },
-  imagesRow: {
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
+  imageScroll: {
+    width: 120,
   },
   itemImage: {
     width: 120,

@@ -39,7 +39,7 @@ export default function DashboardScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.appTitle}>My Stuff</Text>
+        <Text style={styles.appTitle}>My Inventory</Text>
       </View>
 
       <View style={styles.welcomeCard}>
@@ -66,26 +66,26 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={styles.actions}>
         <TouchableOpacity
-          style={[styles.button, styles.successButton]}
+          style={styles.button}
           onPress={() => navigation.navigate('AddInstrument')}
         >
-          <Text style={styles.buttonIcon}>➕</Text>
+          {/* <Text style={styles.buttonIcon}>➕</Text> */}
           <Text style={styles.buttonText}>Add Instrument</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.primaryButton]}
+          style={styles.button}
           onPress={() => navigation.navigate('Inventory')}
         >
-          <Text style={styles.buttonIcon}>📋</Text>
+          {/* <Text style={styles.buttonIcon}>📋</Text> */}
           <Text style={styles.buttonText}>View Inventory</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.logoutButton]}
+          style={styles.button}
           onPress={() => navigation.navigate('Login')}
         >
-          <Text style={styles.buttonIcon}>🚪</Text>
+          {/* <Text style={styles.buttonIcon}>🚪</Text> */}
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -181,15 +181,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  },
-  successButton: {
-    backgroundColor: '#28a745',
-  },
-  primaryButton: {
-    backgroundColor: '#007bff',
-  },
-  logoutButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: '#7193c6ff',
   },
   buttonIcon: {
     fontSize: 20,
