@@ -127,7 +127,9 @@ export default function InventoryScreen({ navigation }) {
       </View>
       
       <View style={styles.itemDetails}>
-        <Text style={styles.itemTitle}>{item.type} - {item.brand} {item.model}</Text>
+        <Text style={styles.itemTitle}>{item.type}</Text>
+        <Text style={styles.itemInfo}>Make: {item.brand}</Text>
+        <Text style={styles.itemInfo}>Model: {item.model}</Text>
         <Text style={styles.itemInfo}>Serial: {item.serialNumber || 'N/A'}</Text>
         <Text style={styles.itemInfo}>Condition: {item.condition}</Text>
         <Text style={styles.itemInfo}>Value: ${item.value || 'N/A'}</Text>
