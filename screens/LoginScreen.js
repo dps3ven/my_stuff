@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import storage from '../utils/storage';
 import CryptoJS from 'crypto-js';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isSignup, setIsSignup] = useState(false);
-  const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -15,162 +15,162 @@ export default function LoginScreen({ navigation }) {
     const unsubscribe = navigation.addListener('focus', () => {
       setUsername('');
       setPassword('');
-      setName('');
       setIsSignup(false);
       setErrorMessage('');
     });
     return unsubscribe;
   }, [navigation]);
 
+  const sanitize = (text) => {
+    return text.replace(/[<>]/g, '').trim();
+  };
+
+  const verifyBiometric = async () => {
+    if (Platform.OS === 'web') return true;
+
+    const compatible = await LocalAuthentication.hasHardwareAsync();
+    if (!compatible) return true;
+
+    const enrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!enrolled) return true;
+
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: 'Verify your identity',
+      fallbackLabel: 'Use passcode',
+      disableDeviceFallback: false,
+    });
+
+    return result.success;
+  };
+
+  const showError = (msg) => {
+    if (Platform.OS === 'web') {
+      setErrorMessage(msg);
+    } else {
+      Alert.alert('Error', msg);
+    }
+  };
+
   const handleLogin = async () => {
     setErrorMessage('');
-    
-    // Validate required fields
     if (!username.trim() || !password.trim()) {
-      if (Platform.OS === 'web') {
-        setErrorMessage('Username and password are required');
-      } else {
-        Alert.alert('Error', 'Username and password are required');
-      }
+      showError('Username and password are required');
       return;
     }
-    
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
       const hashedPassword = CryptoJS.SHA256(password).toString();
       const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === hashedPassword);
-      
       if (user) {
+        const biometricPassed = await verifyBiometric();
+        if (!biometricPassed) {
+          showError('Biometric verification failed. Login denied.');
+          return;
+        }
         const { password: _, ...safeUser } = user;
         await storage.setItem('currentUser', JSON.stringify(safeUser));
-        navigation.navigate('Dashboard');
+        navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
       } else {
-        if (Platform.OS === 'web') {
-          setErrorMessage('Invalid username or password');
-        } else {
-          Alert.alert('Error', 'Invalid username or password');
-        }
+        showError('Invalid username or password');
       }
     } catch (error) {
-      if (Platform.OS === 'web') {
-        setErrorMessage('Login failed');
-      } else {
-        Alert.alert('Error', 'Login failed');
-      }
+      showError('Login failed: ' + error.message);
     }
   };
 
   const handleSignup = async () => {
     setErrorMessage('');
-    
-    // Validate required fields
     if (!username.trim() || !password.trim()) {
-      if (Platform.OS === 'web') {
-        setErrorMessage('All fields are required');
-      } else {
-        Alert.alert('Error', 'All fields are required');
-      }
+      showError('Username and password are required');
       return;
     }
-
-    // Password strength check
-    if (password.length < 8) {
-      if (Platform.OS === 'web') {
-        setErrorMessage('Password must be at least 8 characters');
-      } else {
-        Alert.alert('Error', 'Password must be at least 8 characters');
-      }
+    if (username.trim().length < 3) {
+      showError('Username must be at least 3 characters');
       return;
     }
-    
+    if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) {
+      showError('Username can only contain letters, numbers, and underscores');
+      return;
+    }
+    if (password.trim().length < 12) {
+      showError('Password must be at least 12 characters (currently ' + password.trim().length + ')');
+      return;
+    }
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
-      
       if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-        if (Platform.OS === 'web') {
-          setErrorMessage('Username already exists');
-        } else {
-          Alert.alert('Error', 'Username already exists');
-        }
+        showError('Username already exists');
         return;
       }
-      
       const hashedPassword = CryptoJS.SHA256(password).toString();
       const newUser = { name: sanitize(username), username: sanitize(username).toLowerCase(), password: hashedPassword, id: Date.now() };
       users.push(newUser);
       await storage.setItem('users', JSON.stringify(users));
       const { password: _, ...safeUser } = newUser;
       await storage.setItem('currentUser', JSON.stringify(safeUser));
-      navigation.navigate('Dashboard');
+      navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
     } catch (error) {
-      if (Platform.OS === 'web') {
-        setErrorMessage('Signup failed');
-      } else {
-        Alert.alert('Error', 'Signup failed');
-      }
+      showError('Signup failed: ' + error.message);
     }
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-      <Text style={styles.title}>My Inventory</Text>
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      
-      <View style={styles.passwordContainer}>
+        <Text style={styles.title}>My Inventory</Text>
+
         <TextInput
-          style={styles.passwordInput}
-          placeholder="Password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
         />
-        <TouchableOpacity 
-          style={styles.eyeButton}
-          onPress={() => setShowPassword(!showPassword)}
-        >
-          <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={isSignup ? handleSignup : handleLogin}
-      >
-        <Text style={styles.buttonText}>{isSignup ? 'Sign Up' : 'Login'}</Text>
-      </TouchableOpacity>
-      
-      {errorMessage ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Password"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+          </TouchableOpacity>
         </View>
-      ) : null}
-      
-      <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
-        <Text style={styles.link}>
-          {isSignup ? 'Already have an account?' : "Don't have an account?"}
-        </Text>
-        <Text style={styles.linkAction}>
-          {isSignup ? 'Login' : 'Sign up'}
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity onPress={() => Alert.alert('Login Help', 'To login, enter your username and password.\n\nForgot your password? Contact support or create a new account.\n\nNew user? Click "Sign up" to create an account.')}>
-        <Text style={styles.helpLink}>Need help?</Text>
-      </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={isSignup ? handleSignup : handleLogin}
+        >
+          <Text style={styles.buttonText}>{isSignup ? 'Sign Up' : 'Login'}</Text>
+        </TouchableOpacity>
+
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+
+        <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
+          <Text style={styles.link}>
+            {isSignup ? 'Already have an account?' : "Don't have an account?"}
+          </Text>
+          <Text style={styles.linkAction}>
+            {isSignup ? 'Login' : 'Sign up'}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 100,
     minHeight: Platform.OS === 'web' ? '100vh' : undefined,
-    width: Platform.OS === 'web' ? '100%' : '100%',
+    width: '100%',
     maxWidth: Platform.OS === 'web' ? 500 : '100%',
   },
   title: {
@@ -252,13 +252,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textDecorationLine: 'underline',
     marginTop: 5,
-  },
-  helpLink: {
-    textAlign: 'center',
-    color: '#ffc107',
-    textDecorationLine: 'underline',
-    marginTop: 15,
-    fontSize: Platform.OS === 'web' ? 16 : 14,
   },
   errorContainer: {
     backgroundColor: '#f8d7da',
