@@ -161,7 +161,10 @@ export default function LoginScreen({ navigation }) {
       
       <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
         <Text style={styles.link}>
-          {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign up"}
+          {isSignup ? 'Already have an account?' : "Don't have an account?"}
+        </Text>
+        <Text style={styles.linkAction}>
+          {isSignup ? 'Login' : 'Sign up'}
         </Text>
       </TouchableOpacity>
       
@@ -238,8 +241,17 @@ const styles = StyleSheet.create({
   },
   link: {
     textAlign: 'center',
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+    marginTop: 15,
+  },
+  linkAction: {
+    textAlign: 'center',
     color: '#007bff',
+    fontSize: 18,
+    fontWeight: 'bold',
     textDecorationLine: 'underline',
+    marginTop: 5,
   },
   helpLink: {
     textAlign: 'center',
