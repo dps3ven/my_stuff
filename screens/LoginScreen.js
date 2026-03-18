@@ -64,7 +64,7 @@ export default function LoginScreen({ navigation }) {
     setErrorMessage('');
     
     // Validate required fields
-    if (!name.trim() || !username.trim() || !password.trim()) {
+    if (!username.trim() || !password.trim()) {
       if (Platform.OS === 'web') {
         setErrorMessage('All fields are required');
       } else {
@@ -96,7 +96,7 @@ export default function LoginScreen({ navigation }) {
       }
       
       const hashedPassword = CryptoJS.SHA256(password).toString();
-      const newUser = { name, username: username.toLowerCase(), password: hashedPassword, id: Date.now() };
+      const newUser = { name: sanitize(username), username: sanitize(username).toLowerCase(), password: hashedPassword, id: Date.now() };
       users.push(newUser);
       await storage.setItem('users', JSON.stringify(users));
       const { password: _, ...safeUser } = newUser;
@@ -122,15 +122,6 @@ export default function LoginScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
       <Text style={styles.title}>My Inventory</Text>
-      
-      {isSignup && (
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          value={name}
-          onChangeText={setName}
-        />
-      )}
       
       <TextInput
         style={styles.input}
