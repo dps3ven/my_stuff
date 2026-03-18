@@ -134,7 +134,6 @@ export default function InventoryScreen({ navigation }) {
         {item.images && item.images.length > 1 && (
           <Text style={styles.itemInfo}>Images: {item.images.length}</Text>
         )}
-        {item.notes && <Text style={styles.itemNotes}>Notes: {item.notes}</Text>}
         <Text style={styles.tapHint}>Tap for details</Text>
       </View>
       

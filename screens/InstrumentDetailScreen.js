@@ -27,7 +27,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
                   key={index} 
                   source={{ uri: imageUri }} 
                   style={styles.largeImage}
-                  resizeMode="contain"
+                  resizeMode="cover"
                 />
               ))}
             </ScrollView>
@@ -41,7 +41,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
           <Image 
             source={{ uri: item.image }} 
             style={styles.largeImage}
-            resizeMode="contain"
+            resizeMode="cover"
           />
         ) : (
           <View style={[styles.largeImage, styles.noImage]}>
@@ -80,13 +80,6 @@ export default function InstrumentDetailScreen({ navigation, route }) {
             <Text style={styles.detailLabel}>Estimated Value:</Text>
             <Text style={styles.detailValue}>${item.value || 'N/A'}</Text>
           </View>
-
-          {item.notes && (
-            <View style={styles.notesSection}>
-              <Text style={styles.detailLabel}>Notes:</Text>
-              <Text style={styles.notesText}>{item.notes}</Text>
-            </View>
-          )}
         </View>
 
         {/* Action Buttons */}
@@ -119,7 +112,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     width: '100%',
-    maxWidth: Platform.OS === 'web' ? 1000 : '100%',
+    maxWidth: Platform.OS === 'web' ? 900 : '100%',
   },
   scrollContent: {
     padding: 20,
@@ -138,12 +131,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignItems: 'center',
     width: '100%',
-    maxWidth: 800,
+    maxWidth: 700,
   },
   imageScroll: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    maxWidth: Platform.OS === 'web' ? 800 : '100%',
+    maxWidth: Platform.OS === 'web' ? 700 : '100%',
   },
   largeImage: {
     width: Platform.OS === 'web' ? 400 : 300,
@@ -180,7 +173,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
     width: '100%',
-    maxWidth: 800,
+    maxWidth: 700,
   },
   detailRow: {
     flexDirection: 'row',
@@ -229,7 +222,7 @@ const styles = StyleSheet.create({
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
     gap: 15,
     width: '100%',
-    maxWidth: Platform.OS === 'web' ? 800 : '100%',
+    maxWidth: Platform.OS === 'web' ? 700 : '100%',
   },
   editButton: {
     backgroundColor: '#ffc107',

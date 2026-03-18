@@ -258,16 +258,6 @@ export default function AddInstrumentScreen({ navigation, route }) {
               <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
                 <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
               </TouchableOpacity>
-
-              <Text style={styles.label}>Notes</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={instrument.notes}
-                onChangeText={(text) => setInstrument({ ...instrument, notes: text })}
-                placeholder="Enter any additional notes"
-                multiline={true}
-                numberOfLines={4}
-              />
             </View>
 
             {Platform.OS === 'web' && instrument.images.length > 0 && (
