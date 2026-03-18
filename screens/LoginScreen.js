@@ -38,10 +38,11 @@ export default function LoginScreen({ navigation }) {
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
       const hashedPassword = CryptoJS.SHA256(password).toString();
-      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && (u.password === hashedPassword || u.password === password));
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === hashedPassword);
       
       if (user) {
-        await storage.setItem('currentUser', JSON.stringify(user));
+        const { password: _, ...safeUser } = user;
+        await storage.setItem('currentUser', JSON.stringify(safeUser));
         navigation.navigate('Dashboard');
       } else {
         if (Platform.OS === 'web') {
@@ -71,6 +72,16 @@ export default function LoginScreen({ navigation }) {
       }
       return;
     }
+
+    // Password strength check
+    if (password.length < 8) {
+      if (Platform.OS === 'web') {
+        setErrorMessage('Password must be at least 8 characters');
+      } else {
+        Alert.alert('Error', 'Password must be at least 8 characters');
+      }
+      return;
+    }
     
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
@@ -88,7 +99,8 @@ export default function LoginScreen({ navigation }) {
       const newUser = { name, username: username.toLowerCase(), password: hashedPassword, id: Date.now() };
       users.push(newUser);
       await storage.setItem('users', JSON.stringify(users));
-      await storage.setItem('currentUser', JSON.stringify(newUser));
+      const { password: _, ...safeUser } = newUser;
+      await storage.setItem('currentUser', JSON.stringify(safeUser));
       navigation.navigate('Dashboard');
     } catch (error) {
       if (Platform.OS === 'web') {
