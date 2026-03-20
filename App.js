@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from './screens/LoginScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import InventoryScreen from './screens/InventoryScreen';
@@ -9,6 +11,18 @@ import AddInstrumentScreen from './screens/AddInstrumentScreen';
 import InstrumentDetailScreen from './screens/InstrumentDetailScreen';
 
 const Stack = createStackNavigator();
+
+// ONE-TIME STORAGE CLEAR — remove this block after first run
+const CLEAR_STORAGE = true;
+if (CLEAR_STORAGE) {
+  if (Platform.OS === 'web') {
+    localStorage.clear();
+    console.log('Storage cleared (web)');
+  } else {
+    AsyncStorage.clear().then(() => console.log('Storage cleared (mobile)'));
+  }
+}
+// END ONE-TIME CLEAR
 
 export default function App() {
   return (
