@@ -173,7 +173,14 @@ export default function LoginScreen({ navigation }) {
         </Text>
       </TouchableOpacity>
       
-      <TouchableOpacity onPress={() => Alert.alert('Login Help', 'To login, enter your username and password.\n\nForgot your password? Contact support or create a new account.\n\nNew user? Click "Sign up" to create an account.')}>
+      <TouchableOpacity onPress={() => {
+        const msg = 'To Login, enter your username and password.\n\nNew user? Click "Sign up" to create an account.\n\nForgot your password? Contact support or create a new account.';
+        if (Platform.OS === 'web') {
+          window.alert(msg);
+        } else {
+          Alert.alert('Login Help', msg);
+        }
+      }}>
         <Text style={styles.helpLink}>Need help?</Text>
       </TouchableOpacity>
       </ScrollView>
