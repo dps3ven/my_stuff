@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 2,
+    fontWeight: 'bold',
   },
   itemNotes: {
     fontSize: 12,
