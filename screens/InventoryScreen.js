@@ -127,14 +127,15 @@ export default function InventoryScreen({ navigation }) {
       </View>
       
       <View style={styles.itemDetails}>
-        <Text style={styles.itemTitle}>{item.type} - {item.brand} {item.model}</Text>
-        <Text style={styles.itemInfo}>Serial: {item.serialNumber || 'N/A'}</Text>
-        <Text style={styles.itemInfo}>Condition: {item.condition}</Text>
-        <Text style={styles.itemInfo}>Value: ${item.value || 'N/A'}</Text>
+        <Text style={styles.itemInfo}>{item.brand || 'N/A'}</Text>
+        <Text style={styles.itemInfo}>{item.model || 'N/A'}</Text>
+
+        <Text style={styles.itemInfo}>{item.condition}</Text>
+
         {item.images && item.images.length > 1 && (
           <Text style={styles.itemInfo}>Images: {item.images.length}</Text>
         )}
-        <Text style={styles.tapHint}>Tap for details</Text>
+        <Text style={styles.tapHint}>More details</Text>
       </View>
       
       <View style={styles.actionButtons}>
@@ -304,6 +305,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 2,
+    fontWeight: 'bold',
   },
   itemNotes: {
     fontSize: 12,
