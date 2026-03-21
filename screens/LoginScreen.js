@@ -37,17 +37,28 @@ export default function LoginScreen({ navigation }) {
     
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
+      const userExists = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      
+      if (!userExists) {
+        if (Platform.OS === 'web') {
+          setErrorMessage('No account found with that username');
+        } else {
+          Alert.alert('Error', 'No account found with that username');
+        }
+        return;
+      }
+
       const hashedPassword = CryptoJS.SHA256(password).toString();
-      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && (u.password === hashedPassword || u.password === password));
+      const user = (userExists.password === hashedPassword || userExists.password === password) ? userExists : null;
       
       if (user) {
         await storage.setItem('currentUser', JSON.stringify(user));
         navigation.navigate('Dashboard');
       } else {
         if (Platform.OS === 'web') {
-          setErrorMessage('Invalid username or password');
+          setErrorMessage('Incorrect password');
         } else {
-          Alert.alert('Error', 'Invalid username or password');
+          Alert.alert('Error', 'Incorrect password');
         }
       }
     } catch (error) {
