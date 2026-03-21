@@ -127,15 +127,15 @@ export default function InventoryScreen({ navigation }) {
       </View>
       
       <View style={styles.itemDetails}>
-        <Text style={styles.itemInfo}>Brand: {item.brand || 'N/A'}</Text>
-        <Text style={styles.itemInfo}>Model: {item.model || 'N/A'}</Text>
+        <Text style={styles.itemInfo}>{item.brand || 'N/A'}</Text>
+        <Text style={styles.itemInfo}>{item.model || 'N/A'}</Text>
 
         <Text style={styles.itemInfo}>{item.condition}</Text>
 
         {item.images && item.images.length > 1 && (
           <Text style={styles.itemInfo}>Images: {item.images.length}</Text>
         )}
-        <Text style={styles.tapHint}>Tap for details</Text>
+        <Text style={styles.tapHint}>More details</Text>
       </View>
       
       <View style={styles.actionButtons}>
