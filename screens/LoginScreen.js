@@ -163,7 +163,7 @@ export default function LoginScreen({ navigation }) {
       </TouchableOpacity>
       
       <TouchableOpacity onPress={() => {
-        const msg = 'To login, enter your username and password.\n\nForgot your password? Contact support or create a new account.\n\nNew user? Click "Sign up" to create an account.';
+        const msg = 'To Login, enter your username and password.\n\nNew user? Click "Sign up" to create an account.\n\nForgot your password? Contact support or create a new account.';
         if (Platform.OS === 'web') {
           window.alert(msg);
         } else {
