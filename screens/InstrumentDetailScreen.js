@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, Dimensions } from 'react-native';
 
 export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
   const [activeIndex, setActiveIndex] = useState(0);
+  const imageScrollRef = useRef(null);
   const imageWidth = Platform.OS === 'web' ? 420 : Dimensions.get('window').width - 40;
 
   const handleScroll = useCallback((event) => {
@@ -11,6 +12,11 @@ export default function InstrumentDetailScreen({ navigation, route }) {
     const index = Math.round(offset / imageWidth);
     setActiveIndex(index);
   }, [imageWidth]);
+
+  const scrollToImage = (index) => {
+    imageScrollRef.current?.scrollTo({ x: index * imageWidth, animated: true });
+    setActiveIndex(index);
+  };
 
   return (
     <View style={styles.container}>
@@ -25,6 +31,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
         {item.images && item.images.length > 0 ? (
           <View style={styles.imageGallery}>
             <ScrollView 
+              ref={imageScrollRef}
               horizontal 
               showsHorizontalScrollIndicator={false}
               style={[styles.imageScroll, { width: imageWidth }]}
@@ -44,13 +51,17 @@ export default function InstrumentDetailScreen({ navigation, route }) {
             {item.images.length > 1 && (
               <View style={styles.dotContainer}>
                 {item.images.map((_, index) => (
-                  <View
+                  <TouchableOpacity
                     key={index}
-                    style={[
-                      styles.dot,
-                      activeIndex === index && styles.dotActive,
-                    ]}
-                  />
+                    onPress={() => scrollToImage(index)}
+                  >
+                    <View
+                      style={[
+                        styles.dot,
+                        activeIndex === index && styles.dotActive,
+                      ]}
+                    />
+                  </TouchableOpacity>
                 ))}
               </View>
             )}
