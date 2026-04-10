@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../utils/storage';
 
 export default function DashboardScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -15,10 +15,10 @@ export default function DashboardScreen({ navigation }) {
 
   const loadUserAndStats = async () => {
     try {
-      const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser'));
+      const currentUser = JSON.parse(await storage.getItem('currentUser'));
       setUser(currentUser);
 
-      const inventory = JSON.parse(await AsyncStorage.getItem(`inventory_${currentUser.id}`) || '[]');
+      const inventory = JSON.parse(await storage.getItem(`inventory_${currentUser.id}`) || '[]');
       const totalItems = inventory.length;
       const totalValue = inventory.reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
 
@@ -29,7 +29,7 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem('currentUser');
+    await storage.removeItem('currentUser');
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login' }],
