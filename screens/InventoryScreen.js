@@ -111,11 +111,6 @@ export default function InventoryScreen({ navigation }) {
                 />
               ))}
             </ScrollView>
-            {item.images.length > 3 && (
-              <View style={styles.scrollHint}>
-                <Text style={styles.scrollHintText}>→</Text>
-              </View>
-            )}
           </View>
         ) : item.image ? (
           <Image source={{ uri: item.image }} style={styles.itemImage} />
