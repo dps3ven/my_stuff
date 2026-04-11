@@ -120,7 +120,7 @@ export default function LoginScreen({ navigation }) {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>My Inventory</Text>
+        <Text style={styles.title}>My Stuff</Text>
 
         {isSignup && (
           <TextInput
@@ -175,16 +175,16 @@ export default function LoginScreen({ navigation }) {
 
         <TouchableOpacity onPress={() => {
           const msg = [
-            'Welcome to Toneshelf! 🎸',
-            'To log in, just enter your username and password.',
-            'New here? Tap "Sign up" to create a free account — it only takes a moment.',
-            'Forgot your password? No worries! Reach out to us at support@toneshelf.com and we\'ll get you sorted.',
-            'We\'re always happy to help at toneshelf.com 🎶',
+            'Welcome to My Stuff! 🎸',
+            'My Stuff is designed to help you catalog, organize, and take pride in your musical instrument collection.',
+            'To get started, enter your username and password. New here? Tap "Sign up" to create a free account.',
+            'Forgot your password? No worries — reach out to us at support@mystuff.club and we\'ll get you sorted.',
+            'Rock on! 🎶',
           ].join('\n\n');
           if (Platform.OS === 'web') {
             window.alert(msg);
           } else {
-            Alert.alert('Toneshelf Support', msg);
+            Alert.alert('My Stuff Support', msg);
           }
         }}>
           <Text style={styles.helpLink}>Need help?</Text>
