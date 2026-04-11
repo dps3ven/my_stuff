@@ -39,7 +39,7 @@ export default function DashboardScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.appTitle}>My Inventory</Text>
+        <Text style={styles.appTitle}>My Stuff</Text>
       </View>
 
       <View style={styles.welcomeCard}>
