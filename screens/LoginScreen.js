@@ -24,7 +24,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     setErrorMessage('');
-    
+
     // Validate required fields
     if (!username.trim() || !password.trim()) {
       if (Platform.OS === 'web') {
@@ -34,11 +34,11 @@ export default function LoginScreen({ navigation }) {
       }
       return;
     }
-    
+
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
       const userExists = users.find(u => u.username.toLowerCase() === username.toLowerCase());
-      
+
       if (!userExists) {
         if (Platform.OS === 'web') {
           setErrorMessage('No account found with that username');
@@ -50,7 +50,7 @@ export default function LoginScreen({ navigation }) {
 
       const hashedPassword = CryptoJS.SHA256(password).toString();
       const user = (userExists.password === hashedPassword || userExists.password === password) ? userExists : null;
-      
+
       if (user) {
         await storage.setItem('currentUser', JSON.stringify(user));
         navigation.navigate('Dashboard');
@@ -72,7 +72,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleSignup = async () => {
     setErrorMessage('');
-    
+
     // Validate required fields
     if (!name.trim() || !username.trim() || !password.trim()) {
       if (Platform.OS === 'web') {
@@ -82,10 +82,10 @@ export default function LoginScreen({ navigation }) {
       }
       return;
     }
-    
+
     try {
       const users = JSON.parse(await storage.getItem('users') || '[]');
-      
+
       if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
         if (Platform.OS === 'web') {
           setErrorMessage('Username already exists');
@@ -94,7 +94,7 @@ export default function LoginScreen({ navigation }) {
         }
         return;
       }
-      
+
       const hashedPassword = CryptoJS.SHA256(password).toString();
       const newUser = { name, username: username.toLowerCase(), password: hashedPassword, id: Date.now() };
       users.push(newUser);
@@ -111,78 +111,84 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-      <Text style={styles.title}>My Inventory</Text>
-      
-      {isSignup && (
+        <Text style={styles.title}>My Inventory</Text>
+
+        {isSignup && (
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name"
+            value={name}
+            onChangeText={setName}
+          />
+        )}
+
         <TextInput
           style={styles.input}
-          placeholder="Full Name"
-          value={name}
-          onChangeText={setName}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
         />
-      )}
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.passwordInput}
-          placeholder="Password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity 
-          style={styles.eyeButton}
-          onPress={() => setShowPassword(!showPassword)}
-        >
-          <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={isSignup ? handleSignup : handleLogin}
-      >
-        <Text style={styles.buttonText}>{isSignup ? 'Sign Up' : 'Login'}</Text>
-      </TouchableOpacity>
-      
-      {errorMessage ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Password"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+          </TouchableOpacity>
         </View>
-      ) : null}
-      
-      <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
-        <Text style={styles.link}>
-          {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign up"}
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity onPress={() => {
-        const msg = 'To Login, enter your username and password.\n\nNew user? Click "Sign up" to create an account.\n\nForgot your password? Contact support or create a new account.';
-        if (Platform.OS === 'web') {
-          window.alert(msg);
-        } else {
-          Alert.alert('Login Help', msg);
-        }
-      }}>
-        <Text style={styles.helpLink}>Need help?</Text>
-      </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={isSignup ? handleSignup : handleLogin}
+        >
+          <Text style={styles.buttonText}>{isSignup ? 'Sign Up' : 'Login'}</Text>
+        </TouchableOpacity>
+
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+
+        <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
+          <Text style={styles.link}>
+            {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign up"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => {
+          const msg = [
+            'Welcome to Toneshelf! 🎸',
+            'To log in, just enter your username and password.',
+            'New here? Tap "Sign up" to create a free account — it only takes a moment.',
+            'Forgot your password? No worries! Reach out to us at support@toneshelf.com and we\'ll get you sorted.',
+            'We\'re always happy to help at toneshelf.com 🎶',
+          ].join('\n\n');
+          if (Platform.OS === 'web') {
+            window.alert(msg);
+          } else {
+            Alert.alert('Toneshelf Support', msg);
+          }
+        }}>
+          <Text style={styles.helpLink}>Need help?</Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
