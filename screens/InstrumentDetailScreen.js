@@ -1,8 +1,22 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, Dimensions } from 'react-native';
 
 export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const imageScrollRef = useRef(null);
+  const imageWidth = Platform.OS === 'web' ? 420 : Dimensions.get('window').width - 40;
+
+  const handleScroll = useCallback((event) => {
+    const offset = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offset / imageWidth);
+    setActiveIndex(index);
+  }, [imageWidth]);
+
+  const scrollToImage = (index) => {
+    imageScrollRef.current?.scrollTo({ x: index * imageWidth, animated: true });
+    setActiveIndex(index);
+  };
 
   return (
     <View style={styles.container}>
@@ -17,24 +31,39 @@ export default function InstrumentDetailScreen({ navigation, route }) {
         {item.images && item.images.length > 0 ? (
           <View style={styles.imageGallery}>
             <ScrollView 
+              ref={imageScrollRef}
               horizontal 
-              showsHorizontalScrollIndicator={true}
-              style={styles.imageScroll}
-              pagingEnabled={Platform.OS !== 'web'}
+              showsHorizontalScrollIndicator={false}
+              style={[styles.imageScroll, { width: imageWidth }]}
+              pagingEnabled
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
             >
               {item.images.map((imageUri, index) => (
                 <Image 
                   key={index} 
                   source={{ uri: imageUri }} 
-                  style={styles.largeImage}
+                  style={[styles.largeImage, { width: imageWidth }]}
                   resizeMode="cover"
                 />
               ))}
             </ScrollView>
             {item.images.length > 1 && (
-              <Text style={styles.imageCounter}>
-                Swipe to view all {item.images.length} images
-              </Text>
+              <View style={styles.dotContainer}>
+                {item.images.map((_, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => scrollToImage(index)}
+                  >
+                    <View
+                      style={[
+                        styles.dot,
+                        activeIndex === index && styles.dotActive,
+                      ]}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
             )}
           </View>
         ) : item.image ? (
@@ -134,33 +163,41 @@ const styles = StyleSheet.create({
     maxWidth: 700,
   },
   imageScroll: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    maxWidth: Platform.OS === 'web' ? 700 : '100%',
+    overflow: 'hidden',
   },
   largeImage: {
-    width: Platform.OS === 'web' ? 400 : 300,
     height: Platform.OS === 'web' ? 300 : 250,
     borderRadius: 12,
     backgroundColor: '#fff',
-    marginBottom: 10,
-    marginHorizontal: Platform.OS === 'web' ? 10 : 0,
-    alignSelf: 'center',
   },
   noImage: {
+    width: Platform.OS === 'web' ? 400 : 300,
+    height: Platform.OS === 'web' ? 300 : 250,
+    borderRadius: 12,
+    backgroundColor: '#f0f0f0',
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
   },
   noImageText: {
     fontSize: 18,
     color: '#666',
   },
-  imageCounter: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 14,
-    marginTop: 10,
-    fontStyle: 'italic',
+  dotContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  dotActive: {
+    backgroundColor: '#fff',
   },
   detailsCard: {
     backgroundColor: 'white',

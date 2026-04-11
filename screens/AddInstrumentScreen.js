@@ -46,6 +46,30 @@ export default function AddInstrumentScreen({ navigation, route }) {
     });
   }, [navigation, isEditing]);
 
+  const compressImageForWeb = (blobUri, maxWidth = 800, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = blobUri;
+    });
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -55,7 +79,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
     });
 
     if (!result.canceled) {
-      const newImages = result.assets.map(asset => asset.uri);
+      let newImages;
+      if (Platform.OS === 'web') {
+        newImages = await Promise.all(
+          result.assets.map(asset => compressImageForWeb(asset.uri))
+        );
+      } else {
+        newImages = result.assets.map(asset => asset.uri);
+      }
       setInstrument({ ...instrument, images: [...instrument.images, ...newImages] });
     }
   };
@@ -100,7 +131,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
         navigation.navigate('Dashboard');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to save instrument');
+      console.error('Failed to save instrument:', error);
+      if (Platform.OS === 'web') {
+        window.alert('Failed to save instrument: ' + error.message);
+      } else {
+        Alert.alert('Error', 'Failed to save instrument');
+      }
     }
   };
 
