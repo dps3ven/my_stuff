@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: Platform.OS === 'web' ? 10 : 20,
     width: '100%',
   },
   imageGallery: {
