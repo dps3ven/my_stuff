@@ -6,3 +6,13 @@
 .env
 package-lock.json
 yarn.lock
+
+# Non-Expo files
+app.html
+dashboard.html
+inventory.html
+web/
+static/
+users.json
+App-Store-Deployment-Guide.md
+PRIVACY_POLICY.md
