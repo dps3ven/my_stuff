@@ -10,6 +10,7 @@ const INSTRUMENT_TYPES = [
   { label: 'Drums', value: 'Drums' },
   { label: 'Piano', value: 'Piano' },
   { label: 'Violin', value: 'Violin' },
+  { label: 'Microphone', value: 'Microphone' },
   { label: 'Other', value: 'Other' },
 ];
 
