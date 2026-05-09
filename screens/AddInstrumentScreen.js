@@ -278,15 +278,15 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <Text style={styles.imageButtonText}>Select Images</Text>
-              </TouchableOpacity>
-
               {Platform.OS !== 'web' && (
                 <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
                   <Text style={styles.imageButtonText}>📷 Take Photo</Text>
                 </TouchableOpacity>
               )}
+
+              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                <Text style={styles.imageButtonText}>Select Images</Text>
+              </TouchableOpacity>
 
               {Platform.OS !== 'web' && instrument.images.length > 0 && (
                 <View style={styles.imageGallery}>
@@ -449,16 +449,21 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   imageButton: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  cameraButton: {
-    backgroundColor: '#6c757d',
+    backgroundColor: '#28a745',
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
+  },
+  cameraButton: {
+    backgroundColor: '#28a745',
+    padding: 18,
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   imageButtonText: {
     color: 'white',
