@@ -176,7 +176,7 @@ export default function LoginScreen({ navigation }) {
         <TouchableOpacity onPress={() => {
           const msg = [
             'Welcome to My Stuff! 🎸',
-            'My Stuff is designed to help you catalog, organize, and take pride in your musical instrument collection.',
+            'My Stuff is designed to help you catalog, organize, and take pride in the stuff you own.',
             'To get started, enter your username and password. New here? Tap "Sign up" to create a free account.',
             'Forgot your password? No worries — reach out to us at support@mystuff.club and we\'ll get you sorted.',
             'Rock on! 🎶',

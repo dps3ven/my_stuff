@@ -43,7 +43,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
   useEffect(() => {
     navigation.setOptions({
-      title: isEditing ? 'Edit Instrument' : 'Add Instrument'
+      title: isEditing ? 'Edit Stuff' : 'Add Stuff'
     });
   }, [navigation, isEditing]);
 
@@ -119,10 +119,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
   const saveInstrument = async () => {
     // Validate required fields
     const missingFields = [];
-    if (!instrument.type) missingFields.push('Instrument Type');
+    if (!instrument.type) missingFields.push('Type');
     if (!instrument.brand) missingFields.push('Make');
     if (!instrument.model) missingFields.push('Model');
-    if (!instrument.condition) missingFields.push('Condition');
 
     if (missingFields.length > 0) {
       setErrorMessage(`Please fill in the following required fields: ${missingFields.join(', ')}`);
@@ -151,11 +150,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
         navigation.navigate('Dashboard');
       }
     } catch (error) {
-      console.error('Failed to save instrument:', error);
+      console.error('Failed to save stuff:', error);
       if (Platform.OS === 'web') {
-        window.alert('Failed to save instrument: ' + error.message);
+        window.alert('Failed to save stuff: ' + error.message);
       } else {
-        Alert.alert('Error', 'Failed to save instrument');
+        Alert.alert('Error', 'Failed to save stuff');
       }
     }
   };
@@ -207,11 +206,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
         >
           <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.contentWrapper : null}>
             <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.formColumn : null}>
-              <Text style={styles.title}>Add Instrument</Text>
+              <Text style={styles.title}>Add Stuff</Text>
 
               <View style={styles.formRow}>
                 <View style={styles.formField}>
-                  <Text style={styles.label}>Instrument Type *</Text>
+                  <Text style={styles.label}>Type *</Text>
                   {renderCollapsiblePicker(
                     INSTRUMENT_TYPES,
                     instrument.type,
@@ -240,40 +239,6 @@ export default function AddInstrumentScreen({ navigation, route }) {
                     value={instrument.model}
                     onChangeText={(text) => setInstrument({ ...instrument, model: text })}
                     placeholder="Enter model"
-                  />
-                </View>
-
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Serial Number</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={instrument.serialNumber}
-                    onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
-                    placeholder="Enter serial number"
-                  />
-                </View>
-              </View>
-
-              <View style={styles.formRow}>
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Condition *</Text>
-                  {renderCollapsiblePicker(
-                    CONDITIONS,
-                    instrument.condition,
-                    (value) => setInstrument({ ...instrument, condition: value }),
-                    showConditionPicker,
-                    setShowConditionPicker
-                  )}
-                </View>
-
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Estimated Value ($)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={instrument.value}
-                    onChangeText={(text) => setInstrument({ ...instrument, value: text })}
-                    placeholder="Enter value"
-                    keyboardType="numeric"
                   />
                 </View>
               </View>
@@ -311,6 +276,42 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 </View>
               )}
 
+              <View style={styles.formRow}>
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Serial Number</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={instrument.serialNumber}
+                    onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
+                    placeholder="Enter serial number"
+                  />
+                </View>
+              </View>
+
+              <View style={styles.formRow}>
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Condition</Text>
+                  {renderCollapsiblePicker(
+                    CONDITIONS,
+                    instrument.condition,
+                    (value) => setInstrument({ ...instrument, condition: value }),
+                    showConditionPicker,
+                    setShowConditionPicker
+                  )}
+                </View>
+
+                <View style={styles.formField}>
+                  <Text style={styles.label}>Estimated Value ($)</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={instrument.value}
+                    onChangeText={(text) => setInstrument({ ...instrument, value: text })}
+                    placeholder="Enter value"
+                    keyboardType="numeric"
+                  />
+                </View>
+              </View>
+
               {errorMessage ? (
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorText}>{errorMessage}</Text>
@@ -318,7 +319,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
               ) : null}
 
               <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-                <Text style={styles.saveButtonText}>{isEditing ? 'Update Instrument' : 'Add to Inventory'}</Text>
+                <Text style={styles.saveButtonText}>{isEditing ? 'Update Stuff' : 'Add to Inventory'}</Text>
               </TouchableOpacity>
             </View>
 

@@ -19,8 +19,8 @@
       "bundleIdentifier": "club.mystuff.app",
       "buildNumber": "1",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "My Stuff needs access to your photo library to attach images of your instruments.",
-        "NSCameraUsageDescription": "My Stuff needs camera access to take photos of your instruments."
+        "NSPhotoLibraryUsageDescription": "My Stuff needs access to your photo library to attach images of your stuff.",
+        "NSCameraUsageDescription": "My Stuff needs camera access to take photos of your stuff."
       }
     },
     "android": {
