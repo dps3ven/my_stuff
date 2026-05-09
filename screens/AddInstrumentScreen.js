@@ -71,6 +71,25 @@ export default function AddInstrumentScreen({ navigation, route }) {
     });
   };
 
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Camera access is needed to take photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const newImages = result.assets.map(asset => asset.uri);
+      setInstrument({ ...instrument, images: [...instrument.images, ...newImages] });
+    }
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -263,6 +282,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 <Text style={styles.imageButtonText}>Select Images</Text>
               </TouchableOpacity>
 
+              {Platform.OS !== 'web' && (
+                <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
+                  <Text style={styles.imageButtonText}>📷 Take Photo</Text>
+                </TouchableOpacity>
+              )}
+
               {Platform.OS !== 'web' && instrument.images.length > 0 && (
                 <View style={styles.imageGallery}>
                   <Text style={styles.galleryTitle}>Selected Images ({instrument.images.length})</Text>
@@ -425,6 +450,12 @@ const styles = StyleSheet.create({
   },
   imageButton: {
     backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  cameraButton: {
+    backgroundColor: '#6c757d',
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
