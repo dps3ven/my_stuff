@@ -155,15 +155,6 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.title}>My Stuff</Text>
         </TouchableOpacity>
 
-        {isSignup && (
-          <TextInput
-            style={styles.input}
-            placeholder="Full Name"
-            value={name}
-            onChangeText={setName}
-          />
-        )}
-
         <TextInput
           style={styles.input}
           placeholder="Username"
