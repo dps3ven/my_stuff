@@ -105,7 +105,7 @@ export default function LoginScreen({ navigation }) {
     setErrorMessage('');
 
     // Validate required fields
-    if (!name.trim() || !username.trim() || !password.trim()) {
+    if (!username.trim() || !password.trim()) {
       if (Platform.OS === 'web') {
         setErrorMessage('All fields are required');
       } else {
@@ -127,7 +127,7 @@ export default function LoginScreen({ navigation }) {
       }
 
       const hashedPassword = CryptoJS.SHA256(password).toString();
-      const newUser = { name, username: username.toLowerCase(), password: hashedPassword, id: Date.now() };
+      const newUser = { name: username.trim(), username: username.toLowerCase().trim(), password: hashedPassword, id: Date.now() };
       users.push(newUser);
       await storage.setItem('users', JSON.stringify(users));
       await storage.setItem('currentUser', JSON.stringify(newUser));
