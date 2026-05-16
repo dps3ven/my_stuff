@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import storage from '../utils/storage';
 
 export default function DashboardScreen({ navigation }) {
@@ -38,59 +38,67 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.appTitle}>My Stuff</Text>
-      </View>
-
-      <View style={styles.welcomeCard}>
-        <Text style={styles.welcome}>Hello, {user?.name}!</Text>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <TouchableOpacity 
-          style={styles.statCard}
-          onPress={() => navigation.navigate('Inventory')}
-        >
-          <View style={styles.statIcon}>
-            <Text style={styles.iconText}>🎸</Text>
-          </View>
-          <Text style={styles.statNumber}>{stats.totalItems}</Text>
-          <Text style={styles.statLabel}>My Stuff</Text>
-        </TouchableOpacity>
-        <View style={styles.statCard}>
-          <View style={styles.statIcon}>
-            <Text style={styles.iconText}>💰</Text>
-          </View>
-          <Text style={styles.statNumber}>${stats.totalValue.toFixed(2)}</Text>
-          <Text style={styles.statLabel}>Total Value</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+      >
+        <View style={styles.header}>
+          <Text style={styles.appTitle}>My Stuff</Text>
         </View>
-      </View>
 
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('AddInstrument')}
-        >
-          {/* <Text style={styles.buttonIcon}>➕</Text> */}
-          <Text style={styles.buttonText}>Add Stuff</Text>
-        </TouchableOpacity>
+        <View style={styles.welcomeCard}>
+          <Text style={styles.welcome}>Hello, {user?.name}!</Text>
+        </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('Inventory')}
-        >
-          {/* <Text style={styles.buttonIcon}>📋</Text> */}
-          <Text style={styles.buttonText}>View Stuff</Text>
-        </TouchableOpacity>
+        <View style={styles.whyCard}>
+          <Text style={styles.whyText}>
+          Every great collection deserves great respect.
+          </Text>
+        </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('Login')}
-        >
-          {/* <Text style={styles.buttonIcon}>🚪</Text> */}
-          <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.statsContainer}>
+          <TouchableOpacity 
+            style={styles.statCard}
+            onPress={() => navigation.navigate('Inventory')}
+          >
+            <View style={styles.statIcon}>
+              <Text style={styles.iconText}>🎸</Text>
+            </View>
+            <Text style={styles.statNumber}>{stats.totalItems}</Text>
+            <Text style={styles.statLabel}>My Stuff</Text>
+          </TouchableOpacity>
+          <View style={styles.statCard}>
+            <View style={styles.statIcon}>
+              <Text style={styles.iconText}>💰</Text>
+            </View>
+            <Text style={styles.statNumber}>${stats.totalValue.toFixed(2)}</Text>
+            <Text style={styles.statLabel}>Total Value</Text>
+          </View>
+        </View>
+
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('AddInstrument')}
+          >
+            <Text style={styles.buttonText}>Add Stuff</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('Inventory')}
+          >
+            <Text style={styles.buttonText}>View Stuff</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={logout}
+          >
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -98,8 +106,11 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#133965ff',
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40,
   },
   header: {
     marginBottom: 30,
@@ -123,9 +134,29 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 28,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 6,
     color: '#fff',
     fontWeight: '600',
+  },
+  tagline: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontStyle: 'italic',
+  },
+  whyCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 12,
+    padding: 18,
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  whyText: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.85)',
+    lineHeight: 22,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
