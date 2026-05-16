@@ -226,170 +226,140 @@ export default function AddInstrumentScreen({ navigation, route }) {
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={true}
         >
-          <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.contentWrapper : null}>
-            <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.formColumn : null}>
-              <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : 'Add New Stuff'}</Text>
-              <Text style={styles.subtitle}>{isEditing ? 'Update the details below.' : 'What about your gear'}</Text>
+          <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : '🎸 Add New Stuff'}</Text>
 
-              <View style={styles.formRow}>
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Type *</Text>
-                  {renderCollapsiblePicker(
-                    INSTRUMENT_TYPES,
-                    instrument.type,
-                    (value) => setInstrument({ ...instrument, type: value, brand: '', model: '' }),
-                    showTypePicker,
-                    setShowTypePicker
-                  )}
-                </View>
-
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Make *</Text>
-                  {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
-                    renderCollapsiblePicker(
-                      [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                      instrument.brand,
-                      (value) => setInstrument({ ...instrument, brand: value }),
-                      showMakePicker,
-                      setShowMakePicker
-                    )
-                  ) : (
-                    <TextInput
-                      style={[styles.input, { color: '#999' }]}
-                      value=""
-                      placeholder="Select a type first"
-                      editable={false}
-                    />
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.formRow}>
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Model *</Text>
-                  {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
-                    renderCollapsiblePicker(
-                      [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                      instrument.model,
-                      (value) => setInstrument({ ...instrument, model: value }),
-                      showModelPicker,
-                      setShowModelPicker
-                    )
-                  ) : (
-                    <TextInput
-                      style={[styles.input, { color: '#999' }]}
-                      value=""
-                      placeholder="Select a type first"
-                      editable={false}
-                    />
-                  )}
-                </View>
-              </View>
-
-              {Platform.OS !== 'web' && (
-                <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
-                  <Text style={styles.imageButtonText}>📷 Take Photo</Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <Text style={styles.imageButtonText}>Select Images</Text>
-              </TouchableOpacity>
-
-              {Platform.OS !== 'web' && instrument.images.length > 0 && (
-                <View style={styles.imageGallery}>
-                  <Text style={styles.galleryTitle}>Selected Images ({instrument.images.length})</Text>
-                  <ScrollView 
-                    horizontal 
-                    showsHorizontalScrollIndicator={true}
-                    style={styles.horizontalScroll}
-                  >
-                    {instrument.images.map((imageUri, index) => (
-                      <View key={index} style={styles.imageCard}>
-                        <Image source={{ uri: imageUri }} style={styles.cardImage} />
-                        <TouchableOpacity 
-                          style={styles.removeButton} 
-                          onPress={() => removeImage(index)}
-                        >
-                          <Text style={styles.removeButtonText}>✕ Remove</Text>
-                        </TouchableOpacity>
-                      </View>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-
-              <View style={styles.formRow}>
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Serial Number</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={instrument.serialNumber}
-                    onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
-                    placeholder="Enter serial number"
-                  />
-                </View>
-              </View>
-
-              <View style={styles.formRow}>
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Condition</Text>
-                  {renderCollapsiblePicker(
-                    CONDITIONS,
-                    instrument.condition,
-                    (value) => setInstrument({ ...instrument, condition: value }),
-                    showConditionPicker,
-                    setShowConditionPicker
-                  )}
-                </View>
-
-                <View style={styles.formField}>
-                  <Text style={styles.label}>Estimated Value ($)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={instrument.value}
-                    onChangeText={(text) => setInstrument({ ...instrument, value: text })}
-                    placeholder="Enter value"
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
-
-              {errorMessage ? (
-                <View style={styles.errorContainer}>
-                  <Text style={styles.errorText}>{errorMessage}</Text>
-                </View>
-              ) : null}
-
-              <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-                <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
-              </TouchableOpacity>
-            </View>
-
-            {Platform.OS === 'web' && instrument.images.length > 0 && (
-              <View style={styles.imageColumn}>
-                <Text style={styles.galleryTitle}>Selected Images ({instrument.images.length})</Text>
-                <ScrollView 
-                  style={styles.verticalScroll}
-                  showsVerticalScrollIndicator={true}
-                >
-                  <View style={styles.imageGrid}>
-                    {instrument.images.map((imageUri, index) => (
-                      <View key={index} style={styles.imageCardWeb}>
-                        <Image source={{ uri: imageUri }} style={styles.cardImageWeb} />
-                        <TouchableOpacity 
-                          style={styles.removeButtonSmall} 
-                          onPress={() => removeImage(index)}
-                        >
-                          <Text style={styles.removeButtonText}>✕</Text>
-                        </TouchableOpacity>
-                      </View>
-                    ))}
+          {/* Image Section - Pinterest style hero */}
+          <View style={styles.imageSection}>
+            {instrument.images.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
+                {instrument.images.map((imageUri, index) => (
+                  <View key={index} style={styles.pinCard}>
+                    <Image source={{ uri: imageUri }} style={styles.pinImage} resizeMode="cover" />
+                    <TouchableOpacity style={styles.pinRemove} onPress={() => removeImage(index)}>
+                      <Text style={styles.pinRemoveText}>✕</Text>
+                    </TouchableOpacity>
                   </View>
-                </ScrollView>
+                ))}
+              </ScrollView>
+            ) : (
+              <View style={styles.emptyImageCard}>
+                <Text style={styles.emptyImageEmoji}>📷</Text>
+                <Text style={styles.emptyImageText}>Add photos of your stuff</Text>
               </View>
             )}
+            <View style={styles.imageActions}>
+              {Platform.OS !== 'web' && (
+                <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
+                  <Text style={styles.imageButtonText}>📷 Camera</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                <Text style={styles.imageButtonText}>🖼️ Gallery</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+
+          {/* Form Card */}
+          <View style={styles.formCard}>
+            <View style={styles.formRow}>
+              <View style={styles.formField}>
+                <Text style={styles.label}>Type</Text>
+                {renderCollapsiblePicker(
+                  INSTRUMENT_TYPES,
+                  instrument.type,
+                  (value) => setInstrument({ ...instrument, type: value, brand: '', model: '' }),
+                  showTypePicker,
+                  setShowTypePicker
+                )}
+              </View>
+
+              <View style={styles.formField}>
+                <Text style={styles.label}>Make</Text>
+                {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
+                  renderCollapsiblePicker(
+                    [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                    instrument.brand,
+                    (value) => setInstrument({ ...instrument, brand: value }),
+                    showMakePicker,
+                    setShowMakePicker
+                  )
+                ) : (
+                  <TextInput
+                    style={[styles.input, { color: '#aaa' }]}
+                    value=""
+                    placeholder="Pick a type first"
+                    editable={false}
+                  />
+                )}
+              </View>
+            </View>
+
+            <View style={styles.formRow}>
+              <View style={styles.formField}>
+                <Text style={styles.label}>Model</Text>
+                {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
+                  renderCollapsiblePicker(
+                    [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                    instrument.model,
+                    (value) => setInstrument({ ...instrument, model: value }),
+                    showModelPicker,
+                    setShowModelPicker
+                  )
+                ) : (
+                  <TextInput
+                    style={[styles.input, { color: '#aaa' }]}
+                    value=""
+                    placeholder="Pick a type first"
+                    editable={false}
+                  />
+                )}
+              </View>
+
+              <View style={styles.formField}>
+                <Text style={styles.label}>Serial Number</Text>
+                <TextInput
+                  style={styles.input}
+                  value={instrument.serialNumber}
+                  onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
+                  placeholder="Optional"
+                />
+              </View>
+            </View>
+
+            <View style={styles.formRow}>
+              <View style={styles.formField}>
+                <Text style={styles.label}>Condition</Text>
+                {renderCollapsiblePicker(
+                  CONDITIONS,
+                  instrument.condition,
+                  (value) => setInstrument({ ...instrument, condition: value }),
+                  showConditionPicker,
+                  setShowConditionPicker
+                )}
+              </View>
+
+              <View style={styles.formField}>
+                <Text style={styles.label}>Value ($)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={instrument.value}
+                  onChangeText={(text) => setInstrument({ ...instrument, value: text })}
+                  placeholder="Estimated"
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+          </View>
+
+          {errorMessage ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+          ) : null}
+
+          <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
+            <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
+          </TouchableOpacity>
         </ScrollView>
         
         <View style={styles.fixedFooter}>
@@ -397,7 +367,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
             style={styles.dashboardButton} 
             onPress={() => navigation.navigate('Dashboard')}
           >
-            <Text style={styles.dashboardButtonText}>Back to Dashboard</Text>
+            <Text style={styles.dashboardButtonText}>← Dashboard</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -408,300 +378,249 @@ export default function AddInstrumentScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#133965ff',
-    alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
+    backgroundColor: '#133965',
   },
   scrollView: {
     flex: 1,
-    width: Platform.OS === 'web' ? '100%' : '100%',
-    maxWidth: Platform.OS === 'web' ? 1200 : '100%',
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 120,
-    flexGrow: 1,
+    padding: 16,
+    paddingBottom: 100,
+    maxWidth: Platform.OS === 'web' ? 700 : '100%',
+    alignSelf: 'center',
+    width: '100%',
   },
   title: {
-    fontSize: Platform.OS === 'web' ? 36 : 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '800',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 20,
     color: '#fff',
   },
-  subtitle: {
+  imageSection: {
+    marginBottom: 16,
+  },
+  imageRow: {
+    marginBottom: 12,
+  },
+  pinCard: {
+    width: 160,
+    height: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginRight: 12,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  pinImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  pinRemove: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pinRemoveText: {
+    color: '#fff',
     fontSize: 14,
+    fontWeight: 'bold',
+  },
+  emptyImageCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 40,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#eee',
+    borderStyle: 'dashed',
+    marginBottom: 12,
+  },
+  emptyImageEmoji: {
+    fontSize: 48,
+    marginBottom: 10,
+  },
+  emptyImageText: {
+    color: '#999',
+    fontSize: 16,
+  },
+  imageActions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  imageButton: {
+    flex: 1,
+    backgroundColor: '#28a745',
+    padding: 14,
+    borderRadius: 24,
+    shadowColor: '#28a745',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  cameraButton: {
+    flex: 1,
+    backgroundColor: '#28a745',
+    padding: 14,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  imageButtonText: {
+    color: 'white',
     textAlign: 'center',
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginBottom: 25,
-    fontStyle: 'italic',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  formCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   formRow: {
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
-    gap: 15,
-    marginBottom: 0,
+    gap: 12,
+    marginBottom: 4,
   },
   formField: {
     flex: 1,
-    minWidth: Platform.OS === 'web' ? 0 : '100%',
   },
   label: {
-    fontSize: Platform.OS === 'web' ? 18 : 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 6,
+    color: '#666',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
   },
   input: {
-    backgroundColor: 'white',
-    padding: Platform.OS === 'web' ? 18 : 15,
-    marginBottom: 15,
-    borderRadius: 8,
+    backgroundColor: '#f8f8f8',
+    padding: 14,
+    marginBottom: 12,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
-    fontSize: Platform.OS === 'web' ? 18 : 16,
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
+    borderColor: '#eee',
+    fontSize: 15,
+    color: '#333',
   },
   pickerButton: {
-    backgroundColor: 'white',
-    padding: Platform.OS === 'web' ? 18 : 15,
-    marginBottom: 15,
-    borderRadius: 8,
+    backgroundColor: '#f8f8f8',
+    padding: 14,
+    marginBottom: 12,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#eee',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   pickerButtonText: {
-    fontSize: Platform.OS === 'web' ? 18 : 16,
+    fontSize: 15,
     color: '#333',
   },
   pickerArrow: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 12,
+    color: '#28a745',
+    fontWeight: 'bold',
   },
   pickerContainer: {
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: 15,
-    marginTop: -15,
-  },
-  pickerItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  pickerText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  imageButton: {
-    backgroundColor: '#28a745',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  cameraButton: {
-    backgroundColor: '#28a745',
-    padding: 18,
-    borderRadius: 8,
-    marginBottom: 10,
+    borderColor: '#eee',
+    marginBottom: 12,
+    marginTop: -12,
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
     elevation: 5,
   },
-  imageButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 16,
+  pickerItem: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f5f5f5',
   },
-  imagePreview: {
-    width: 200,
-    height: 150,
-    borderRadius: 8,
-    alignSelf: 'center',
-    marginBottom: 15,
+  pickerText: {
+    fontSize: 15,
+    color: '#333',
   },
   saveButton: {
     backgroundColor: '#28a745',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
+    padding: 18,
+    borderRadius: 28,
+    shadowColor: '#28a745',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 6,
   },
   saveButtonText: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   errorContainer: {
-    backgroundColor: '#f8d7da',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    borderWidth: 2,
-    borderColor: '#f5c6cb',
+    backgroundColor: '#fff3f3',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#ffcdd2',
   },
   errorText: {
-    color: '#721c24',
+    color: '#c62828',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   dashboardButton: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 8,
-    width: '100%',
-    maxWidth: 400,
+    padding: 12,
   },
   dashboardButtonText: {
-    color: 'white',
+    color: '#fff',
     textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '600',
   },
   fixedFooter: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#133965ff',
-    padding: 15,
+    backgroundColor: '#0f2d52',
+    padding: 12,
     alignItems: 'center',
-    borderTopWidth: 2,
-    borderTopColor: '#1e4976',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.15)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 10,
-  },
-  contentWrapper: {
-    flexDirection: 'row',
-    gap: 20,
-    alignItems: 'flex-start',
-  },
-  formColumn: {
-    flex: 1,
-    minWidth: 0,
-  },
-  imageColumn: {
-    width: 400,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 8,
-    padding: 15,
-  },
-  verticalScroll: {
-    maxHeight: 400,
-  },
-  imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  imageGallery: {
-    marginBottom: 20,
-  },
-  galleryTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
-  },
-  horizontalScroll: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 8,
-    padding: 10,
-  },
-  imageCard: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 10,
-    marginRight: 15,
-    alignItems: 'center',
-    width: 150,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardImage: {
-    width: 130,
-    height: 130,
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  cardLabel: {
-    fontSize: 12,
-    color: '#333',
-    marginBottom: 8,
-    fontWeight: '500',
-  },
-  removeButton: {
-    backgroundColor: '#dc3545',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  removeButtonText: {
-    color: 'white',
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-  imageCardWeb: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-    width: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
-  },
-  cardImageWeb: {
-    width: '100%',
-    height: 100,
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  imageCardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardLabelWeb: {
-    fontSize: 12,
-    color: '#333',
-    fontWeight: '500',
-  },
-  removeButtonSmall: {
-    backgroundColor: '#dc3545',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
-    alignItems: 'center',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    elevation: 5,
   },
 });
