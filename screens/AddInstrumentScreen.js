@@ -206,7 +206,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
         >
           <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.contentWrapper : null}>
             <View style={Platform.OS === 'web' && instrument.images.length > 0 ? styles.formColumn : null}>
-              <Text style={styles.title}>Add Stuff</Text>
+              <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : 'Add New Stuff'}</Text>
+              <Text style={styles.subtitle}>{isEditing ? 'Update the details below.' : 'What about your gear'}</Text>
 
               <View style={styles.formRow}>
                 <View style={styles.formField}>
@@ -319,7 +320,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
               ) : null}
 
               <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-                <Text style={styles.saveButtonText}>{isEditing ? 'Update Stuff' : 'Add to Inventory'}</Text>
+                <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
               </TouchableOpacity>
             </View>
 
@@ -382,8 +383,15 @@ const styles = StyleSheet.create({
     fontSize: Platform.OS === 'web' ? 36 : 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 8,
     color: '#fff',
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 25,
+    fontStyle: 'italic',
   },
   formRow: {
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
