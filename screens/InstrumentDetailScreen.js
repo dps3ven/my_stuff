@@ -25,7 +25,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
-        <Text style={styles.title}>{item.type} Details</Text>
+
 
         {/* Image Gallery */}
         {item.images && item.images.length > 0 ? (
@@ -117,7 +117,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
             style={styles.editButton}
             onPress={() => navigation.navigate('AddInstrument', { editItem: item })}
           >
-            <Text style={styles.buttonText}>Edit Instrument</Text>
+            <Text style={styles.buttonText}>Edit Stuff</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 

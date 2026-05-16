@@ -17,9 +17,9 @@ export default function App() {
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
-          <Stack.Screen name="Inventory" component={InventoryScreen} />
+          <Stack.Screen name="Inventory" component={InventoryScreen} options={{ title: 'My Stuff' }} />
           <Stack.Screen name="AddInstrument" component={AddInstrumentScreen} />
-          <Stack.Screen name="InstrumentDetail" component={InstrumentDetailScreen} options={{ title: 'Instrument Details' }} />
+          <Stack.Screen name="InstrumentDetail" component={InstrumentDetailScreen} options={{ title: 'Details' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
