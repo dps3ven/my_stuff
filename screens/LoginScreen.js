@@ -24,28 +24,43 @@ export default function LoginScreen({ navigation }) {
 
   const resetAllData = async () => {
     if (Platform.OS === 'web') {
-      if (window.confirm('Reset all data? This will delete all users and inventory.')) {
-        localStorage.clear();
-        setErrorMessage('');
-        setUsername('');
-        setPassword('');
+      if (window.confirm('⚠️ Reset all data?\n\nThis will permanently delete all users, inventory, and images. This cannot be undone.')) {
+        if (window.confirm('Are you absolutely sure? All data will be lost forever.')) {
+          localStorage.clear();
+          setErrorMessage('');
+          setUsername('');
+          setPassword('');
+        }
       }
     } else {
       Alert.alert(
-        'Reset All Data',
-        'This will delete all users and inventory. Are you sure?',
+        '⚠️ Reset All Data',
+        'This will permanently delete all users, inventory, and images. This cannot be undone.',
         [
           { text: 'Cancel', style: 'cancel' },
           {
-            text: 'Reset',
+            text: 'Yes, Delete Everything',
             style: 'destructive',
-            onPress: async () => {
-              await storage.removeItem('users');
-              await storage.removeItem('currentUser');
-              setErrorMessage('');
-              setUsername('');
-              setPassword('');
-              Alert.alert('Done', 'All data has been reset.');
+            onPress: () => {
+              Alert.alert(
+                'Final Warning',
+                'Are you absolutely sure? All data will be lost forever.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Delete All',
+                    style: 'destructive',
+                    onPress: async () => {
+                      await storage.removeItem('users');
+                      await storage.removeItem('currentUser');
+                      setErrorMessage('');
+                      setUsername('');
+                      setPassword('');
+                      Alert.alert('Done', 'All data has been reset.');
+                    }
+                  }
+                ]
+              );
             }
           }
         ]
