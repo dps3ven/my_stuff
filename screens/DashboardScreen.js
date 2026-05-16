@@ -44,7 +44,6 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={styles.welcomeCard}>
         <Text style={styles.welcome}>Hello, {user?.name}!</Text>
-        <Text style={styles.subtitle}>Manage your musical instrument inventory</Text>
       </View>
 
       <View style={styles.statsContainer}>
@@ -56,7 +55,7 @@ export default function DashboardScreen({ navigation }) {
             <Text style={styles.iconText}>🎸</Text>
           </View>
           <Text style={styles.statNumber}>{stats.totalItems}</Text>
-          <Text style={styles.statLabel}>Instruments</Text>
+          <Text style={styles.statLabel}>My Stuff</Text>
         </TouchableOpacity>
         <View style={styles.statCard}>
           <View style={styles.statIcon}>
@@ -73,7 +72,7 @@ export default function DashboardScreen({ navigation }) {
           onPress={() => navigation.navigate('AddInstrument')}
         >
           {/* <Text style={styles.buttonIcon}>➕</Text> */}
-          <Text style={styles.buttonText}>Add Instrument</Text>
+          <Text style={styles.buttonText}>Add Stuff</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -81,7 +80,7 @@ export default function DashboardScreen({ navigation }) {
           onPress={() => navigation.navigate('Inventory')}
         >
           {/* <Text style={styles.buttonIcon}>📋</Text> */}
-          <Text style={styles.buttonText}>View Inventory</Text>
+          <Text style={styles.buttonText}>View Stuff</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

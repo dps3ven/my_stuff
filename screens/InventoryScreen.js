@@ -163,7 +163,7 @@ export default function InventoryScreen({ navigation }) {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Inventory</Text>
+          <Text style={styles.title}>My Stuff</Text>
           <TouchableOpacity 
             style={styles.addButton}
             onPress={() => navigation.navigate('AddInstrument')}
@@ -174,12 +174,12 @@ export default function InventoryScreen({ navigation }) {
         
         {inventory.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No instruments added yet</Text>
+            <Text style={styles.emptyText}>Nothing Added Yet</Text>
             <TouchableOpacity 
               style={styles.primaryButton}
               onPress={() => navigation.navigate('AddInstrument')}
             >
-              <Text style={styles.buttonText}>Add Your First Instrument</Text>
+              <Text style={styles.buttonText}>Add Some Stuff</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.logoutLink}
