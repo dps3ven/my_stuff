@@ -174,7 +174,9 @@ export default function InventoryScreen({ navigation }) {
         
         {inventory.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Nothing Added Yet</Text>
+            <Text style={styles.emptyIcon}>🎸</Text>
+            <Text style={styles.emptyText}>Nothing here yet!</Text>
+            <Text style={styles.emptyHint}>Photos and serial numbers go a long way — for insurance, resale, or just peace of mind.</Text>
             <TouchableOpacity 
               style={styles.primaryButton}
               onPress={() => navigation.navigate('AddInstrument')}
@@ -190,6 +192,9 @@ export default function InventoryScreen({ navigation }) {
           </View>
         ) : (
           <>
+            <View style={styles.tipBanner}>
+              <Text style={styles.tipText}>💡 Tap any item to see full details. Swipe images to browse photos.</Text>
+            </View>
             <SectionList
               sections={inventory}
               renderItem={renderItem}
@@ -347,11 +352,38 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+  emptyIcon: {
+    fontSize: 60,
+    marginBottom: 15,
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: 22,
     color: '#fff',
-    marginBottom: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  emptyHint: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+    marginBottom: 25,
+    lineHeight: 22,
+    fontStyle: 'italic',
+  },
+  tipBanner: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  tipText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 13,
+    textAlign: 'center',
   },
   primaryButton: {
     backgroundColor: '#007bff',
