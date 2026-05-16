@@ -22,6 +22,37 @@ export default function LoginScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
+  const resetAllData = async () => {
+    if (Platform.OS === 'web') {
+      if (window.confirm('Reset all data? This will delete all users and inventory.')) {
+        localStorage.clear();
+        setErrorMessage('');
+        setUsername('');
+        setPassword('');
+      }
+    } else {
+      Alert.alert(
+        'Reset All Data',
+        'This will delete all users and inventory. Are you sure?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Reset',
+            style: 'destructive',
+            onPress: async () => {
+              await storage.removeItem('users');
+              await storage.removeItem('currentUser');
+              setErrorMessage('');
+              setUsername('');
+              setPassword('');
+              Alert.alert('Done', 'All data has been reset.');
+            }
+          }
+        ]
+      );
+    }
+  };
+
   const handleLogin = async () => {
     setErrorMessage('');
 
@@ -120,7 +151,9 @@ export default function LoginScreen({ navigation }) {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>My Stuff</Text>
+        <TouchableOpacity onLongPress={resetAllData} delayLongPress={3000}>
+          <Text style={styles.title}>My Stuff</Text>
+        </TouchableOpacity>
 
         {isSignup && (
           <TextInput
@@ -171,6 +204,10 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.link}>
             {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign up"}
           </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={resetAllData} style={styles.resetButton}>
+          <Text style={styles.resetText}>Reset All Data</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -265,5 +302,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: Platform.OS === 'web' ? 16 : 14,
     fontWeight: '600',
+  },
+  resetButton: {
+    marginTop: 30,
+    padding: 12,
+    alignItems: 'center',
+  },
+  resetText: {
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: 13,
+    textDecorationLine: 'underline',
   },
 });
