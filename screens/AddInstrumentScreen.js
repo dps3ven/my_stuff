@@ -194,7 +194,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       </TouchableOpacity>
       {isVisible && (
         <View style={styles.pickerContainer}>
-          {items.map((item) => (
+          {items.filter(item => item.value !== '').map((item) => (
             <TouchableOpacity
               key={item.value}
               style={styles.pickerItem}
@@ -276,13 +276,23 @@ export default function AddInstrumentScreen({ navigation, route }) {
               <View style={styles.formField}>
                 <Text style={styles.label}>Make</Text>
                 {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
-                  renderCollapsiblePicker(
-                    [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                    instrument.brand,
-                    (value) => setInstrument({ ...instrument, brand: value }),
-                    showMakePicker,
-                    setShowMakePicker
-                  )
+                  <>
+                    {renderCollapsiblePicker(
+                      [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                      instrument.brand === 'Other' ? 'Other' : instrument.brand,
+                      (value) => setInstrument({ ...instrument, brand: value }),
+                      showMakePicker,
+                      setShowMakePicker
+                    )}
+                    {instrument.brand === 'Other' && (
+                      <TextInput
+                        style={styles.otherInput}
+                        value={instrument.customBrand || ''}
+                        onChangeText={(text) => setInstrument({ ...instrument, customBrand: text, brand: text || 'Other' })}
+                        placeholder="✏️ Type your make/brand here"
+                      />
+                    )}
+                  </>
                 ) : (
                   <TextInput
                     style={[styles.input, { color: '#aaa' }]}
@@ -298,13 +308,23 @@ export default function AddInstrumentScreen({ navigation, route }) {
               <View style={styles.formField}>
                 <Text style={styles.label}>Model</Text>
                 {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
-                  renderCollapsiblePicker(
-                    [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                    instrument.model,
-                    (value) => setInstrument({ ...instrument, model: value }),
-                    showModelPicker,
-                    setShowModelPicker
-                  )
+                  <>
+                    {renderCollapsiblePicker(
+                      [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                      instrument.model === 'Other' ? 'Other' : instrument.model,
+                      (value) => setInstrument({ ...instrument, model: value }),
+                      showModelPicker,
+                      setShowModelPicker
+                    )}
+                    {instrument.model === 'Other' && (
+                      <TextInput
+                        style={styles.otherInput}
+                        value={instrument.customModel || ''}
+                        onChangeText={(text) => setInstrument({ ...instrument, customModel: text, model: text || 'Other' })}
+                        placeholder="✏️ Type your model here"
+                      />
+                    )}
+                  </>
                 ) : (
                   <TextInput
                     style={[styles.input, { color: '#aaa' }]}
@@ -521,6 +541,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#eee',
+    fontSize: 15,
+    color: '#333',
+  },
+  otherInput: {
+    backgroundColor: '#fffde7',
+    padding: 14,
+    marginBottom: 12,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#F39C12',
     fontSize: 15,
     color: '#333',
   },
