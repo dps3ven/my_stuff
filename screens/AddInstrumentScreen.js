@@ -97,6 +97,25 @@ export default function AddInstrumentScreen({ navigation, route }) {
     setInstrument({ ...instrument, images: updatedImages });
   };
 
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Camera access is required to take photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: false,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      const newImage = result.assets[0].uri;
+      setInstrument({ ...instrument, images: [...instrument.images, newImage] });
+    }
+  };
+
   const saveInstrument = async () => {
     // Validate required fields
     const missingFields = [];
@@ -213,6 +232,16 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 </View>
               </View>
 
+              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                <Text style={styles.imageButtonText}>Select Images</Text>
+              </TouchableOpacity>
+
+              {Platform.OS !== 'web' && (
+                <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
+                  <Text style={styles.imageButtonText}>📷 Take Photo</Text>
+                </TouchableOpacity>
+              )}
+
               <View style={styles.formRow}>
                 <View style={styles.formField}>
                   <Text style={styles.label}>Model *</Text>
@@ -258,10 +287,6 @@ export default function AddInstrumentScreen({ navigation, route }) {
                   />
                 </View>
               </View>
-
-              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <Text style={styles.imageButtonText}>Select Images</Text>
-              </TouchableOpacity>
 
               {Platform.OS !== 'web' && instrument.images.length > 0 && (
                 <View style={styles.imageGallery}>
@@ -425,6 +450,12 @@ const styles = StyleSheet.create({
   },
   imageButton: {
     backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  cameraButton: {
+    backgroundColor: '#28a745',
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,

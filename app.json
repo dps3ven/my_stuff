@@ -19,13 +19,15 @@
       "bundleIdentifier": "club.mystuff.app",
       "buildNumber": "1",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "My Stuff needs access to your photo library to attach images of your instruments."
+        "NSPhotoLibraryUsageDescription": "My Stuff needs access to your photo library to attach images of your instruments.",
+        "NSFaceIDUsageDescription": "My Stuff uses Face ID to verify your identity when logging in.",
+        "NSCameraUsageDescription": "My Stuff needs camera access to take photos of your instruments."
       }
     },
     "android": {
       "package": "club.mystuff.app",
       "versionCode": 1,
-      "permissions": ["READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE"],
+      "permissions": ["READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE", "CAMERA", "USE_BIOMETRIC", "USE_FINGERPRINT"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#133965"
