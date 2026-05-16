@@ -14,6 +14,16 @@ const INSTRUMENT_TYPES = [
   { label: 'Other', value: 'Other' },
 ];
 
+const MAKES_BY_TYPE = {
+  Guitar: ['Fender', 'Gibson', 'PRS', 'Ibanez', 'Epiphone', 'Taylor', 'Martin', 'Yamaha', 'Gretsch', 'ESP', 'Jackson', 'Dean', 'Schecter', 'Other'],
+  Bass: ['Fender', 'Gibson', 'Music Man', 'Ibanez', 'Warwick', 'Rickenbacker', 'Spector', 'Yamaha', 'ESP', 'Other'],
+  Drums: ['Pearl', 'Tama', 'DW', 'Ludwig', 'Gretsch', 'Mapex', 'Sonor', 'Yamaha', 'Roland', 'Alesis', 'Other'],
+  Piano: ['Steinway', 'Yamaha', 'Kawai', 'Roland', 'Casio', 'Nord', 'Korg', 'Baldwin', 'Bösendorfer', 'Other'],
+  Violin: ['Stradivarius', 'Yamaha', 'Stentor', 'Mendini', 'Cecilio', 'Scott Cao', 'Other'],
+  Microphone: ['Shure', 'Sennheiser', 'AKG', 'Audio-Technica', 'Neumann', 'Rode', 'Blue', 'Electro-Voice', 'Other'],
+  Other: ['Other'],
+};
+
 const CONDITIONS = [
   { label: 'Select Condition', value: '' },
   { label: 'New', value: 'New' },
@@ -38,6 +48,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     images: editItem?.images || [],
   });
   const [showTypePicker, setShowTypePicker] = useState(false);
+  const [showMakePicker, setShowMakePicker] = useState(false);
   const [showConditionPicker, setShowConditionPicker] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -215,7 +226,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
                   {renderCollapsiblePicker(
                     INSTRUMENT_TYPES,
                     instrument.type,
-                    (value) => setInstrument({ ...instrument, type: value }),
+                    (value) => setInstrument({ ...instrument, type: value, brand: '' }),
                     showTypePicker,
                     setShowTypePicker
                   )}
@@ -223,12 +234,22 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
                 <View style={styles.formField}>
                   <Text style={styles.label}>Make *</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={instrument.brand}
-                    onChangeText={(text) => setInstrument({ ...instrument, brand: text })}
-                    placeholder="Enter make/brand"
-                  />
+                  {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
+                    renderCollapsiblePicker(
+                      [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                      instrument.brand,
+                      (value) => setInstrument({ ...instrument, brand: value }),
+                      showMakePicker,
+                      setShowMakePicker
+                    )
+                  ) : (
+                    <TextInput
+                      style={[styles.input, { color: '#999' }]}
+                      value=""
+                      placeholder="Select a type first"
+                      editable={false}
+                    />
+                  )}
                 </View>
               </View>
 
