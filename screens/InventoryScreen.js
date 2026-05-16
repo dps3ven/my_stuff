@@ -176,7 +176,7 @@ export default function InventoryScreen({ navigation }) {
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>🎸</Text>
             <Text style={styles.emptyText}>Nothing here yet!</Text>
-            <Text style={styles.emptyHint}>Photos and serial numbers go a long way — for insurance, resale, or just peace of mind.</Text>
+            <Text style={styles.emptyHint}>Document your instruments with photos and anything important. A detailed record supports insurance claims, proof of ownership, and resale value.</Text>
             <TouchableOpacity 
               style={styles.primaryButton}
               onPress={() => navigation.navigate('AddInstrument')}
