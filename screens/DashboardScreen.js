@@ -52,7 +52,7 @@ export default function DashboardScreen({ navigation }) {
 
         <View style={styles.whyCard}>
           <Text style={styles.whyText}>
-          Every great collection deserves great respect.
+          Every great collection deserves this
           </Text>
         </View>
 
