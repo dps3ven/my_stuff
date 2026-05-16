@@ -24,6 +24,16 @@ const MAKES_BY_TYPE = {
   Other: ['Other'],
 };
 
+const MODELS_BY_TYPE = {
+  Guitar: ['Stratocaster', 'Telecaster', 'Les Paul', 'SG', 'ES-335', 'Flying V', 'Explorer', 'Jazzmaster', 'Jaguar', '335', 'PRS Custom 24', 'RG Series', 'Dreadnought', '000-15M', 'Other'],
+  Bass: ['Jazz Bass', 'Precision Bass', 'StingRay', 'Thunderbird', 'Rick 4003', '4-String', '5-String', 'SR Series', 'Other'],
+  Drums: ['Export Series', 'Imperialstar', 'Collector\'s Series', 'Classic Maple', 'Catalina', 'Stage Custom', 'TD-17', 'DM10', 'Other'],
+  Piano: ['Model D', 'U1', 'K-200', 'FP-90', 'PX-S3100', 'Stage 88', 'Kronos', 'Hamilton', 'Other'],
+  Violin: ['4/4 Full Size', '3/4 Size', '1/2 Size', 'Electric Violin', 'Other'],
+  Microphone: ['SM58', 'SM7B', 'e835', 'C414', 'AT2020', 'TLM 102', 'NT1', 'NT2-A', 'Yeti', 'Other'],
+  Other: ['Other'],
+};
+
 const CONDITIONS = [
   { label: 'Select Condition', value: '' },
   { label: 'New', value: 'New' },
@@ -49,6 +59,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   });
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [showMakePicker, setShowMakePicker] = useState(false);
+  const [showModelPicker, setShowModelPicker] = useState(false);
   const [showConditionPicker, setShowConditionPicker] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -226,7 +237,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
                   {renderCollapsiblePicker(
                     INSTRUMENT_TYPES,
                     instrument.type,
-                    (value) => setInstrument({ ...instrument, type: value, brand: '' }),
+                    (value) => setInstrument({ ...instrument, type: value, brand: '', model: '' }),
                     showTypePicker,
                     setShowTypePicker
                   )}
@@ -256,12 +267,22 @@ export default function AddInstrumentScreen({ navigation, route }) {
               <View style={styles.formRow}>
                 <View style={styles.formField}>
                   <Text style={styles.label}>Model *</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={instrument.model}
-                    onChangeText={(text) => setInstrument({ ...instrument, model: text })}
-                    placeholder="Enter model"
-                  />
+                  {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
+                    renderCollapsiblePicker(
+                      [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                      instrument.model,
+                      (value) => setInstrument({ ...instrument, model: value }),
+                      showModelPicker,
+                      setShowModelPicker
+                    )
+                  ) : (
+                    <TextInput
+                      style={[styles.input, { color: '#999' }]}
+                      value=""
+                      placeholder="Select a type first"
+                      editable={false}
+                    />
+                  )}
                 </View>
               </View>
 
