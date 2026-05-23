@@ -130,3 +130,5 @@ eas submit --platform android
 ## License
 
 MIT
+
+This might need some help
