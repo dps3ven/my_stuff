@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions, Modal, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import storage from '../utils/storage';
@@ -70,6 +70,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   const [activePicker, setActivePicker] = useState(null);
   const [activePickerItems, setActivePickerItems] = useState([]);
   const [activePickerCallback, setActivePickerCallback] = useState(null);
+  const scrollViewRef = useRef(null);
 
   useEffect(() => {
     navigation.setOptions({
@@ -195,6 +196,19 @@ export default function AddInstrumentScreen({ navigation, route }) {
     setActivePickerCallback(() => onSelect);
   };
 
+  const closePicker = (value) => {
+    if (value !== undefined && activePickerCallback) {
+      activePickerCallback(value);
+    }
+    setActivePicker(null);
+    setActivePickerItems([]);
+    setActivePickerCallback(null);
+    // Re-enable scroll on mobile after modal closes
+    setTimeout(() => {
+      scrollViewRef.current?.flashScrollIndicators?.();
+    }, 100);
+  };
+
   const renderPickerButton = (label, selectedValue, title, items, onSelect) => (
     <TouchableOpacity
       style={styles.pickerButton}
@@ -216,9 +230,10 @@ export default function AddInstrumentScreen({ navigation, route }) {
     >
       <View style={styles.container}>
         <ScrollView
+          ref={scrollViewRef}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="always"
           scrollEnabled={true}
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={true}
@@ -375,19 +390,20 @@ export default function AddInstrumentScreen({ navigation, route }) {
         visible={activePicker !== null}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setActivePicker(null)}
+        onRequestClose={() => closePicker()}
         statusBarTranslucent={true}
+        hardwareAccelerated={true}
       >
         <View style={styles.modalOverlay}>
           <TouchableOpacity 
             style={{ flex: 1 }}
             activeOpacity={1} 
-            onPress={() => setActivePicker(null)}
+            onPress={() => closePicker()}
           />
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{activePicker}</Text>
-              <TouchableOpacity onPress={() => setActivePicker(null)}>
+              <TouchableOpacity onPress={() => closePicker()}>
                 <Text style={styles.modalClose}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -397,10 +413,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.modalItem}
-                  onPress={() => {
-                    if (activePickerCallback) activePickerCallback(item.value);
-                    setActivePicker(null);
-                  }}
+                  onPress={() => closePicker(item.value)}
                 >
                   <Text style={styles.modalItemText}>{item.label}</Text>
                 </TouchableOpacity>
@@ -680,6 +693,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
     flexDirection: 'column',
+    ...(Platform.OS === 'web' && { cursor: 'default' }),
   },
   modalContent: {
     backgroundColor: '#fff',
