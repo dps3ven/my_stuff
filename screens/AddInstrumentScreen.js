@@ -354,12 +354,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
             </View>
           ) : null}
 
-          <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
-            <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
-          </TouchableOpacity>
         </ScrollView>
         
         <View style={styles.fixedFooter}>
+          <TouchableOpacity style={styles.saveButton} onPress={saveInstrument}>
+            <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
+          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.dashboardButton} 
             onPress={() => navigation.navigate('Dashboard')}
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 70,
+    paddingBottom: 160,
     maxWidth: isWebDesktop ? 700 : '100%',
     alignSelf: 'center',
     width: '100%',
@@ -615,13 +615,15 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: '#28a745',
-    padding: 18,
+    padding: 14,
     borderRadius: 28,
+    width: '100%',
+    maxWidth: 400,
     shadowColor: '#28a745',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
   },
   saveButtonText: {
     color: 'white',
@@ -645,7 +647,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   dashboardButton: {
-    padding: 12,
+    padding: 10,
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
   },
   dashboardButtonText: {
     color: '#fff',
@@ -660,6 +665,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: '#0f2d52',
     padding: 12,
+    gap: 8,
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.15)',
