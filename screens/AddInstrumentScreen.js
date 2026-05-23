@@ -223,129 +223,124 @@ export default function AddInstrumentScreen({ navigation, route }) {
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={true}
         >
-          <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : '🎸 Add New Stuff'}</Text>
+          <Text style={styles.title}>{isEditing ? 'Edit Listing' : 'Create Listing'}</Text>
 
-          {/* Image Section - Pinterest style hero */}
-          <View style={styles.imageSection}>
+          {/* SECTION 1: Photos */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>📸 Photos</Text>
+            <Text style={styles.sectionHint}>Add up to 10 photos. First photo is the cover.</Text>
             {instrument.images.length > 0 ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
                 {instrument.images.map((imageUri, index) => (
                   <View key={index} style={styles.pinCard}>
                     <Image source={{ uri: imageUri }} style={styles.pinImage} resizeMode="cover" />
+                    {index === 0 && <View style={styles.coverBadge}><Text style={styles.coverBadgeText}>Cover</Text></View>}
                     <TouchableOpacity style={styles.pinRemove} onPress={() => removeImage(index)}>
                       <Text style={styles.pinRemoveText}>✕</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
+                <TouchableOpacity style={styles.addMoreCard} onPress={pickImage}>
+                  <Text style={styles.addMoreText}>+</Text>
+                </TouchableOpacity>
               </ScrollView>
             ) : (
               <View style={styles.emptyImageCard}>
                 <Text style={styles.emptyImageEmoji}>📷</Text>
-                <Text style={styles.emptyImageText}>Add photos of your stuff</Text>
+                <Text style={styles.emptyImageText}>Add photos to attract more interest</Text>
               </View>
             )}
             <View style={styles.imageActions}>
               {Platform.OS !== 'web' && (
                 <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
-                  <Text style={styles.imageButtonText}>📷 Camera</Text>
+                  <Text style={styles.imageButtonText}>📷 Take Photo</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <Text style={styles.imageButtonText}>🖼️ Gallery</Text>
+                <Text style={styles.imageButtonText}>🖼️ Choose from Library</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Form Card */}
-          <View style={styles.formCard}>
-            <View style={styles.formRow}>
-              <View style={styles.formField}>
-                <Text style={styles.label}>Type</Text>
-                {renderPickerButton('Select Type', instrument.type, 'Type', INSTRUMENT_TYPES, 
-                  (value) => setInstrument({ ...instrument, type: value, brand: '', model: '' })
+          {/* SECTION 2: Item Details */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>📋 Item Details</Text>
+
+            <Text style={styles.fieldLabel}>Category <Text style={styles.required}>*</Text></Text>
+            {renderPickerButton('Select instrument type', instrument.type, 'Category', INSTRUMENT_TYPES,
+              (value) => setInstrument({ ...instrument, type: value, brand: '', model: '' })
+            )}
+
+            <Text style={styles.fieldLabel}>Brand / Make <Text style={styles.required}>*</Text></Text>
+            {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
+              <>
+                {renderPickerButton('Select brand', instrument.brand === 'Other' ? 'Other' : instrument.brand, 'Brand / Make',
+                  [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                  (value) => setInstrument({ ...instrument, brand: value })
                 )}
-              </View>
-
-              <View style={styles.formField}>
-                <Text style={styles.label}>Make</Text>
-                {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
-                  <>
-                    {renderPickerButton('Select Make', instrument.brand === 'Other' ? 'Other' : instrument.brand, 'Make',
-                      [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                      (value) => setInstrument({ ...instrument, brand: value })
-                    )}
-                    {instrument.brand === 'Other' && (
-                      <TextInput
-                        style={styles.otherInput}
-                        value={instrument.customBrand || ''}
-                        onChangeText={(text) => setInstrument({ ...instrument, customBrand: text, brand: text || 'Other' })}
-                        placeholder="✏️ Type your make/brand here"
-                      />
-                    )}
-                  </>
-                ) : (
-                  <View style={[styles.pickerButton, { opacity: 0.5 }]}>
-                    <Text style={[styles.pickerButtonText, { color: '#999' }]}>Pick a type first</Text>
-                  </View>
+                {instrument.brand === 'Other' && (
+                  <TextInput
+                    style={styles.otherInput}
+                    value={instrument.customBrand || ''}
+                    onChangeText={(text) => setInstrument({ ...instrument, customBrand: text, brand: text || 'Other' })}
+                    placeholder="Enter brand name"
+                  />
                 )}
+              </>
+            ) : (
+              <View style={[styles.pickerButton, styles.disabledField]}>
+                <Text style={styles.disabledText}>Select a category first</Text>
               </View>
-            </View>
+            )}
 
-            <View style={styles.formRow}>
-              <View style={styles.formField}>
-                <Text style={styles.label}>Model</Text>
-                {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
-                  <>
-                    {renderPickerButton('Select Model', instrument.model === 'Other' ? 'Other' : instrument.model, 'Model',
-                      [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                      (value) => setInstrument({ ...instrument, model: value })
-                    )}
-                    {instrument.model === 'Other' && (
-                      <TextInput
-                        style={styles.otherInput}
-                        value={instrument.customModel || ''}
-                        onChangeText={(text) => setInstrument({ ...instrument, customModel: text, model: text || 'Other' })}
-                        placeholder="✏️ Type your model here"
-                      />
-                    )}
-                  </>
-                ) : (
-                  <View style={[styles.pickerButton, { opacity: 0.5 }]}>
-                    <Text style={[styles.pickerButtonText, { color: '#999' }]}>Pick a type first</Text>
-                  </View>
+            <Text style={styles.fieldLabel}>Model <Text style={styles.required}>*</Text></Text>
+            {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
+              <>
+                {renderPickerButton('Select model', instrument.model === 'Other' ? 'Other' : instrument.model, 'Model',
+                  [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
+                  (value) => setInstrument({ ...instrument, model: value })
                 )}
-              </View>
-
-              <View style={styles.formField}>
-                <Text style={styles.label}>Serial Number</Text>
-                <TextInput
-                  style={styles.input}
-                  value={instrument.serialNumber}
-                  onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
-                  placeholder="Optional"
-                />
-              </View>
-            </View>
-
-            <View style={styles.formRow}>
-              <View style={styles.formField}>
-                <Text style={styles.label}>Condition</Text>
-                {renderPickerButton('Select Condition', instrument.condition, 'Condition', CONDITIONS,
-                  (value) => setInstrument({ ...instrument, condition: value })
+                {instrument.model === 'Other' && (
+                  <TextInput
+                    style={styles.otherInput}
+                    value={instrument.customModel || ''}
+                    onChangeText={(text) => setInstrument({ ...instrument, customModel: text, model: text || 'Other' })}
+                    placeholder="Enter model name"
+                  />
                 )}
+              </>
+            ) : (
+              <View style={[styles.pickerButton, styles.disabledField]}>
+                <Text style={styles.disabledText}>Select a category first</Text>
               </View>
+            )}
 
-              <View style={styles.formField}>
-                <Text style={styles.label}>Value ($)</Text>
-                <TextInput
-                  style={styles.input}
-                  value={instrument.value}
-                  onChangeText={(text) => setInstrument({ ...instrument, value: text })}
-                  placeholder="Estimated"
-                  keyboardType="numeric"
-                />
-              </View>
-            </View>
+            <Text style={styles.fieldLabel}>Serial Number</Text>
+            <TextInput
+              style={styles.input}
+              value={instrument.serialNumber}
+              onChangeText={(text) => setInstrument({ ...instrument, serialNumber: text })}
+              placeholder="e.g. US12345678 (found on headstock or back)"
+            />
+          </View>
+
+          {/* SECTION 3: Condition & Price */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>💰 Condition & Value</Text>
+
+            <Text style={styles.fieldLabel}>Condition <Text style={styles.required}>*</Text></Text>
+            {renderPickerButton('Select condition', instrument.condition, 'Condition', CONDITIONS,
+              (value) => setInstrument({ ...instrument, condition: value })
+            )}
+
+            <Text style={styles.fieldLabel}>Estimated Value ($)</Text>
+            <TextInput
+              style={styles.input}
+              value={instrument.value}
+              onChangeText={(text) => setInstrument({ ...instrument, value: text })}
+              placeholder="0.00"
+              keyboardType="numeric"
+            />
           </View>
 
           {errorMessage ? (
@@ -432,11 +427,81 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '800',
-    textAlign: 'center',
-    marginBottom: 20,
+    textAlign: 'left',
+    marginBottom: 16,
     color: '#fff',
+  },
+  section: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  sectionHeader: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111',
+    marginBottom: 4,
+  },
+  sectionHint: {
+    fontSize: 12,
+    color: '#888',
+    marginBottom: 12,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 6,
+    marginTop: 12,
+  },
+  required: {
+    color: '#e53935',
+  },
+  disabledField: {
+    opacity: 0.5,
+    backgroundColor: '#f5f5f5',
+  },
+  disabledText: {
+    color: '#aaa',
+    fontSize: 15,
+  },
+  addMoreCard: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+    backgroundColor: '#fafafa',
+  },
+  addMoreText: {
+    fontSize: 28,
+    color: '#aaa',
+  },
+  coverBadge: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    backgroundColor: '#0064d2',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  coverBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
   },
   imageSection: {
     marginBottom: 16,
@@ -556,13 +621,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   input: {
-    backgroundColor: '#f8f8f8',
-    padding: 12,
-    marginBottom: 8,
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    padding: 14,
+    marginBottom: 0,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#eee',
-    fontSize: 14,
+    borderColor: '#ccc',
+    fontSize: 15,
     color: '#333',
   },
   otherInput: {
@@ -576,12 +641,12 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   pickerButton: {
-    backgroundColor: '#f8f8f8',
-    padding: 12,
-    marginBottom: 8,
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    padding: 14,
+    marginBottom: 0,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#ccc',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -614,16 +679,23 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   saveButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#0064d2',
     padding: 14,
-    borderRadius: 28,
+    borderRadius: 8,
     width: '100%',
     maxWidth: 400,
-    shadowColor: '#28a745',
+    shadowColor: '#0064d2',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 4,
+  },
+  saveButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   saveButtonText: {
     color: 'white',
