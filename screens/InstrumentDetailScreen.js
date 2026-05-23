@@ -5,7 +5,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
   const [activeIndex, setActiveIndex] = useState(0);
   const imageScrollRef = useRef(null);
-  const imageWidth = Platform.OS === 'web' ? 420 : Dimensions.get('window').width - 40;
+  const imageWidth = Platform.OS === 'web' ? 320 : Dimensions.get('window').width - 32;
 
   const handleScroll = useCallback((event) => {
     const offset = event.nativeEvent.contentOffset.x;
@@ -27,59 +27,52 @@ export default function InstrumentDetailScreen({ navigation, route }) {
       >
 
 
-        {/* Image Gallery */}
-        {item.images && item.images.length > 0 ? (
+        {/* Layout: side by side on web, stacked on mobile */}
+        <View style={styles.contentLayout}>
+
+          {/* Image Gallery */}
           <View style={styles.imageGallery}>
-            <ScrollView 
-              ref={imageScrollRef}
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              style={[styles.imageScroll, { width: imageWidth }]}
-              pagingEnabled
-              onScroll={handleScroll}
-              scrollEventThrottle={16}
-            >
-              {item.images.map((imageUri, index) => (
-                <Image 
-                  key={index} 
-                  source={{ uri: imageUri }} 
-                  style={[styles.largeImage, { width: imageWidth }]}
-                  resizeMode="cover"
-                />
-              ))}
-            </ScrollView>
-            {item.images.length > 1 && (
-              <View style={styles.dotContainer}>
-                {item.images.map((_, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => scrollToImage(index)}
-                  >
-                    <View
-                      style={[
-                        styles.dot,
-                        activeIndex === index && styles.dotActive,
-                      ]}
+            {item.images && item.images.length > 0 ? (
+              <>
+                <ScrollView 
+                  ref={imageScrollRef}
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  style={[styles.imageScroll, { width: imageWidth }]}
+                  pagingEnabled
+                  onScroll={handleScroll}
+                  scrollEventThrottle={16}
+                >
+                  {item.images.map((imageUri, index) => (
+                    <Image 
+                      key={index} 
+                      source={{ uri: imageUri }} 
+                      style={[styles.largeImage, { width: imageWidth }]}
+                      resizeMode="cover"
                     />
-                  </TouchableOpacity>
-                ))}
+                  ))}
+                </ScrollView>
+                {item.images.length > 1 && (
+                  <View style={styles.dotContainer}>
+                    {item.images.map((_, index) => (
+                      <TouchableOpacity key={index} onPress={() => scrollToImage(index)}>
+                        <View style={[styles.dot, activeIndex === index && styles.dotActive]} />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </>
+            ) : item.image ? (
+              <Image source={{ uri: item.image }} style={[styles.largeImage, { width: imageWidth }]} resizeMode="cover" />
+            ) : (
+              <View style={[styles.largeImage, styles.noImage, { width: imageWidth }]}>
+                <Text style={styles.noImageText}>No Image</Text>
               </View>
             )}
           </View>
-        ) : item.image ? (
-          <Image 
-            source={{ uri: item.image }} 
-            style={styles.largeImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={[styles.largeImage, styles.noImage]}>
-            <Text style={styles.noImageText}>No Image Available</Text>
-          </View>
-        )}
 
-        {/* Instrument Details */}
-        <View style={styles.detailsCard}>
+          {/* Instrument Details */}
+          <View style={styles.detailsCard}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Type:</Text>
             <Text style={styles.detailValue}>{item.type}</Text>
@@ -110,6 +103,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
             <Text style={styles.detailValue}>${item.value || 'N/A'}</Text>
           </View>
         </View>
+        </View>{/* end contentLayout */}
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
@@ -158,17 +152,16 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   imageGallery: {
-    marginBottom: 20,
+    marginBottom: 12,
     alignItems: 'center',
-    width: '100%',
-    maxWidth: 700,
+    flexShrink: 0,
   },
   imageScroll: {
     borderRadius: 12,
     overflow: 'hidden',
   },
   largeImage: {
-    height: Platform.OS === 'web' ? 300 : 250,
+    height: Platform.OS === 'web' ? 220 : 160,
     borderRadius: 12,
     backgroundColor: '#fff',
   },
@@ -203,32 +196,32 @@ const styles = StyleSheet.create({
   detailsCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
+    padding: Platform.OS === 'web' ? 16 : 12,
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
     width: '100%',
-    maxWidth: 700,
+    flex: Platform.OS === 'web' ? 1 : undefined,
   },
   detailRow: {
     flexDirection: 'row',
-    paddingVertical: 10,
+    paddingVertical: Platform.OS === 'web' ? 10 : 7,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     alignItems: 'baseline',
   },
   detailLabel: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: 'bold',
     color: '#999',
-    width: 100,
+    width: 90,
     textTransform: 'uppercase',
   },
   detailValue: {
-    fontSize: 16,
+    fontSize: Platform.OS === 'web' ? 16 : 14,
     color: '#333',
     flex: 1,
     fontWeight: '500',
