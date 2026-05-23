@@ -192,9 +192,6 @@ export default function InventoryScreen({ navigation }) {
           </View>
         ) : (
           <>
-            <View style={styles.tipBanner}>
-              <Text style={styles.tipText}>💡 Tap any item to see full details. Swipe images to browse photos.</Text>
-            </View>
             <SectionList
               sections={inventory}
               renderItem={renderItem}
@@ -253,8 +250,8 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     backgroundColor: 'white',
-    padding: 15,
-    marginBottom: 15,
+    padding: 10,
+    marginBottom: 10,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -265,25 +262,31 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   imageContainer: {
-    marginRight: 15,
-    width: 120,
+    marginRight: 10,
+    width: 80,
     ...(Platform.OS === 'web' && {
       maxWidth: 380,
       width: 'auto',
+      marginRight: 15,
     }),
   },
   imageScroll: {
-    width: 120,
+    width: 80,
     ...(Platform.OS === 'web' && {
       maxWidth: 380,
       width: 'auto',
     }),
   },
   itemImage: {
-    width: 120,
-    height: 120,
+    width: 80,
+    height: 80,
     borderRadius: 6,
-    marginRight: 10,
+    marginRight: 6,
+    ...(Platform.OS === 'web' && {
+      width: 120,
+      height: 120,
+      marginRight: 10,
+    }),
   },
   noImage: {
     backgroundColor: '#f0f0f0',
@@ -304,10 +307,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   itemInfo: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
-    marginBottom: 2,
-    fontWeight: 'bold',
+    marginBottom: 1,
+    fontWeight: '500',
   },
   itemNotes: {
     fontSize: 12,
@@ -322,30 +325,30 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   actionButtons: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     gap: 5,
   },
   editButton: {
-    backgroundColor: '#ffc107',
-    padding: 8,
+    backgroundColor: '#F39C12',
+    padding: 6,
     borderRadius: 4,
-    minWidth: 50,
+    minWidth: 44,
   },
   editButtonText: {
-    color: '#212529',
-    fontSize: 12,
+    color: '#fff',
+    fontSize: 11,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   deleteButton: {
     backgroundColor: '#dc3545',
-    padding: 8,
+    padding: 6,
     borderRadius: 4,
-    minWidth: 50,
+    minWidth: 44,
   },
   deleteButtonText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
     textAlign: 'center',
   },

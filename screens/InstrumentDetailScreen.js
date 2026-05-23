@@ -5,7 +5,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
   const [activeIndex, setActiveIndex] = useState(0);
   const imageScrollRef = useRef(null);
-  const imageWidth = Platform.OS === 'web' ? 320 : Dimensions.get('window').width - 32;
+  const imageWidth = Platform.OS === 'web' ? 700 : Dimensions.get('window').width - 32;
 
   const handleScroll = useCallback((event) => {
     const offset = event.nativeEvent.contentOffset.x;
@@ -143,6 +143,14 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     alignItems: 'center',
   },
+  contentLayout: {
+    flexDirection: 'column',
+    gap: 12,
+    width: '100%',
+    maxWidth: 700,
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
   title: {
     fontSize: Platform.OS === 'web' ? 32 : 28,
     fontWeight: 'bold',
@@ -152,9 +160,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   imageGallery: {
-    marginBottom: 12,
+    marginBottom: 0,
     alignItems: 'center',
     flexShrink: 0,
+    width: '100%',
   },
   imageScroll: {
     borderRadius: 12,
@@ -196,15 +205,14 @@ const styles = StyleSheet.create({
   detailsCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: Platform.OS === 'web' ? 16 : 12,
-    marginBottom: 12,
+    padding: 16,
+    marginBottom: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 4,
     width: '100%',
-    flex: Platform.OS === 'web' ? 1 : undefined,
   },
   detailRow: {
     flexDirection: 'row',
@@ -253,38 +261,39 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   actionButtons: {
-    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    flexDirection: 'row',
     gap: 12,
     width: '100%',
     maxWidth: 700,
     marginTop: 12,
+    alignSelf: 'center',
   },
   editButton: {
     backgroundColor: '#ffc107',
-    padding: 18,
+    padding: 14,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    flex: Platform.OS === 'web' ? 1 : 0,
+    flex: 1,
   },
   backButton: {
     backgroundColor: '#007bff',
-    padding: 18,
+    padding: 14,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    flex: Platform.OS === 'web' ? 1 : 0,
+    flex: 1,
   },
   buttonText: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: 'bold',
   },
 });
