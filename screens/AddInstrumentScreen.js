@@ -210,7 +210,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   return (
     <>
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, height: Platform.OS === 'web' ? '100%' : undefined }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       enabled={Platform.OS !== 'web'}
     >
@@ -415,9 +415,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965',
+    height: Platform.OS === 'web' ? '100%' : undefined,
   },
   scrollView: {
     flex: 1,
+    height: Platform.OS === 'web' ? '100%' : undefined,
   },
   scrollContent: {
     padding: 16,
