@@ -701,6 +701,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     maxHeight: '60%',
     paddingBottom: 30,
+    width: '100%',
+    maxWidth: isWebDesktop ? 700 : '100%',
+    alignSelf: 'center',
   },
   modalHeader: {
     flexDirection: 'row',
