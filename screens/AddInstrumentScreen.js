@@ -198,7 +198,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         <Text style={styles.pickerArrow}>{isVisible ? '▲' : '▼'}</Text>
       </TouchableOpacity>
       {isVisible && (
-        <View style={styles.pickerContainer}>
+        <ScrollView style={styles.pickerContainer} nestedScrollEnabled={true}>
           {items.filter(item => item.value !== '').map((item) => (
             <TouchableOpacity
               key={item.value}
@@ -211,7 +211,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
               <Text style={styles.pickerText}>{item.label}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       )}
     </View>
   );
@@ -585,13 +585,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
     marginBottom: 12,
-    marginTop: -12,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+    maxHeight: 200,
   },
   pickerItem: {
     padding: 14,
