@@ -416,6 +416,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#133965',
     height: Platform.OS === 'web' ? '100%' : undefined,
+    overflow: 'hidden',
   },
   scrollView: {
     flex: 1,
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 70,
     maxWidth: isWebDesktop ? 700 : '100%',
     alignSelf: 'center',
     width: '100%',

@@ -226,6 +226,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965ff',
+    overflow: 'hidden',
   },
   scrollContent: {
     flexGrow: 1,

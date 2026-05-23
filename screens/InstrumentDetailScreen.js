@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#133965ff',
     alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
+    overflow: 'hidden',
   },
   scrollView: {
     flex: 1,
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 180,
+    paddingBottom: 40,
     alignItems: 'center',
   },
   title: {

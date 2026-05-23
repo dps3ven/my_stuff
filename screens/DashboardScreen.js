@@ -107,10 +107,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965ff',
+    overflow: 'hidden',
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 60,
+    paddingBottom: 30,
   },
   header: {
     marginBottom: 15,

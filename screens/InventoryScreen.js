@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#133965ff',
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
