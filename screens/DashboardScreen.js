@@ -41,6 +41,8 @@ export default function DashboardScreen({ navigation }) {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
+        bounces={false}
+        overScrollMode="never"
       >
         <View style={styles.header}>
           <Text style={styles.appTitle}>My Stuff</Text>

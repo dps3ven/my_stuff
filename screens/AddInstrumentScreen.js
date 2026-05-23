@@ -237,6 +237,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
           scrollEnabled={true}
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={true}
+          bounces={false}
+          overScrollMode="never"
         >
           <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : '🎸 Add New Stuff'}</Text>
 

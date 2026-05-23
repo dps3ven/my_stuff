@@ -24,6 +24,8 @@ export default function InstrumentDetailScreen({ navigation, route }) {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
+        bounces={false}
+        overScrollMode="never"
       >
 
 
