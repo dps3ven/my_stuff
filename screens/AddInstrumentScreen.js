@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions, Modal, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import storage from '../utils/storage';
 
@@ -67,6 +67,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [showConditionPicker, setShowConditionPicker] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [activePicker, setActivePicker] = useState(null);
+  const [activePickerItems, setActivePickerItems] = useState([]);
+  const [activePickerCallback, setActivePickerCallback] = useState(null);
 
   useEffect(() => {
     navigation.setOptions({
@@ -186,37 +189,26 @@ export default function AddInstrumentScreen({ navigation, route }) {
     }
   };
 
-  const renderCollapsiblePicker = (items, selectedValue, onValueChange, isVisible, setVisible) => (
-    <View>
-      <TouchableOpacity
-        style={styles.pickerButton}
-        onPress={() => setVisible(!isVisible)}
-      >
-        <Text style={styles.pickerButtonText}>
-          {selectedValue || items[0].label}
-        </Text>
-        <Text style={styles.pickerArrow}>{isVisible ? '▲' : '▼'}</Text>
-      </TouchableOpacity>
-      {isVisible && (
-        <ScrollView style={styles.pickerContainer} nestedScrollEnabled={true}>
-          {items.filter(item => item.value !== '').map((item) => (
-            <TouchableOpacity
-              key={item.value}
-              style={styles.pickerItem}
-              onPress={() => {
-                onValueChange(item.value);
-                setVisible(false);
-              }}
-            >
-              <Text style={styles.pickerText}>{item.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
-    </View>
+  const openPicker = (title, items, onSelect) => {
+    setActivePicker(title);
+    setActivePickerItems(items.filter(i => i.value !== ''));
+    setActivePickerCallback(() => onSelect);
+  };
+
+  const renderPickerButton = (label, selectedValue, title, items, onSelect) => (
+    <TouchableOpacity
+      style={styles.pickerButton}
+      onPress={() => openPicker(title, items, onSelect)}
+    >
+      <Text style={[styles.pickerButtonText, !selectedValue && { color: '#999' }]}>
+        {selectedValue || label}
+      </Text>
+      <Text style={styles.pickerArrow}>▼</Text>
+    </TouchableOpacity>
   );
 
   return (
+    <>
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -269,12 +261,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
             <View style={styles.formRow}>
               <View style={styles.formField}>
                 <Text style={styles.label}>Type</Text>
-                {renderCollapsiblePicker(
-                  INSTRUMENT_TYPES,
-                  instrument.type,
-                  (value) => setInstrument({ ...instrument, type: value, brand: '', model: '' }),
-                  showTypePicker,
-                  setShowTypePicker
+                {renderPickerButton('Select Type', instrument.type, 'Type', INSTRUMENT_TYPES, 
+                  (value) => setInstrument({ ...instrument, type: value, brand: '', model: '' })
                 )}
               </View>
 
@@ -282,12 +270,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 <Text style={styles.label}>Make</Text>
                 {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
                   <>
-                    {renderCollapsiblePicker(
+                    {renderPickerButton('Select Make', instrument.brand === 'Other' ? 'Other' : instrument.brand, 'Make',
                       [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                      instrument.brand === 'Other' ? 'Other' : instrument.brand,
-                      (value) => setInstrument({ ...instrument, brand: value }),
-                      showMakePicker,
-                      setShowMakePicker
+                      (value) => setInstrument({ ...instrument, brand: value })
                     )}
                     {instrument.brand === 'Other' && (
                       <TextInput
@@ -299,12 +284,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
                     )}
                   </>
                 ) : (
-                  <TextInput
-                    style={[styles.input, { color: '#aaa' }]}
-                    value=""
-                    placeholder="Pick a type first"
-                    editable={false}
-                  />
+                  <View style={[styles.pickerButton, { opacity: 0.5 }]}>
+                    <Text style={[styles.pickerButtonText, { color: '#999' }]}>Pick a type first</Text>
+                  </View>
                 )}
               </View>
             </View>
@@ -314,12 +296,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 <Text style={styles.label}>Model</Text>
                 {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
                   <>
-                    {renderCollapsiblePicker(
+                    {renderPickerButton('Select Model', instrument.model === 'Other' ? 'Other' : instrument.model, 'Model',
                       [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-                      instrument.model === 'Other' ? 'Other' : instrument.model,
-                      (value) => setInstrument({ ...instrument, model: value }),
-                      showModelPicker,
-                      setShowModelPicker
+                      (value) => setInstrument({ ...instrument, model: value })
                     )}
                     {instrument.model === 'Other' && (
                       <TextInput
@@ -331,12 +310,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
                     )}
                   </>
                 ) : (
-                  <TextInput
-                    style={[styles.input, { color: '#aaa' }]}
-                    value=""
-                    placeholder="Pick a type first"
-                    editable={false}
-                  />
+                  <View style={[styles.pickerButton, { opacity: 0.5 }]}>
+                    <Text style={[styles.pickerButtonText, { color: '#999' }]}>Pick a type first</Text>
+                  </View>
                 )}
               </View>
 
@@ -354,12 +330,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
             <View style={styles.formRow}>
               <View style={styles.formField}>
                 <Text style={styles.label}>Condition</Text>
-                {renderCollapsiblePicker(
-                  CONDITIONS,
-                  instrument.condition,
-                  (value) => setInstrument({ ...instrument, condition: value }),
-                  showConditionPicker,
-                  setShowConditionPicker
+                {renderPickerButton('Select Condition', instrument.condition, 'Condition', CONDITIONS,
+                  (value) => setInstrument({ ...instrument, condition: value })
                 )}
               </View>
 
@@ -397,6 +369,45 @@ export default function AddInstrumentScreen({ navigation, route }) {
         </View>
       </View>
     </KeyboardAvoidingView>
+
+      {/* Picker Modal */}
+      <Modal
+        visible={activePicker !== null}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setActivePicker(null)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setActivePicker(null)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{activePicker}</Text>
+              <TouchableOpacity onPress={() => setActivePicker(null)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={activePickerItems}
+              keyExtractor={(item) => item.value}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => {
+                    if (activePickerCallback) activePickerCallback(item.value);
+                    setActivePicker(null);
+                  }}
+                >
+                  <Text style={styles.modalItemText}>{item.label}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </>
   );
 }
 
@@ -652,5 +663,44 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '60%',
+    paddingBottom: 30,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+  },
+  modalClose: {
+    fontSize: 20,
+    color: '#999',
+    padding: 4,
+  },
+  modalItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f5f5f5',
+  },
+  modalItemText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
