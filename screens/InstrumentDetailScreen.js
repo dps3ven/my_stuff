@@ -214,20 +214,23 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     flexDirection: 'row',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    alignItems: 'baseline',
   },
   detailLabel: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: 'bold',
-    color: '#333',
-    width: 140,
+    color: '#999',
+    width: 100,
+    textTransform: 'uppercase',
   },
   detailValue: {
     fontSize: 16,
-    color: '#666',
+    color: '#333',
     flex: 1,
+    fontWeight: '500',
   },
   notesSection: {
     paddingTop: 12,
