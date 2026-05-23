@@ -376,12 +376,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
         transparent={true}
         animationType="slide"
         onRequestClose={() => setActivePicker(null)}
+        statusBarTranslucent={true}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
-          onPress={() => setActivePicker(null)}
-        >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity 
+            style={{ flex: 1 }}
+            activeOpacity={1} 
+            onPress={() => setActivePicker(null)}
+          />
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{activePicker}</Text>
@@ -405,7 +407,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
               )}
             />
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
     </>
   );
@@ -671,6 +673,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
+    flexDirection: 'column',
   },
   modalContent: {
     backgroundColor: '#fff',
