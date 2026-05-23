@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
     maxHeight: '60%',
     paddingBottom: 30,
     width: '100%',
-    maxWidth: isWebDesktop ? 700 : '100%',
+    maxWidth: 700,
     alignSelf: 'center',
   },
   modalHeader: {
