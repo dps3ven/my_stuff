@@ -226,17 +226,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#133965ff',
-    height: Platform.OS === 'web' ? '100vh' : undefined,
-    alignItems: isWebDesktop ? 'center' : 'stretch',
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
-    paddingBottom: 40,
-    minHeight: Platform.OS === 'web' ? '100vh' : undefined,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
     width: '100%',
     maxWidth: isWebDesktop ? 500 : '100%',
+    alignSelf: 'center',
   },
   title: {
     fontSize: isWebDesktop ? 48 : 28,

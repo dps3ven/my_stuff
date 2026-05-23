@@ -14,12 +14,12 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
+        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
-          <Stack.Screen name="Inventory" component={InventoryScreen} options={{ title: 'My Stuff' }} />
+          <Stack.Screen name="Inventory" component={InventoryScreen} />
           <Stack.Screen name="AddInstrument" component={AddInstrumentScreen} />
-          <Stack.Screen name="InstrumentDetail" component={InstrumentDetailScreen} options={{ title: 'Details' }} />
+          <Stack.Screen name="InstrumentDetail" component={InstrumentDetailScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
