@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import storage from '../utils/storage';
+
+const isWebDesktop = Platform.OS === 'web' && Dimensions.get('window').width > 768;
 
 const INSTRUMENT_TYPES = [
   { label: 'Select Type', value: '' },
@@ -409,7 +411,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 100,
-    maxWidth: Platform.OS === 'web' ? 700 : '100%',
+    maxWidth: isWebDesktop ? 700 : '100%',
     alignSelf: 'center',
     width: '100%',
   },
@@ -522,7 +524,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   formRow: {
-    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    flexDirection: isWebDesktop ? 'row' : 'column',
     gap: 12,
     marginBottom: 4,
   },

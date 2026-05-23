@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView, Dimensions } from 'react-native';
 import storage from '../utils/storage';
 import CryptoJS from 'crypto-js';
+
+const isWebDesktop = Platform.OS === 'web' && Dimensions.get('window').width > 768;
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -225,7 +227,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#133965ff',
     height: Platform.OS === 'web' ? '100vh' : undefined,
-    alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
+    alignItems: isWebDesktop ? 'center' : 'stretch',
   },
   scrollContent: {
     flexGrow: 1,
@@ -233,8 +235,8 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 100,
     minHeight: Platform.OS === 'web' ? '100vh' : undefined,
-    width: Platform.OS === 'web' ? '100%' : '100%',
-    maxWidth: Platform.OS === 'web' ? 500 : '100%',
+    width: '100%',
+    maxWidth: isWebDesktop ? 500 : '100%',
   },
   title: {
     fontSize: Platform.OS === 'web' ? 48 : 32,
