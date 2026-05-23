@@ -105,7 +105,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
         </View>
         </View>{/* end contentLayout */}
 
-        {/* Action Buttons */}
+        {/* Action Buttons - aligned with content */}
         <View style={styles.actionButtons}>
           <TouchableOpacity 
             style={styles.editButton}
@@ -254,9 +254,10 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
-    gap: 15,
+    gap: 12,
     width: '100%',
-    maxWidth: Platform.OS === 'web' ? 700 : '100%',
+    maxWidth: 700,
+    marginTop: 12,
   },
   editButton: {
     backgroundColor: '#ffc107',
