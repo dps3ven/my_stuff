@@ -56,6 +56,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     type: editItem?.type || '',
     brand: editItem?.brand || '',
     model: editItem?.model || '',
+    year: editItem?.year || '',
     serialNumber: editItem?.serialNumber || '',
     condition: editItem?.condition || '',
     value: editItem?.value || '',
@@ -331,6 +332,20 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 )}
               </View>
 
+              <View style={styles.formField}>
+                <Text style={styles.label}>Year</Text>
+                <TextInput
+                  style={styles.input}
+                  value={instrument.year}
+                  onChangeText={(text) => setInstrument({ ...instrument, year: text })}
+                  placeholder="e.g. 2015"
+                  keyboardType="numeric"
+                  maxLength={4}
+                />
+              </View>
+            </View>
+
+            <View style={styles.formRow}>
               <View style={styles.formField}>
                 <Text style={styles.label}>Serial Number</Text>
                 <TextInput

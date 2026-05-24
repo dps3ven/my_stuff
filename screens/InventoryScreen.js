@@ -124,7 +124,7 @@ export default function InventoryScreen({ navigation }) {
       <View style={styles.itemDetails}>
         <Text style={styles.itemInfo}>{item.brand || 'N/A'}</Text>
         <Text style={styles.itemInfo}>{item.model || 'N/A'}</Text>
-
+        {item.year ? <Text style={styles.itemInfo}>{item.year}</Text> : null}
         <Text style={styles.itemInfo}>{item.condition}</Text>
 
         {item.images && item.images.length > 1 && (
