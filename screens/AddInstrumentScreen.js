@@ -324,7 +324,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       {/* Header */}
       <View style={styles.wizardHeader}>
         <TouchableOpacity onPress={() => step > 0 ? setStep(step - 1) : navigation.navigate('Dashboard')}>
-          <Text style={styles.wizardBack}>{step > 0 ? '← Back' : '✕'}</Text>
+          <Text style={styles.wizardBack}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.wizardTitle}>{isEditing ? 'Edit Stuff' : 'Add New Stuff'}</Text>
         <TouchableOpacity onPress={saveInstrument}>
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '100%',
   },
-  wizardBack: { color: '#fff', fontSize: 15, fontWeight: '600', minWidth: 50 },
+  wizardBack: { color: '#fff', fontSize: 15, fontWeight: '600', minWidth: 70 },
   wizardTitle: { color: '#fff', fontSize: 17, fontWeight: '700', flex: 1, textAlign: 'center' },
   wizardSave: { color: '#28a745', fontSize: 15, fontWeight: '700', minWidth: 50, textAlign: 'right' },
   progressBar: {
