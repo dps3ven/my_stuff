@@ -26,6 +26,15 @@ export default function InstrumentDetailScreen({ navigation, route }) {
         colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
         style={StyleSheet.absoluteFillObject}
       />
+      {/* Top Header with quick exits */}
+      <View style={styles.topHeader}>
+        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.headerButtonText}>← Inventory</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('Dashboard')}>
+          <Text style={styles.headerButtonText}>🏠 Dashboard</Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -132,6 +141,13 @@ export default function InstrumentDetailScreen({ navigation, route }) {
             <Text style={styles.buttonText}>Back to Inventory</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity 
+          style={styles.dashboardLink}
+          onPress={() => navigation.navigate('Dashboard')}
+        >
+          <Text style={styles.dashboardLinkText}>🏠 Back to Dashboard</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -142,6 +158,41 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
     overflow: 'hidden',
+  },
+  topHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingTop: Platform.OS === 'ios' ? 50 : 12,
+    width: '100%',
+    maxWidth: 900,
+    alignSelf: 'center',
+  },
+  headerButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  headerButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  dashboardLink: {
+    marginTop: 16,
+    padding: 14,
+    alignItems: 'center',
+  },
+  dashboardLinkText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   scrollView: {
     flex: 1,
