@@ -288,16 +288,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
     width: 80,
     ...(Platform.OS === 'web' && {
-      maxWidth: 380,
-      width: 'auto',
+      width: 120,
       marginRight: 15,
     }),
   },
   imageScroll: {
     width: 80,
     ...(Platform.OS === 'web' && {
-      maxWidth: 380,
-      width: 'auto',
+      width: 120,
     }),
   },
   itemImage: {
