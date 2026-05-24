@@ -94,6 +94,11 @@ export default function InstrumentDetailScreen({ navigation, route }) {
           </View>
 
           <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Year:</Text>
+            <Text style={styles.detailValue}>{item.year || 'N/A'}</Text>
+          </View>
+
+          <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Serial Number:</Text>
             <Text style={styles.detailValue}>{item.serialNumber || 'N/A'}</Text>
           </View>
@@ -164,14 +169,16 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   imageGallery: {
-    marginBottom: 0,
+    marginBottom: 12,
     alignItems: 'center',
-    flexShrink: 0,
     width: '100%',
+    maxWidth: '100%',
+    overflow: 'hidden',
   },
   imageScroll: {
     borderRadius: 12,
     overflow: 'hidden',
+    maxWidth: '100%',
   },
   largeImage: {
     height: Platform.OS === 'web' ? 220 : 160,
