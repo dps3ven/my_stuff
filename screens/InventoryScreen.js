@@ -187,7 +187,7 @@ export default function InventoryScreen({ navigation }) {
               style={styles.logoutLink}
               onPress={() => navigation.navigate('Login')}
             >
-              <Text style={styles.logoutLinkText}>Logout</Text>
+              <Text style={styles.logoutLinkText}>Switch Profile</Text>
             </TouchableOpacity>
           </View>
         ) : (

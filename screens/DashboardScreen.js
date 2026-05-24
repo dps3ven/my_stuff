@@ -95,7 +95,7 @@ export default function DashboardScreen({ navigation }) {
             style={styles.button}
             onPress={logout}
           >
-            <Text style={styles.buttonText}>Logout</Text>
+            <Text style={styles.buttonText}>Switch Profile</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
