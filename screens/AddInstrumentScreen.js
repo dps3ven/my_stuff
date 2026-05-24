@@ -471,6 +471,7 @@ const styles = StyleSheet.create({
     maxWidth: isWebDesktop ? 700 : '100%',
     alignSelf: 'center',
     width: '100%',
+    flexGrow: 1,
   },
   title: {
     fontSize: 22,
