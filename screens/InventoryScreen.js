@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, SectionList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 
 export default function InventoryScreen({ navigation }) {
@@ -161,6 +162,10 @@ export default function InventoryScreen({ navigation }) {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <LinearGradient
+        colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
+        style={StyleSheet.absoluteFillObject}
+      />
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>My Stuff</Text>
@@ -223,7 +228,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#133965ff',
     overflow: 'hidden',
   },
   header: {

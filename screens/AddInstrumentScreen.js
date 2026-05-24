@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions, Modal, FlatList } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import storage from '../utils/storage';
 
@@ -368,10 +369,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: '#133965', height: Platform.OS === 'web' ? '100%' : undefined }}
+        style={{ flex: 1, height: Platform.OS === 'web' ? '100%' : undefined }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         enabled={Platform.OS !== 'web'}
       >
+        <LinearGradient
+          colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
+          style={StyleSheet.absoluteFillObject}
+        />
         {renderMobileWizard()}
       </KeyboardAvoidingView>
 
@@ -438,7 +443,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#133965',
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
     paddingVertical: 12,
     paddingTop: Platform.OS === 'ios' ? 50 : 12,
@@ -453,7 +458,7 @@ const styles = StyleSheet.create({
   wizardSave: { color: '#28a745', fontSize: 15, fontWeight: '700', minWidth: 50, textAlign: 'right' },
   progressBar: {
     flexDirection: 'row',
-    backgroundColor: '#0f2d52',
+    backgroundColor: 'rgba(0,0,0,0.2)',
     paddingVertical: 10,
     paddingHorizontal: 20,
     justifyContent: 'space-around',
@@ -474,7 +479,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   wizardFooter: {
-    backgroundColor: '#0f2d52',
+    backgroundColor: 'rgba(0,0,0,0.2)',
     padding: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.15)',

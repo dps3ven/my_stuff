@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
@@ -20,6 +21,10 @@ export default function InstrumentDetailScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
+        style={StyleSheet.absoluteFillObject}
+      />
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -129,7 +134,6 @@ export default function InstrumentDetailScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#133965ff',
     alignItems: Platform.OS === 'web' ? 'center' : 'stretch',
     overflow: 'hidden',
   },
