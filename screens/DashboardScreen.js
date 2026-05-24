@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 
 export default function DashboardScreen({ navigation }) {
@@ -37,7 +38,10 @@ export default function DashboardScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#133965', '#1e4d8c', '#2d6cb3']}
+      style={styles.container}
+    >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
@@ -99,14 +103,13 @@ export default function DashboardScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#133965ff',
     overflow: 'hidden',
   },
   scrollContent: {
