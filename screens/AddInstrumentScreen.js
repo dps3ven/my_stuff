@@ -239,7 +239,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={true}
         >
-          <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : '🎸 Add New Stuff'}</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : '🎸 Add New Stuff'}</Text>
+            {Platform.OS !== 'web' && (
+              <TouchableOpacity style={styles.topSaveButton} onPress={saveInstrument}>
+                <Text style={styles.topSaveText}>Save</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* Image Section - Pinterest style hero */}
           <View style={styles.imageSection}>
@@ -465,6 +472,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     color: '#fff',
+    flex: 1,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 10,
+  },
+  topSaveButton: {
+    backgroundColor: '#28a745',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 20,
+    shadowColor: '#28a745',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  topSaveText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
   },
   imageSection: {
     marginBottom: 16,
