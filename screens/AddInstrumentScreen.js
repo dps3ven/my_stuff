@@ -459,7 +459,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#133965',
     height: Platform.OS === 'web' ? '100%' : undefined,
-    overflow: 'hidden',
   },
   scrollView: {
     flex: 1,
@@ -471,7 +470,6 @@ const styles = StyleSheet.create({
     maxWidth: isWebDesktop ? 700 : '100%',
     alignSelf: 'center',
     width: '100%',
-    flexGrow: 1,
   },
   title: {
     fontSize: 22,
