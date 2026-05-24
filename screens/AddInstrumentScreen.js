@@ -372,21 +372,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         enabled={Platform.OS !== 'web'}
       >
-        {isWebDesktop ? (
-          <View style={styles.webContainer}>
-            {renderWebDesktop()}
-            <View style={styles.fixedFooter}>
-              <TouchableOpacity style={styles.saveButtonFull} onPress={saveInstrument}>
-                <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dashboardButton} onPress={() => navigation.navigate('Dashboard')}>
-                <Text style={styles.dashboardButtonText}>← Dashboard</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ) : (
-          renderMobileWizard()
-        )}
+        {renderMobileWizard()}
       </KeyboardAvoidingView>
 
       {/* Picker Modal */}
@@ -453,11 +439,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#133965',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 12,
     paddingTop: Platform.OS === 'ios' ? 50 : 12,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.15)',
+    maxWidth: isWebDesktop ? 700 : '100%',
+    alignSelf: 'center',
+    width: '100%',
   },
   wizardBack: { color: '#fff', fontSize: 15, fontWeight: '600', minWidth: 50 },
   wizardTitle: { color: '#fff', fontSize: 17, fontWeight: '700', flex: 1, textAlign: 'center' },
@@ -477,18 +466,27 @@ const styles = StyleSheet.create({
   progressDotActive: { backgroundColor: '#28a745' },
   progressLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 11 },
   progressLabelActive: { color: '#fff', fontWeight: '700' },
-  wizardContent: { padding: 16, paddingBottom: 20 },
+  wizardContent: {
+    padding: 16,
+    paddingBottom: 20,
+    maxWidth: isWebDesktop ? 700 : '100%',
+    alignSelf: 'center',
+    width: '100%',
+  },
   wizardFooter: {
     backgroundColor: '#0f2d52',
     padding: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
   },
   nextButton: {
     backgroundColor: '#007bff',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
+    width: '100%',
+    maxWidth: isWebDesktop ? 700 : '100%',
   },
   nextButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
