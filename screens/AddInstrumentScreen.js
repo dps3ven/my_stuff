@@ -57,7 +57,7 @@ const YEARS = [
   }),
 ];
 
-const STEPS = ['Photos', 'Category', 'Details'];
+const STEPS = ['Category', 'Photos', 'Details'];
 
 export default function AddInstrumentScreen({ navigation, route }) {
   const editItem = route?.params?.editItem;
@@ -344,8 +344,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
       {/* Step content */}
       <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={styles.wizardContent}
         keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={true}>
-        {step === 0 && renderStep0()}
-        {step === 1 && renderStep1()}
+        {step === 0 && renderStep1()}
+        {step === 1 && renderStep0()}
         {step === 2 && renderStep2()}
         {errorMessage ? <View style={styles.errorContainer}><Text style={styles.errorText}>{errorMessage}</Text></View> : null}
       </ScrollView>
