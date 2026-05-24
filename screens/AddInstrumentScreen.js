@@ -246,7 +246,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
             >
               <Text style={styles.backArrowText}>← Back</Text>
             </TouchableOpacity>
-            <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : '🎸 Add New Stuff'}</Text>
+            <Text style={styles.title}>{isEditing ? 'Edit Stuff' : 'Add New Stuff'}</Text>
             {!isWebDesktop && (
               <TouchableOpacity style={styles.topSaveButton} onPress={saveInstrument}>
                 <Text style={styles.topSaveText}>Save</Text>
