@@ -240,8 +240,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
           showsVerticalScrollIndicator={true}
         >
           <View style={styles.titleRow}>
+            <TouchableOpacity 
+              style={styles.backArrow} 
+              onPress={() => navigation.navigate('Dashboard')}
+            >
+              <Text style={styles.backArrowText}>← Back</Text>
+            </TouchableOpacity>
             <Text style={styles.title}>{isEditing ? '✏️ Edit Stuff' : '🎸 Add New Stuff'}</Text>
-            {Platform.OS !== 'web' && (
+            {!isWebDesktop && (
               <TouchableOpacity style={styles.topSaveButton} onPress={saveInstrument}>
                 <Text style={styles.topSaveText}>Save</Text>
               </TouchableOpacity>
@@ -467,10 +473,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '800',
     textAlign: 'center',
-    marginBottom: 20,
     color: '#fff',
     flex: 1,
   },
@@ -478,15 +483,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-    gap: 10,
+    marginBottom: 16,
+    gap: 8,
+  },
+  backArrow: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  backArrowText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   topSaveButton: {
     backgroundColor: '#28a745',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    marginBottom: 20,
     shadowColor: '#28a745',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
