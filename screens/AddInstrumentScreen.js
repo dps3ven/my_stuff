@@ -314,16 +314,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       {renderStep0()}
       {renderStep1()}
       {renderStep2()}
-      {errorMessage ? (
-        <TouchableOpacity 
-          style={styles.errorContainer}
-          onPress={() => setStep(0)}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.errorText}>{errorMessage}</Text>
-          <Text style={styles.errorLink}>Tap to fix →</Text>
-        </TouchableOpacity>
-      ) : null}
+      {errorMessage ? <View style={styles.errorContainer}><Text style={styles.errorText}>{errorMessage}</Text></View> : null}
     </ScrollView>
   );
 
@@ -357,16 +348,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         {step === 0 && renderStep1()}
         {step === 1 && renderStep0()}
         {step === 2 && renderStep2()}
-        {errorMessage ? (
-          <TouchableOpacity 
-            style={styles.errorContainer}
-            onPress={() => setStep(0)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.errorText}>{errorMessage}</Text>
-            <Text style={styles.errorLink}>Tap to fix →</Text>
-          </TouchableOpacity>
-        ) : null}
+        {errorMessage ? <View style={styles.errorContainer}><Text style={styles.errorText}>{errorMessage}</Text></View> : null}
       </ScrollView>
 
       {/* Footer nav */}
@@ -616,7 +598,6 @@ const styles = StyleSheet.create({
     marginBottom: 16, borderWidth: 1, borderColor: '#ffcdd2',
   },
   errorText: { color: '#c62828', textAlign: 'center', fontSize: 14, fontWeight: '600' },
-  errorLink: { color: '#0064d2', textAlign: 'center', fontSize: 13, fontWeight: '700', marginTop: 6, textDecorationLine: 'underline' },
 
   // ── Modal ────────────────────────────────────────────────────
   modalOverlay: {
