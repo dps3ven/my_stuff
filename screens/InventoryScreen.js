@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, SectionList, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
+import Skeleton, { SkeletonLine } from '../components/Skeleton';
 
 export default function InventoryScreen({ navigation }) {
   const [inventory, setInventory] = useState([]);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -15,6 +17,7 @@ export default function InventoryScreen({ navigation }) {
   }, [navigation]);
 
   const loadInventory = async () => {
+    setLoading(true);
     try {
       const currentUser = JSON.parse(await storage.getItem('currentUser'));
       setUser(currentUser);
@@ -46,6 +49,8 @@ export default function InventoryScreen({ navigation }) {
       setInventory(sections);
     } catch (error) {
       console.error('Error loading inventory:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -177,7 +182,21 @@ export default function InventoryScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         
-        {inventory.length === 0 ? (
+        {loading ? (
+          <View>
+            {[1, 2, 3].map(i => (
+              <View key={i} style={styles.itemContainer}>
+                <Skeleton width={80} height={80} borderRadius={6} style={{ marginRight: 10 }} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <SkeletonLine width="60%" height={16} />
+                  <SkeletonLine width="80%" />
+                  <SkeletonLine width="40%" />
+                  <SkeletonLine width="50%" />
+                </View>
+              </View>
+            ))}
+          </View>
+        ) : inventory.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>🎸</Text>
             <Text style={styles.emptyText}>Nothing here yet!</Text>

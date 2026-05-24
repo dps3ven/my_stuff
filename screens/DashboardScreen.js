@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
+import Skeleton, { SkeletonLine } from '../components/Skeleton';
 
 const HAPPY_MESSAGES = [
   'A great collection deserves a record.',
@@ -19,6 +20,7 @@ const HAPPY_MESSAGES = [
 export default function DashboardScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({ totalItems: 0, totalValue: 0 });
+  const [loading, setLoading] = useState(true);
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
 
   useEffect(() => {
@@ -29,6 +31,7 @@ export default function DashboardScreen({ navigation }) {
   }, [navigation]);
 
   const loadUserAndStats = async () => {
+    setLoading(true);
     try {
       const currentUser = JSON.parse(await storage.getItem('currentUser'));
       setUser(currentUser);
@@ -40,6 +43,8 @@ export default function DashboardScreen({ navigation }) {
       setStats({ totalItems, totalValue });
     } catch (error) {
       console.error('Error loading stats:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,7 +70,11 @@ export default function DashboardScreen({ navigation }) {
         </View>
 
         <View style={styles.welcomeCard}>
-          <Text style={styles.welcome}>Hello, {user?.name}!</Text>
+          {loading ? (
+            <SkeletonLine width={200} height={28} style={{ alignSelf: 'center' }} />
+          ) : (
+            <Text style={styles.welcome}>Hello, {user?.name}!</Text>
+          )}
         </View>
 
         <View style={styles.whyCard}>
@@ -80,14 +89,22 @@ export default function DashboardScreen({ navigation }) {
             <View style={styles.statIcon}>
               <Text style={styles.iconText}>🎸</Text>
             </View>
-            <Text style={styles.statNumber}>{stats.totalItems}</Text>
+            {loading ? (
+              <SkeletonLine width={40} height={20} style={{ marginBottom: 5 }} />
+            ) : (
+              <Text style={styles.statNumber}>{stats.totalItems}</Text>
+            )}
             <Text style={styles.statLabel}>My Stuff</Text>
           </TouchableOpacity>
           <View style={styles.statCard}>
             <View style={styles.statIcon}>
               <Text style={styles.iconText}>💰</Text>
             </View>
-            <Text style={styles.statNumber}>${stats.totalValue.toFixed(2)}</Text>
+            {loading ? (
+              <SkeletonLine width={60} height={20} style={{ marginBottom: 5 }} />
+            ) : (
+              <Text style={styles.statNumber}>${stats.totalValue.toFixed(2)}</Text>
+            )}
             <Text style={styles.statLabel}>Total Value</Text>
           </View>
         </View>
