@@ -9,6 +9,9 @@ const isWebDesktop = Platform.OS === 'web' && Dimensions.get('window').width > 7
 export default function LoginScreen({ navigation }) {
   const [profiles, setProfiles] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(null);
+  const [editingName, setEditingName] = useState('');
   const [newProfileName, setNewProfileName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -75,27 +78,70 @@ export default function LoginScreen({ navigation }) {
     selectProfile(newProfile);
   };
 
-  const deleteProfile = (profile) => {
-    const action = async () => {
-      const updated = profiles.filter(p => p.id !== profile.id);
-      await storage.setItem('profiles', JSON.stringify(updated));
-      await storage.removeItem(`inventory_${profile.id}`);
-      setProfiles(updated);
-    };
+  const showProfileOptions = (profile) => {
     if (Platform.OS === 'web') {
-      if (window.confirm(`Delete "${profile.name}" and all its data? This cannot be undone.`)) {
-        action();
+      const choice = window.confirm(`Edit "${profile.name}"?\n\nClick OK to rename, or Cancel to delete.`);
+      if (choice) {
+        setEditingProfile(profile);
+        setEditingName(profile.name);
+        setShowEditModal(true);
+      } else {
+        if (window.confirm(`Delete "${profile.name}" and all its data? This cannot be undone.`)) {
+          deleteProfileConfirmed(profile);
+        }
       }
     } else {
       Alert.alert(
-        'Delete Profile',
-        `Delete "${profile.name}" and all its data? This cannot be undone.`,
+        profile.name,
+        'What would you like to do?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Delete', style: 'destructive', onPress: action },
+          { text: 'Rename', onPress: () => {
+            setEditingProfile(profile);
+            setEditingName(profile.name);
+            setShowEditModal(true);
+          }},
+          { text: 'Delete', style: 'destructive', onPress: () => deleteProfile(profile) },
         ]
       );
     }
+  };
+
+  const deleteProfileConfirmed = async (profile) => {
+    const updated = profiles.filter(p => p.id !== profile.id);
+    await storage.setItem('profiles', JSON.stringify(updated));
+    await storage.removeItem(`inventory_${profile.id}`);
+    setProfiles(updated);
+  };
+
+  const deleteProfile = (profile) => {
+    Alert.alert(
+      'Delete Profile',
+      `Delete "${profile.name}" and all its data? This cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => deleteProfileConfirmed(profile) },
+      ]
+    );
+  };
+
+  const renameProfile = async () => {
+    const name = editingName.trim();
+    if (!name) {
+      setErrorMessage('Enter a profile name');
+      return;
+    }
+    if (profiles.find(p => p.id !== editingProfile.id && p.name.toLowerCase() === name.toLowerCase())) {
+      setErrorMessage('A profile with that name already exists');
+      return;
+    }
+    const updated = profiles.map(p => p.id === editingProfile.id ? { ...p, name } : p);
+    await storage.setItem('profiles', JSON.stringify(updated));
+    setProfiles(updated);
+    setShowEditModal(false);
+    setEditingProfile(null);
+    setEditingName('');
+    setErrorMessage('');
   };
 
   const resetAllData = () => {
@@ -152,7 +198,7 @@ export default function LoginScreen({ navigation }) {
               <TouchableOpacity
                 style={styles.profileCard}
                 onPress={() => selectProfile(profile)}
-                onLongPress={() => deleteProfile(profile)}
+                onLongPress={() => showProfileOptions(profile)}
                 activeOpacity={0.7}
               >
                 <View style={styles.avatar}>
@@ -177,7 +223,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         {profiles.length > 0 && (
-          <Text style={styles.hint}>Long-press a profile to delete it</Text>
+          <Text style={styles.hint}>Long-press a profile to rename or delete</Text>
         )}
 
         {errorMessage ? (
@@ -220,6 +266,42 @@ export default function LoginScreen({ navigation }) {
                 onPress={createProfile}
               >
                 <Text style={styles.modalCreateText}>Create</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Edit Profile Modal */}
+      <Modal
+        visible={showEditModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Rename Profile</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter new name"
+              value={editingName}
+              onChangeText={setEditingName}
+              autoFocus
+            />
+            {errorMessage ? <Text style={styles.modalError}>{errorMessage}</Text> : null}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={() => { setShowEditModal(false); setEditingName(''); setEditingProfile(null); setErrorMessage(''); }}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCreateButton]}
+                onPress={renameProfile}
+              >
+                <Text style={styles.modalCreateText}>Save</Text>
               </TouchableOpacity>
             </View>
           </View>
