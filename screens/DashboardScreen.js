@@ -3,9 +3,23 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 
+const HAPPY_MESSAGES = [
+  'A great collection deserves a record.',
+  'Every instrument has a story.',
+  'Your gear, organized.',
+  'Keep track of what you own.',
+  'Document what matters.',
+  'Where music meets memory.',
+  'Your sound, your stuff.',
+  'A home for your gear.',
+  'For the love of music.',
+  'Every piece counts.',
+];
+
 export default function DashboardScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({ totalItems: 0, totalValue: 0 });
+  const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -55,9 +69,7 @@ export default function DashboardScreen({ navigation }) {
         </View>
 
         <View style={styles.whyCard}>
-          <Text style={styles.whyText}>
-          A Great Collection
-          </Text>
+          <Text style={styles.whyText}>{happyMessage}</Text>
         </View>
 
         <View style={styles.statsContainer}>
