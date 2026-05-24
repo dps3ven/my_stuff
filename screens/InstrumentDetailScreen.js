@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   detailsCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
+    padding: 12,
     marginBottom: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     flexDirection: 'row',
-    paddingVertical: 10,
+    paddingVertical: 7,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     alignItems: 'baseline',
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   detailValue: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#333',
     flex: 1,
     fontWeight: '600',
