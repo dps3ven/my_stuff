@@ -10,6 +10,7 @@ export default function LoginScreen({ navigation }) {
   const [profiles, setProfiles] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showOptionsFor, setShowOptionsFor] = useState(null);
   const [editingProfile, setEditingProfile] = useState(null);
   const [editingName, setEditingName] = useState('');
   const [newProfileName, setNewProfileName] = useState('');
@@ -79,29 +80,30 @@ export default function LoginScreen({ navigation }) {
   };
 
   const showProfileOptions = (profile) => {
+    setShowOptionsFor(profile);
+  };
+
+  const handleRename = () => {
+    setEditingProfile(showOptionsFor);
+    setEditingName(showOptionsFor.name);
+    setShowOptionsFor(null);
+    setShowEditModal(true);
+  };
+
+  const handleDelete = () => {
+    const profile = showOptionsFor;
+    setShowOptionsFor(null);
     if (Platform.OS === 'web') {
-      const choice = window.confirm(`Edit "${profile.name}"?\n\nClick OK to rename, or Cancel to delete.`);
-      if (choice) {
-        setEditingProfile(profile);
-        setEditingName(profile.name);
-        setShowEditModal(true);
-      } else {
-        if (window.confirm(`Delete "${profile.name}" and all its data? This cannot be undone.`)) {
-          deleteProfileConfirmed(profile);
-        }
+      if (window.confirm(`Delete "${profile.name}" and all its data? This cannot be undone.`)) {
+        deleteProfileConfirmed(profile);
       }
     } else {
       Alert.alert(
-        profile.name,
-        'What would you like to do?',
+        'Delete Profile',
+        `Delete "${profile.name}" and all its data? This cannot be undone.`,
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Rename', onPress: () => {
-            setEditingProfile(profile);
-            setEditingName(profile.name);
-            setShowEditModal(true);
-          }},
-          { text: 'Delete', style: 'destructive', onPress: () => deleteProfile(profile) },
+          { text: 'Delete', style: 'destructive', onPress: () => deleteProfileConfirmed(profile) },
         ]
       );
     }
@@ -112,17 +114,6 @@ export default function LoginScreen({ navigation }) {
     await storage.setItem('profiles', JSON.stringify(updated));
     await storage.removeItem(`inventory_${profile.id}`);
     setProfiles(updated);
-  };
-
-  const deleteProfile = (profile) => {
-    Alert.alert(
-      'Delete Profile',
-      `Delete "${profile.name}" and all its data? This cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => deleteProfileConfirmed(profile) },
-      ]
-    );
   };
 
   const renameProfile = async () => {
@@ -307,6 +298,37 @@ export default function LoginScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+
+      {/* Profile Options Action Sheet */}
+      <Modal
+        visible={showOptionsFor !== null}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowOptionsFor(null)}
+      >
+        <TouchableOpacity 
+          style={styles.actionSheetOverlay}
+          activeOpacity={1}
+          onPress={() => setShowOptionsFor(null)}
+        >
+          <View style={styles.actionSheet}>
+            <View style={styles.actionSheetHeader}>
+              <Text style={styles.actionSheetTitle}>{showOptionsFor?.name}</Text>
+            </View>
+            <TouchableOpacity style={styles.actionSheetItem} onPress={handleRename}>
+              <Text style={styles.actionSheetIcon}>✏️</Text>
+              <Text style={styles.actionSheetText}>Rename</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionSheetItem} onPress={handleDelete}>
+              <Text style={styles.actionSheetIcon}>🗑️</Text>
+              <Text style={[styles.actionSheetText, { color: '#dc3545' }]}>Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.actionSheetItem, styles.actionSheetCancel]} onPress={() => setShowOptionsFor(null)}>
+              <Text style={[styles.actionSheetText, { color: '#666', fontWeight: '700' }]}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -486,5 +508,52 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
     fontSize: 16,
+  },
+  actionSheetOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  actionSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingBottom: Platform.OS === 'ios' ? 30 : 20,
+    width: '100%',
+    maxWidth: 500,
+    alignSelf: 'center',
+  },
+  actionSheetHeader: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    alignItems: 'center',
+  },
+  actionSheetTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333',
+  },
+  actionSheetItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f5f5f5',
+  },
+  actionSheetIcon: {
+    fontSize: 20,
+    marginRight: 14,
+  },
+  actionSheetText: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '600',
+  },
+  actionSheetCancel: {
+    justifyContent: 'center',
+    borderBottomWidth: 0,
+    marginTop: 8,
+    backgroundColor: '#f5f5f5',
   },
 });
