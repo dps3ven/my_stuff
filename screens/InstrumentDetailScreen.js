@@ -6,7 +6,8 @@ export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
   const [activeIndex, setActiveIndex] = useState(0);
   const imageScrollRef = useRef(null);
-  const imageWidth = Platform.OS === 'web' ? 700 : Dimensions.get('window').width - 32;
+  const screenWidth = Dimensions.get('window').width;
+  const imageWidth = Platform.OS === 'web' ? Math.min(700, screenWidth - 32) : screenWidth - 32;
 
   const handleScroll = useCallback((event) => {
     const offset = event.nativeEvent.contentOffset.x;
@@ -148,8 +149,8 @@ const styles = StyleSheet.create({
     maxWidth: Platform.OS === 'web' ? 900 : '100%',
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: 16,
+    paddingBottom: 60,
     alignItems: 'center',
   },
   contentLayout: {
