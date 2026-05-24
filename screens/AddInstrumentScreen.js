@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     height: Platform.OS === 'web' ? '100%' : undefined,
+    WebkitOverflowScrolling: 'touch',
   },
   scrollContent: {
     padding: 16,
