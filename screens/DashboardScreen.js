@@ -39,7 +39,7 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <LinearGradient
-      colors={['#133965', '#1e4d8c', '#2d6cb3']}
+      colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
       style={styles.container}
     >
       <ScrollView
