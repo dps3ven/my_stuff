@@ -174,11 +174,13 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: '100%',
     overflow: 'hidden',
+    height: Platform.OS === 'web' ? 250 : 170,
   },
   imageScroll: {
     borderRadius: 12,
     overflow: 'hidden',
     maxWidth: '100%',
+    height: Platform.OS === 'web' ? 220 : 140,
   },
   largeImage: {
     height: Platform.OS === 'web' ? 220 : 160,
@@ -226,21 +228,24 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   detailRow: {
+    flexDirection: 'row',
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    alignItems: 'baseline',
   },
   detailLabel: {
     fontSize: 11,
     fontWeight: 'bold',
     color: '#999',
+    width: 90,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 3,
   },
   detailValue: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#333',
+    flex: 1,
     fontWeight: '600',
   },
   notesSection: {
