@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     gap: 12,
     width: '100%',
     maxWidth: 700,
-    alignItems: 'center',
+    alignItems: 'stretch',
     alignSelf: 'center',
   },
   title: {
