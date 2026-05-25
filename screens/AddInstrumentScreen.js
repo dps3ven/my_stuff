@@ -279,9 +279,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
       <Text style={styles.stepHint}>Add more info to complete your listing.</Text>
 
       <Text style={styles.fieldLabel}>Year</Text>
-      {renderPickerButton('Select year', instrument.year, 'Year', YEARS,
-        (v) => setInstrument(prev => ({ ...prev, year: v }))
-      )}
+      <TextInput
+        style={styles.input}
+        value={instrument.year}
+        onChangeText={(t) => setInstrument(prev => ({ ...prev, year: t }))}
+        placeholder="e.g. 2015"
+        keyboardType="numeric"
+        maxLength={4}
+      />
 
       <Text style={styles.fieldLabel}>Serial Number</Text>
       <TextInput style={styles.input} value={instrument.serialNumber}
