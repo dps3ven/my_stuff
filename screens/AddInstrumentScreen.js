@@ -276,7 +276,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   const renderStep2 = () => (
     <View style={styles.stepContent}>
       <Text style={styles.stepTitle}>📋 Details</Text>
-      <Text style={styles.stepHint}>Add more info to complete your listing.</Text>
+      <Text style={styles.stepHint}>Complete your listing</Text>
 
       <Text style={styles.fieldLabel}>Year</Text>
       <TextInput
