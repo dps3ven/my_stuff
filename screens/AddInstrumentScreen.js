@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions, Modal, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions, Modal, FlatList, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import storage from '../utils/storage';
@@ -298,7 +298,17 @@ export default function AddInstrumentScreen({ navigation, route }) {
         (v) => setInstrument(prev => ({ ...prev, condition: v }))
       )}
 
-      <Text style={styles.fieldLabel}>Estimated Value ($)</Text>
+      <View style={styles.valueLabelRow}>
+        <Text style={styles.fieldLabel}>Estimated Value ($)</Text>
+        {(instrument.brand || instrument.model) && (
+          <TouchableOpacity onPress={() => {
+            const query = encodeURIComponent([instrument.brand, instrument.model, instrument.year].filter(Boolean).join(' '));
+            Linking.openURL(`https://reverb.com/marketplace?query=${query}`);
+          }}>
+            <Text style={styles.checkReverbLink}>Check Reverb →</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       <TextInput style={styles.input} value={instrument.value}
         onChangeText={(t) => setInstrument(prev => ({ ...prev, value: t }))}
         placeholder="0.00" keyboardType="numeric" />
@@ -516,6 +526,19 @@ const styles = StyleSheet.create({
   stepHint: { fontSize: 13, color: '#888', marginBottom: 14 },
   fieldLabel: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 6, marginTop: 12 },
   required: { color: '#e53935' },
+  valueLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  checkReverbLink: {
+    color: '#0064d2',
+    fontSize: 13,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
 
   // ── Images ───────────────────────────────────────────────────
   imageRow: { marginBottom: 12 },
