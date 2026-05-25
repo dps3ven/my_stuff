@@ -298,7 +298,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         (v) => setInstrument(prev => ({ ...prev, condition: v }))
       )}
 
-      <Text style={styles.fieldLabel}>Estimated Value ($)</Text>
+      <Text style={styles.fieldLabel}>What's it worth? ($)</Text>
       <TextInput style={styles.input} value={instrument.value}
         onChangeText={(t) => setInstrument(prev => ({ ...prev, value: t }))}
         placeholder="0.00" keyboardType="numeric" />

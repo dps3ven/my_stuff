@@ -110,7 +110,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Estimated Value:</Text>
+            <Text style={styles.detailLabel}>What's it worth?:</Text>
             <Text style={styles.detailValue}>${item.value || 'N/A'}</Text>
           </View>
         </View>
