@@ -25,7 +25,6 @@ export default function LoginScreen({ navigation }) {
   const [editingName, setEditingName] = useState('');
   const [newProfileName, setNewProfileName] = useState('');
   const [newPrimaryInstrument, setNewPrimaryInstrument] = useState('');
-  const [newCurrency, setNewCurrency] = useState('USD');
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
