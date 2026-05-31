@@ -260,7 +260,7 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.modalTitle}>New Profile</Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Pick a profile name"
+              placeholder="Your profile name"
               value={newProfileName}
               onChangeText={setNewProfileName}
               autoFocus
@@ -275,19 +275,6 @@ export default function LoginScreen({ navigation }) {
                   onPress={() => setNewPrimaryInstrument(newPrimaryInstrument === opt ? '' : opt)}
                 >
                   <Text style={[styles.chipText, newPrimaryInstrument === opt && styles.chipTextActive]}>{opt}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.prefLabel}>Currency</Text>
-            <View style={styles.chipRow}>
-              {CURRENCY_OPTIONS.map(opt => (
-                <TouchableOpacity
-                  key={opt.value}
-                  style={[styles.chip, newCurrency === opt.value && styles.chipActive]}
-                  onPress={() => setNewCurrency(opt.value)}
-                >
-                  <Text style={[styles.chipText, newCurrency === opt.value && styles.chipTextActive]}>{opt.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
