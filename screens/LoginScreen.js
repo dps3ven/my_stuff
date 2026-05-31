@@ -260,7 +260,7 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.modalTitle}>New Profile</Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Enter your name"
+              placeholder="Pick a profile name"
               value={newProfileName}
               onChangeText={setNewProfileName}
               autoFocus
