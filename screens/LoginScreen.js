@@ -7,14 +7,6 @@ import * as LocalAuthentication from 'expo-local-authentication';
 const isWebDesktop = Platform.OS === 'web' && Dimensions.get('window').width > 768;
 
 const INSTRUMENT_OPTIONS = ['Guitar', 'Bass', 'Drums', 'Piano', 'Violin', 'Microphone', 'Amplifier', 'Other'];
-const CURRENCY_OPTIONS = [
-  { label: '$ USD', value: 'USD' },
-  { label: '€ EUR', value: 'EUR' },
-  { label: '£ GBP', value: 'GBP' },
-  { label: '¥ JPY', value: 'JPY' },
-  { label: '$ CAD', value: 'CAD' },
-  { label: '$ AUD', value: 'AUD' },
-];
 
 export default function LoginScreen({ navigation }) {
   const [profiles, setProfiles] = useState([]);
@@ -85,7 +77,7 @@ export default function LoginScreen({ navigation }) {
       name,
       preferences: {
         primaryInstrument: newPrimaryInstrument || '',
-        currency: newCurrency || 'USD',
+        currency: 'USD',
       },
     };
     const updated = [...profiles, newProfile];
@@ -94,7 +86,6 @@ export default function LoginScreen({ navigation }) {
     setShowCreateModal(false);
     setNewProfileName('');
     setNewPrimaryInstrument('');
-    setNewCurrency('USD');
     setErrorMessage('');
     selectProfile(newProfile);
   };
@@ -282,7 +273,7 @@ export default function LoginScreen({ navigation }) {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalCancelButton]}
-                onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setNewCurrency('USD'); setErrorMessage(''); }}
+                onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
