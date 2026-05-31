@@ -16,7 +16,7 @@ export default function LoginScreen({ navigation }) {
   const [editingProfile, setEditingProfile] = useState(null);
   const [editingName, setEditingName] = useState('');
   const [newProfileName, setNewProfileName] = useState('');
-  const [newPrimaryInstrument, setNewPrimaryInstrument] = useState('');
+  const [newInstruments, setNewInstruments] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -76,7 +76,8 @@ export default function LoginScreen({ navigation }) {
       id: Date.now(),
       name,
       preferences: {
-        primaryInstrument: newPrimaryInstrument || '',
+        instruments: newInstruments,
+        primaryInstrument: newInstruments[0] || '',
         currency: 'USD',
       },
     };
@@ -85,7 +86,7 @@ export default function LoginScreen({ navigation }) {
     setProfiles(updated);
     setShowCreateModal(false);
     setNewProfileName('');
-    setNewPrimaryInstrument('');
+    setNewInstruments([]);
     setErrorMessage('');
     selectProfile(newProfile);
   };
@@ -256,24 +257,29 @@ export default function LoginScreen({ navigation }) {
               autoFocus
             />
 
-            <Text style={styles.prefLabel}>What do you mostly collect?</Text>
+            <Text style={styles.prefLabel}>What do you collect? (pick any)</Text>
             <View style={styles.chipRow}>
-              {INSTRUMENT_OPTIONS.map(opt => (
-                <TouchableOpacity
-                  key={opt}
-                  style={[styles.chip, newPrimaryInstrument === opt && styles.chipActive]}
-                  onPress={() => setNewPrimaryInstrument(newPrimaryInstrument === opt ? '' : opt)}
-                >
-                  <Text style={[styles.chipText, newPrimaryInstrument === opt && styles.chipTextActive]}>{opt}</Text>
-                </TouchableOpacity>
-              ))}
+              {INSTRUMENT_OPTIONS.map(opt => {
+                const selected = newInstruments.includes(opt);
+                return (
+                  <TouchableOpacity
+                    key={opt}
+                    style={[styles.chip, selected && styles.chipActive]}
+                    onPress={() => setNewInstruments(prev =>
+                      prev.includes(opt) ? prev.filter(i => i !== opt) : [...prev, opt]
+                    )}
+                  >
+                    <Text style={[styles.chipText, selected && styles.chipTextActive]}>{opt}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
 
             {errorMessage ? <Text style={styles.modalError}>{errorMessage}</Text> : null}
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalCancelButton]}
-                onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
+                onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewInstruments([]); setErrorMessage(''); }}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
