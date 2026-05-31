@@ -67,7 +67,11 @@ export default function InventoryScreen({ navigation }) {
           await storage.setItem(`inventory_${user.id}`, JSON.stringify(updatedInventory));
           loadInventory();
         } catch (error) {
-          alert('Failed to delete item');
+          if (Platform.OS === 'web') {
+            window.confirm('Failed to delete item');
+          } else {
+            Alert.alert('Error', 'Failed to delete item');
+          }
         }
       }
     } else {
