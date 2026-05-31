@@ -60,11 +60,14 @@ const YEARS = [
 
 const STEPS = ['Category', 'Photos', 'Details'];
 
+const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', GBP: '£', JPY: '¥', CAD: '$', AUD: '$' };
+
 export default function AddInstrumentScreen({ navigation, route }) {
   const editItem = route?.params?.editItem;
   const isEditing = !!editItem;
 
   const [step, setStep] = useState(0);
+  const [userPrefs, setUserPrefs] = useState({ primaryInstrument: '', currency: 'USD' });
   const [instrument, setInstrument] = useState({
     type: editItem?.type || '',
     brand: editItem?.brand || '',
@@ -84,6 +87,20 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
   useEffect(() => {
     navigation.setOptions({ title: isEditing ? 'Edit Stuff' : 'Add Stuff' });
+    // Load user preferences and pre-select primary instrument for new items
+    (async () => {
+      try {
+        const currentUser = JSON.parse(await storage.getItem('currentUser'));
+        if (currentUser?.preferences) {
+          setUserPrefs(currentUser.preferences);
+          if (!isEditing && !instrument.type && currentUser.preferences.primaryInstrument) {
+            setInstrument(prev => ({ ...prev, type: currentUser.preferences.primaryInstrument }));
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
   }, [navigation, isEditing]);
 
   // ── Image helpers ──────────────────────────────────────────────
@@ -306,7 +323,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         (v) => setInstrument(prev => ({ ...prev, condition: v }))
       )}
 
-      <Text style={styles.fieldLabel}>Value:($)</Text>
+      <Text style={styles.fieldLabel}>Value: ({CURRENCY_SYMBOLS[userPrefs.currency] || '$'})</Text>
       <TextInput style={styles.input} value={instrument.value}
         onChangeText={(t) => setInstrument(prev => ({ ...prev, value: t }))}
         placeholder="0.00" keyboardType="numeric" />

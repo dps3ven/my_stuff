@@ -6,6 +6,16 @@ import * as LocalAuthentication from 'expo-local-authentication';
 
 const isWebDesktop = Platform.OS === 'web' && Dimensions.get('window').width > 768;
 
+const INSTRUMENT_OPTIONS = ['Guitar', 'Bass', 'Drums', 'Piano', 'Violin', 'Microphone', 'Amplifier', 'Other'];
+const CURRENCY_OPTIONS = [
+  { label: '$ USD', value: 'USD' },
+  { label: '€ EUR', value: 'EUR' },
+  { label: '£ GBP', value: 'GBP' },
+  { label: '¥ JPY', value: 'JPY' },
+  { label: '$ CAD', value: 'CAD' },
+  { label: '$ AUD', value: 'AUD' },
+];
+
 export default function LoginScreen({ navigation }) {
   const [profiles, setProfiles] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -14,6 +24,8 @@ export default function LoginScreen({ navigation }) {
   const [editingProfile, setEditingProfile] = useState(null);
   const [editingName, setEditingName] = useState('');
   const [newProfileName, setNewProfileName] = useState('');
+  const [newPrimaryInstrument, setNewPrimaryInstrument] = useState('');
+  const [newCurrency, setNewCurrency] = useState('USD');
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -69,12 +81,21 @@ export default function LoginScreen({ navigation }) {
       setErrorMessage('A profile with that name already exists');
       return;
     }
-    const newProfile = { id: Date.now(), name };
+    const newProfile = {
+      id: Date.now(),
+      name,
+      preferences: {
+        primaryInstrument: newPrimaryInstrument || '',
+        currency: newCurrency || 'USD',
+      },
+    };
     const updated = [...profiles, newProfile];
     await storage.setItem('profiles', JSON.stringify(updated));
     setProfiles(updated);
     setShowCreateModal(false);
     setNewProfileName('');
+    setNewPrimaryInstrument('');
+    setNewCurrency('USD');
     setErrorMessage('');
     selectProfile(newProfile);
   };
@@ -244,11 +265,38 @@ export default function LoginScreen({ navigation }) {
               onChangeText={setNewProfileName}
               autoFocus
             />
+
+            <Text style={styles.prefLabel}>What do you mostly collect?</Text>
+            <View style={styles.chipRow}>
+              {INSTRUMENT_OPTIONS.map(opt => (
+                <TouchableOpacity
+                  key={opt}
+                  style={[styles.chip, newPrimaryInstrument === opt && styles.chipActive]}
+                  onPress={() => setNewPrimaryInstrument(newPrimaryInstrument === opt ? '' : opt)}
+                >
+                  <Text style={[styles.chipText, newPrimaryInstrument === opt && styles.chipTextActive]}>{opt}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.prefLabel}>Currency</Text>
+            <View style={styles.chipRow}>
+              {CURRENCY_OPTIONS.map(opt => (
+                <TouchableOpacity
+                  key={opt.value}
+                  style={[styles.chip, newCurrency === opt.value && styles.chipActive]}
+                  onPress={() => setNewCurrency(opt.value)}
+                >
+                  <Text style={[styles.chipText, newCurrency === opt.value && styles.chipTextActive]}>{opt.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
             {errorMessage ? <Text style={styles.modalError}>{errorMessage}</Text> : null}
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalCancelButton]}
-                onPress={() => { setShowCreateModal(false); setNewProfileName(''); setErrorMessage(''); }}
+                onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setNewCurrency('USD'); setErrorMessage(''); }}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
@@ -481,6 +529,39 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 12,
     textAlign: 'center',
+  },
+  prefLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 8,
+    marginTop: 4,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 14,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  chipActive: {
+    backgroundColor: '#0064d2',
+    borderColor: '#0064d2',
+  },
+  chipText: {
+    fontSize: 13,
+    color: '#555',
+    fontWeight: '600',
+  },
+  chipTextActive: {
+    color: '#fff',
   },
   modalButtons: {
     flexDirection: 'row',
