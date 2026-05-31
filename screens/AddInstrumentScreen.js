@@ -169,11 +169,19 @@ export default function AddInstrumentScreen({ navigation, route }) {
     try {
       const currentUser = JSON.parse(await storage.getItem('currentUser'));
       const inventory = JSON.parse(await storage.getItem(`inventory_${currentUser.id}`) || '[]');
+
+      // Resolve "Other" custom values before saving
+      const finalInstrument = {
+        ...instrument,
+        brand: instrument.brand === 'Other' && instrument.customBrand ? instrument.customBrand : instrument.brand,
+        model: instrument.model === 'Other' && instrument.customModel ? instrument.customModel : instrument.model,
+      };
+
       if (isEditing) {
-        const updated = inventory.map(item => item.id === editItem.id ? { ...instrument, id: editItem.id } : item);
+        const updated = inventory.map(item => item.id === editItem.id ? { ...finalInstrument, id: editItem.id } : item);
         await storage.setItem(`inventory_${currentUser.id}`, JSON.stringify(updated));
       } else {
-        inventory.push({ ...instrument, id: Date.now() });
+        inventory.push({ ...finalInstrument, id: Date.now() });
         await storage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
       }
       navigation.navigate('Dashboard');
@@ -242,7 +250,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
           )}
           {instrument.brand === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customBrand || ''}
-              onChangeText={(t) => setInstrument(prev => ({ ...prev, customBrand: t, brand: t || 'Other' }))}
+              onChangeText={(t) => setInstrument(prev => ({ ...prev, customBrand: t }))}
               placeholder="Enter brand name" />
           )}
         </>
@@ -261,7 +269,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
           )}
           {instrument.model === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customModel || ''}
-              onChangeText={(t) => setInstrument(prev => ({ ...prev, customModel: t, model: t || 'Other' }))}
+              onChangeText={(t) => setInstrument(prev => ({ ...prev, customModel: t }))}
               placeholder="Enter model name" />
           )}
         </>
