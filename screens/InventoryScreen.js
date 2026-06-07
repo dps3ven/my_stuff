@@ -113,10 +113,10 @@ export default function InventoryScreen({ navigation }) {
               showsHorizontalScrollIndicator={true}
               style={styles.imageScroll}
             >
-              {item.images.map((imageUri, index) => (
+              {item.images.map((img, index) => (
                 <Image 
                   key={index} 
-                  source={{ uri: imageUri }} 
+                  source={{ uri: typeof img === 'string' ? img : img.uri }} 
                   style={styles.itemImage} 
                 />
               ))}

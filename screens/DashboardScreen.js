@@ -19,7 +19,7 @@ const HAPPY_MESSAGES = [
 
 export default function DashboardScreen({ navigation }) {
   const [user, setUser] = useState(null);
-  const [stats, setStats] = useState({ totalItems: 0, totalValue: 0 });
+  const [stats, setStats] = useState({ totalItems: 0, totalValue: 0, storageUsed: 0 });
   const [loading, setLoading] = useState(true);
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
 
@@ -40,12 +40,26 @@ export default function DashboardScreen({ navigation }) {
       const totalItems = inventory.length;
       const totalValue = inventory.reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
 
-      setStats({ totalItems, totalValue });
+      // Sum actual stored image sizes; support legacy plain-string URIs (size treated as 0)
+      const totalBytes = inventory.reduce((sum, item) => {
+        const imageBytes = (item.images || []).reduce((s, img) => {
+          return s + (typeof img === 'string' ? 0 : (img.size || 0));
+        }, 0);
+        return sum + imageBytes;
+      }, 0);
+
+      setStats({ totalItems, totalValue, storageUsed: totalBytes });
     } catch (error) {
       console.error('Error loading stats:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatStorage = (bytes) => {
+    if (bytes < 1024) return `${Math.round(bytes)} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
   const logout = async () => {
@@ -106,6 +120,17 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.statNumber}>${stats.totalValue.toFixed(2)}</Text>
             )}
             <Text style={styles.statLabel}>Total Value</Text>
+          </View>
+          <View style={styles.statCard}>
+            <View style={styles.statIcon}>
+              <Text style={styles.iconText}>💾</Text>
+            </View>
+            {loading ? (
+              <SkeletonLine width={50} height={20} style={{ marginBottom: 5 }} />
+            ) : (
+              <Text style={styles.statNumber}>{formatStorage(stats.storageUsed)}</Text>
+            )}
+            <Text style={styles.statLabel}>Photos</Text>
           </View>
         </View>
 

@@ -106,7 +106,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   // ── Image helpers ──────────────────────────────────────────────
   const compressImageForWeb = (blobUri, maxWidth = 800, quality = 0.7) => {
     return new Promise((resolve) => {
-      if (typeof window === 'undefined' || typeof document === 'undefined') { resolve(blobUri); return; }
+      if (typeof window === 'undefined' || typeof document === 'undefined') { resolve({ uri: blobUri, size: 0 }); return; }
       const img = new window.Image();
       img.onload = () => {
         try {
@@ -115,10 +115,13 @@ export default function AddInstrumentScreen({ navigation, route }) {
           if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
           canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } catch { resolve(blobUri); }
+          const dataUri = canvas.toDataURL('image/jpeg', quality);
+          // base64 chars * 0.75 gives actual byte size
+          const size = Math.round(dataUri.length * 0.75);
+          resolve({ uri: dataUri, size });
+        } catch { resolve({ uri: blobUri, size: 0 }); }
       };
-      img.onerror = () => resolve(blobUri);
+      img.onerror = () => resolve({ uri: blobUri, size: 0 });
       img.src = blobUri;
     });
   };
@@ -128,7 +131,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
     if (status !== 'granted') { Alert.alert('Permission Required', 'Camera access is needed.'); return; }
     const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.7 });
     if (!result.canceled) {
-      setInstrument(prev => ({ ...prev, images: [...prev.images, result.assets[0].uri] }));
+      const asset = result.assets[0];
+      setInstrument(prev => ({
+        ...prev,
+        images: [...prev.images, { uri: asset.uri, size: asset.fileSize || 0 }],
+      }));
     }
   };
 
@@ -139,7 +146,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       if (Platform.OS === 'web') {
         newImages = await Promise.all(result.assets.map(a => compressImageForWeb(a.uri)));
       } else {
-        newImages = result.assets.map(a => a.uri);
+        newImages = result.assets.map(a => ({ uri: a.uri, size: a.fileSize || 0 }));
       }
       setInstrument(prev => ({ ...prev, images: [...prev.images, ...newImages] }));
     }
@@ -215,9 +222,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
       {instrument.images.length > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
-          {instrument.images.map((uri, index) => (
+          {instrument.images.map((img, index) => (
             <View key={index} style={styles.pinCard}>
-              <Image source={{ uri }} style={styles.pinImage} resizeMode="cover" />
+              <Image source={{ uri: img.uri }} style={styles.pinImage} resizeMode="cover" />
               {index === 0 && <View style={styles.coverBadge}><Text style={styles.coverBadgeText}>Cover</Text></View>}
               <TouchableOpacity style={styles.pinRemove} onPress={() => removeImage(index)}>
                 <Text style={styles.pinRemoveText}>✕</Text>

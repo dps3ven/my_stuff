@@ -49,10 +49,10 @@ export default function InstrumentDetailScreen({ navigation, route }) {
                   onScroll={handleScroll}
                   scrollEventThrottle={16}
                 >
-                  {item.images.map((imageUri, index) => (
+                  {item.images.map((img, index) => (
                     <Image 
                       key={index} 
-                      source={{ uri: imageUri }} 
+                      source={{ uri: typeof img === 'string' ? img : img.uri }} 
                       style={[styles.largeImage, { width: imageWidth }]}
                       resizeMode="cover"
                     />
