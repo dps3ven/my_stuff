@@ -8,6 +8,8 @@ import InventoryScreen from './screens/InventoryScreen';
 import AddInstrumentScreen from './screens/AddInstrumentScreen';
 import InstrumentDetailScreen from './screens/InstrumentDetailScreen';
 
+import PhotoGalleryScreen from './screens/PhotoGalleryScreen';
+
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -20,6 +22,7 @@ export default function App() {
           <Stack.Screen name="Inventory" component={InventoryScreen} />
           <Stack.Screen name="AddInstrument" component={AddInstrumentScreen} />
           <Stack.Screen name="InstrumentDetail" component={InstrumentDetailScreen} />
+          <Stack.Screen name="PhotoGallery" component={PhotoGalleryScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
