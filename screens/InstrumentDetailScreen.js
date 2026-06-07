@@ -69,7 +69,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
                 )}
               </>
             ) : item.image ? (
-              <Image source={{ uri: item.image }} style={[styles.largeImage, { width: imageWidth }]} resizeMode="cover" />
+              <Image source={{ uri: item.image }} style={[styles.largeImage, { width: imageWidth }]} resizeMode="contain" />
             ) : (
               <View style={[styles.largeImage, styles.noImage, { width: imageWidth }]}>
                 <Text style={styles.noImageText}>No Image</Text>
@@ -174,19 +174,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     maxWidth: '100%',
-    overflow: 'hidden',
-    height: Platform.OS === 'web' ? 250 : 170,
   },
   imageScroll: {
     borderRadius: 12,
     overflow: 'hidden',
     maxWidth: '100%',
-    height: Platform.OS === 'web' ? 220 : 140,
   },
   largeImage: {
-    height: Platform.OS === 'web' ? 220 : 160,
+    aspectRatio: 4 / 3,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#1a3a5c',
   },
   noImage: {
     width: Platform.OS === 'web' ? 400 : 300,
