@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
   const [activeIndex, setActiveIndex] = useState(0);
   const imageScrollRef = useRef(null);
-  const screenWidth = Dimensions.get('window').width;
+  const { width: screenWidth } = useWindowDimensions();
   const imageWidth = Platform.OS === 'web' ? Math.min(700, screenWidth - 32) : screenWidth - 32;
 
   const handleScroll = useCallback((event) => {
@@ -54,7 +54,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
                       key={index} 
                       source={{ uri: typeof img === 'string' ? img : img.uri }} 
                       style={[styles.largeImage, { width: imageWidth }]}
-                      resizeMode="cover"
+                      resizeMode="contain"
                     />
                   ))}
                 </ScrollView>
