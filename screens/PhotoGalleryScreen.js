@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import {
   View, Text, Image, TouchableOpacity, StyleSheet,
-  FlatList, Dimensions, Platform, StatusBar,
+  FlatList, StatusBar, useWindowDimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const NUM_COLUMNS = 3;
-const THUMB_SIZE = Math.floor((SCREEN_WIDTH - 4) / NUM_COLUMNS) - 4;
+const GAP = 3;
 
 function formatStorage(bytes) {
   if (!bytes) return '0 B';
@@ -21,8 +20,12 @@ export default function PhotoGalleryScreen({ navigation, route }) {
   const { photos = [], storageUsed = 0 } = route.params || {};
   const [lightbox, setLightbox] = useState(null);
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
 
-  // ── Lightbox view ──────────────────────────────────────────────
+  // Thumb fills exactly 1/3 of available width accounting for gaps
+  const thumbSize = Math.floor((width - GAP * (NUM_COLUMNS + 1)) / NUM_COLUMNS);
+
+  // ── Lightbox ───────────────────────────────────────────────────
   if (lightbox !== null) {
     const photo = photos[lightbox];
     return (
@@ -35,23 +38,24 @@ export default function PhotoGalleryScreen({ navigation, route }) {
         >
           <Image
             source={{ uri: photo.uri }}
-            style={styles.lightboxImage}
+            style={{ width, height: height * 0.85 }}
             resizeMode="contain"
           />
         </TouchableOpacity>
 
-        {/* Label bar */}
+        {/* Label / counter bar */}
         <View style={[styles.lightboxBar, { paddingBottom: insets.bottom + 12 }]}>
           <Text style={styles.lightboxLabel}>{photo.label}</Text>
           <Text style={styles.lightboxCounter}>{lightbox + 1} / {photos.length}</Text>
         </View>
 
-        {/* Prev / Next */}
+        {/* Prev */}
         {lightbox > 0 && (
           <TouchableOpacity style={[styles.navBtn, styles.navLeft]} onPress={() => setLightbox(lightbox - 1)}>
             <Text style={styles.navText}>‹</Text>
           </TouchableOpacity>
         )}
+        {/* Next */}
         {lightbox < photos.length - 1 && (
           <TouchableOpacity style={[styles.navBtn, styles.navRight]} onPress={() => setLightbox(lightbox + 1)}>
             <Text style={styles.navText}>›</Text>
@@ -68,12 +72,12 @@ export default function PhotoGalleryScreen({ navigation, route }) {
     );
   }
 
-  // ── Grid view ──────────────────────────────────────────────────
+  // ── Grid ───────────────────────────────────────────────────────
   return (
     <LinearGradient colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']} style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerSide}>
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -82,7 +86,7 @@ export default function PhotoGalleryScreen({ navigation, route }) {
             {photos.length} photo{photos.length !== 1 ? 's' : ''} · {formatStorage(storageUsed)} used
           </Text>
         </View>
-        <View style={styles.backBtn} />
+        <View style={styles.headerSide} />
       </View>
 
       {photos.length === 0 ? (
@@ -91,28 +95,30 @@ export default function PhotoGalleryScreen({ navigation, route }) {
           <Text style={styles.emptyText}>No photos yet</Text>
         </View>
       ) : (
-        <View style={{ flex: 1 }}>
-          <FlatList
-            data={photos}
-            numColumns={NUM_COLUMNS}
-            keyExtractor={(item, index) => `${item.itemId}-${item.idx}-${index}`}
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 2, paddingBottom: insets.bottom + 16 }}
-            showsVerticalScrollIndicator={true}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                style={styles.thumb}
-                onPress={() => setLightbox(index)}
-                activeOpacity={0.85}
-              >
-                <Image source={{ uri: item.uri }} style={styles.thumbImage} resizeMode="cover" />
-                <View style={styles.thumbLabel}>
-                  <Text style={styles.thumbLabelText} numberOfLines={1}>{item.label}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
+        <FlatList
+          data={photos}
+          numColumns={NUM_COLUMNS}
+          keyExtractor={(item, index) => `${item.itemId}-${item.idx}-${index}`}
+          style={styles.list}
+          contentContainerStyle={{ padding: GAP, paddingBottom: insets.bottom + 20 }}
+          showsVerticalScrollIndicator={true}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              onPress={() => setLightbox(index)}
+              activeOpacity={0.85}
+              style={{ margin: GAP }}
+            >
+              <Image
+                source={{ uri: item.uri }}
+                style={{ width: thumbSize, height: thumbSize, borderRadius: 6 }}
+                resizeMode="cover"
+              />
+              <View style={[styles.thumbLabel, { width: thumbSize }]}>
+                <Text style={styles.thumbLabelText} numberOfLines={1}>{item.label}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
       )}
     </LinearGradient>
   );
@@ -123,6 +129,7 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden',
   },
+  // ── Header ────────────────────────────────────────────────────
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -131,7 +138,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.15)',
   },
-  backBtn: {
+  headerSide: {
     minWidth: 70,
   },
   backText: {
@@ -153,6 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
   },
+  // ── Empty ─────────────────────────────────────────────────────
   empty: {
     flex: 1,
     justifyContent: 'center',
@@ -167,23 +175,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   // ── Grid ─────────────────────────────────────────────────────
-  thumb: {
-    width: THUMB_SIZE,
-    height: THUMB_SIZE,
-    margin: 2,
-    borderRadius: 6,
-    overflow: 'hidden',
-    backgroundColor: '#1e4d8c',
-  },
-  thumbImage: {
-    width: '100%',
-    height: '100%',
+  list: {
+    flex: 1,
   },
   thumbLabel: {
     position: 'absolute',
     bottom: 0,
     left: 0,
-    right: 0,
+    borderBottomLeftRadius: 6,
+    borderBottomRightRadius: 6,
     backgroundColor: 'rgba(0,0,0,0.55)',
     paddingHorizontal: 4,
     paddingVertical: 3,
@@ -202,10 +202,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  lightboxImage: {
-    width: SCREEN_WIDTH,
-    height: '100%',
   },
   lightboxBar: {
     position: 'absolute',
