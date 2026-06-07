@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Image, FlatList, Dimensions, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 import { SkeletonLine } from '../components/Skeleton';
@@ -22,6 +22,9 @@ export default function DashboardScreen({ navigation }) {
   const [stats, setStats] = useState({ totalItems: 0, totalValue: 0, storageUsed: 0 });
   const [loading, setLoading] = useState(true);
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
+  const [allPhotos, setAllPhotos] = useState([]);
+  const [photosModalVisible, setPhotosModalVisible] = useState(false);
+  const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -49,6 +52,17 @@ export default function DashboardScreen({ navigation }) {
       }, 0);
 
       setStats({ totalItems, totalValue, storageUsed: totalBytes });
+
+      // Collect all photos with instrument context for the gallery
+      const photos = [];
+      inventory.forEach(item => {
+        const label = [item.brand, item.model].filter(Boolean).join(' ') || item.type || 'Unknown';
+        (item.images || []).forEach((img, idx) => {
+          const uri = typeof img === 'string' ? img : img.uri;
+          if (uri) photos.push({ uri, label, itemId: item.id, idx });
+        });
+      });
+      setAllPhotos(photos);
     } catch (error) {
       console.error('Error loading stats:', error);
     } finally {
@@ -71,6 +85,7 @@ export default function DashboardScreen({ navigation }) {
   };
 
   return (
+    <>
     <LinearGradient
       colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
       style={styles.container}
@@ -121,7 +136,7 @@ export default function DashboardScreen({ navigation }) {
             )}
             <Text style={styles.statLabel}>Total Value</Text>
           </View>
-          <View style={styles.statCard}>
+          <TouchableOpacity style={styles.statCard} onPress={() => allPhotos.length > 0 && setPhotosModalVisible(true)}>
             <View style={styles.statIcon}>
               <Text style={styles.iconText}>💾</Text>
             </View>
@@ -131,7 +146,7 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.statNumber}>{formatStorage(stats.storageUsed)}</Text>
             )}
             <Text style={styles.statLabel}>Photos</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.actions}>
@@ -158,6 +173,63 @@ export default function DashboardScreen({ navigation }) {
         </View>
       </ScrollView>
     </LinearGradient>
+
+    {/* Photo Gallery Modal */}
+    <Modal
+      visible={photosModalVisible}
+      animationType="slide"
+      onRequestClose={() => setPhotosModalVisible(false)}
+    >
+      <SafeAreaView style={styles.galleryContainer}>
+        <View style={styles.galleryHeader}>
+          <Text style={styles.galleryTitle}>All Photos ({allPhotos.length})</Text>
+          <TouchableOpacity onPress={() => setPhotosModalVisible(false)} style={styles.galleryClose}>
+            <Text style={styles.galleryCloseText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          data={allPhotos}
+          numColumns={3}
+          keyExtractor={(item, index) => `${item.itemId}-${item.idx}-${index}`}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.gridItem}
+              onPress={() => setLightboxPhoto(item)}
+              activeOpacity={0.8}
+            >
+              <Image source={{ uri: item.uri }} style={styles.gridImage} resizeMode="cover" />
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.gridContent}
+        />
+      </SafeAreaView>
+    </Modal>
+
+    {/* Lightbox Modal */}
+    <Modal
+      visible={lightboxPhoto !== null}
+      transparent
+      animationType="fade"
+      onRequestClose={() => setLightboxPhoto(null)}
+    >
+      <TouchableOpacity
+        style={styles.lightboxOverlay}
+        activeOpacity={1}
+        onPress={() => setLightboxPhoto(null)}
+      >
+        <Image
+          source={{ uri: lightboxPhoto?.uri }}
+          style={styles.lightboxImage}
+          resizeMode="contain"
+        />
+        {lightboxPhoto?.label ? (
+          <View style={styles.lightboxLabel}>
+            <Text style={styles.lightboxLabelText}>{lightboxPhoto.label}</Text>
+          </View>
+        ) : null}
+      </TouchableOpacity>
+    </Modal>
+  </>
   );
 }
 
@@ -243,6 +315,68 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 14,
     fontWeight: '500',
+  },
+  // ── Photo gallery ────────────────────────────────────────────
+  galleryContainer: {
+    flex: 1,
+    backgroundColor: '#0a1f3d',
+  },
+  galleryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.15)',
+  },
+  galleryTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  galleryClose: {
+    padding: 6,
+  },
+  galleryCloseText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '300',
+  },
+  gridContent: {
+    padding: 2,
+  },
+  gridItem: {
+    flex: 1/3,
+    aspectRatio: 1,
+    margin: 2,
+  },
+  gridImage: {
+    width: '100%',
+    height: '100%',
+  },
+  // ── Lightbox ─────────────────────────────────────────────────
+  lightboxOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lightboxImage: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height * 0.8,
+  },
+  lightboxLabel: {
+    position: 'absolute',
+    bottom: 40,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  lightboxLabelText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   actions: {
     alignItems: 'center',
