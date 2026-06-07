@@ -91,24 +91,28 @@ export default function PhotoGalleryScreen({ navigation, route }) {
           <Text style={styles.emptyText}>No photos yet</Text>
         </View>
       ) : (
-        <FlatList
-          data={photos}
-          numColumns={NUM_COLUMNS}
-          keyExtractor={(item, index) => `${item.itemId}-${item.idx}-${index}`}
-          contentContainerStyle={{ padding: 2, paddingBottom: insets.bottom + 16 }}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity
-              style={styles.thumb}
-              onPress={() => setLightbox(index)}
-              activeOpacity={0.85}
-            >
-              <Image source={{ uri: item.uri }} style={styles.thumbImage} resizeMode="cover" />
-              <View style={styles.thumbLabel}>
-                <Text style={styles.thumbLabelText} numberOfLines={1}>{item.label}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+        <View style={{ flex: 1 }}>
+          <FlatList
+            data={photos}
+            numColumns={NUM_COLUMNS}
+            keyExtractor={(item, index) => `${item.itemId}-${item.idx}-${index}`}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ padding: 2, paddingBottom: insets.bottom + 16 }}
+            showsVerticalScrollIndicator={true}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity
+                style={styles.thumb}
+                onPress={() => setLightbox(index)}
+                activeOpacity={0.85}
+              >
+                <Image source={{ uri: item.uri }} style={styles.thumbImage} resizeMode="cover" />
+                <View style={styles.thumbLabel}>
+                  <Text style={styles.thumbLabelText} numberOfLines={1}>{item.label}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
       )}
     </LinearGradient>
   );
@@ -117,6 +121,7 @@ export default function PhotoGalleryScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
