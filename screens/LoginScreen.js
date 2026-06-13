@@ -237,7 +237,7 @@ export default function LoginScreen({ navigation }) {
 
         <View style={styles.tipsCard}>
           <Text style={styles.tipsTitle}>How it works</Text>
-          <Text style={styles.tipItem}>📸  Tap "Add Profile" then add your stuff with photos</Text>
+          <Text style={styles.tipItem}>📸  You Tap "Add Profile" then add your stuff with photos</Text>
           <Text style={styles.tipItem}>📋  Fill in the type, make, model, and condition</Text>
           <Text style={styles.tipItem}>🏷️  Give items a nickname so you can find them quickly</Text>
           <Text style={styles.tipItem}>👀  Browse your inventory and tap items for full details</Text>
