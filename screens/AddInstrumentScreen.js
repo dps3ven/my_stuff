@@ -429,7 +429,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       >
         <LinearGradient
           colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
-          style={StyleSheet.absoluteFillObject}
+          style={Platform.OS === 'web' ? { display: 'none' } : StyleSheet.absoluteFillObject}
         />
         {renderMobileWizard()}
       </KeyboardAvoidingView>

@@ -15,7 +15,10 @@ const Stack = createStackNavigator();
 
 // On web, let the page scroll instead of trapping content inside fixed-height cards
 const webScreenOptions = Platform.OS === 'web'
-  ? { cardStyle: { overflow: 'visible', backgroundColor: 'transparent' } }
+  ? {
+      cardStyle: { overflow: 'visible', backgroundColor: 'transparent' },
+      cardOverlayEnabled: false,
+    }
   : {};
 
 // Expo's Metro web export generates its own index.html with a reset that sets
@@ -67,6 +70,7 @@ function applyWebGlobalLayout() {
       height: auto !important;
       overflow: visible !important;
       flex-shrink: 0;
+      background-color: transparent !important;
     }
   `;
   document.head.appendChild(style);
@@ -86,7 +90,11 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Login"
-          screenOptions={{ headerShown: false, ...webScreenOptions }}
+          screenOptions={{
+            headerShown: false,
+            ...webScreenOptions,
+            ...(Platform.OS === 'web' ? { cardContainerStyle: { backgroundColor: 'transparent' } } : {}),
+          }}
         >
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />

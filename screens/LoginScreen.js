@@ -185,7 +185,7 @@ export default function LoginScreen({ navigation }) {
     >
       <LinearGradient
         colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
-        style={StyleSheet.absoluteFillObject}
+        style={Platform.OS === 'web' ? { display: 'none' } : StyleSheet.absoluteFillObject}
       />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, isWide && { maxWidth: 600 }]}

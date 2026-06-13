@@ -173,7 +173,7 @@ export default function InventoryScreen({ navigation }) {
     >
       <LinearGradient
         colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
-        style={StyleSheet.absoluteFillObject}
+        style={Platform.OS === 'web' ? { display: 'none' } : StyleSheet.absoluteFillObject}
       />
       <View style={styles.container}>
         <View style={styles.header}>

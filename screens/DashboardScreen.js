@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 import { SkeletonLine } from '../components/Skeleton';
@@ -82,11 +82,13 @@ export default function DashboardScreen({ navigation }) {
     });
   };
 
+  const Wrapper = Platform.OS === 'web' ? View : LinearGradient;
+  const wrapperProps = Platform.OS === 'web'
+    ? { style: styles.container }
+    : { colors: ['#0a1f3d', '#1e4d8c', '#4ECDC4'], style: styles.container };
+
   return (
-    <LinearGradient
-      colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
-      style={styles.container}
-    >
+    <Wrapper {...wrapperProps}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
@@ -169,7 +171,7 @@ export default function DashboardScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </LinearGradient>
+    </Wrapper>
   );
 }
 

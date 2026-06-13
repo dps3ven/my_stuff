@@ -73,8 +73,13 @@ export default function PhotoGalleryScreen({ navigation, route }) {
   }
 
   // ── Grid ───────────────────────────────────────────────────────
+  const Wrapper = Platform.OS === 'web' ? View : LinearGradient;
+  const wrapperProps = Platform.OS === 'web'
+    ? { style: styles.container }
+    : { colors: ['#0a1f3d', '#1e4d8c', '#4ECDC4'], style: styles.container };
+
   return (
-    <LinearGradient colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']} style={styles.container}>
+    <Wrapper {...wrapperProps}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerSide}>
@@ -142,7 +147,7 @@ export default function PhotoGalleryScreen({ navigation, route }) {
           )}
         />
       )}
-    </LinearGradient>
+    </Wrapper>
   );
 }
 
