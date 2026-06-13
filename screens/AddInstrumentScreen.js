@@ -312,6 +312,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
       <Text style={styles.stepTitle}>📋 Details</Text>
       <Text style={styles.stepHint}>Complete your listing</Text>
 
+      <Text style={styles.fieldLabel}>Nickname</Text>
+      <TextInput style={styles.input} value={instrument.nickname}
+        onChangeText={(t) => setInstrument(prev => ({ ...prev, nickname: t }))}
+        placeholder="e.g. Old Faithful" />
+
       <Text style={styles.fieldLabel}>Year</Text>
       <TextInput
         style={styles.input}
