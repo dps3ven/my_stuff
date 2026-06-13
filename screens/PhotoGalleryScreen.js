@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, Image, TouchableOpacity, StyleSheet,
-  FlatList, StatusBar, useWindowDimensions,
+  FlatList, StatusBar, useWindowDimensions, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -94,6 +94,28 @@ export default function PhotoGalleryScreen({ navigation, route }) {
           <Text style={styles.emptyEmoji}>📷</Text>
           <Text style={styles.emptyText}>No photos yet</Text>
         </View>
+      ) : Platform.OS === 'web' ? (
+        // Web: wrap-grid that flows with the page so the body owns the scroll,
+        // matching the single-container model used across the app.
+        <View style={[styles.webGrid, { padding: GAP, paddingBottom: insets.bottom + 20 }]}>
+          {photos.map((item, index) => (
+            <TouchableOpacity
+              key={`${item.itemId}-${item.idx}-${index}`}
+              onPress={() => setLightbox(index)}
+              activeOpacity={0.85}
+              style={{ margin: GAP }}
+            >
+              <Image
+                source={{ uri: item.uri }}
+                style={{ width: thumbSize, height: thumbSize, borderRadius: 6 }}
+                resizeMode="cover"
+              />
+              <View style={[styles.thumbLabel, { width: thumbSize }]}>
+                <Text style={styles.thumbLabelText} numberOfLines={1}>{item.label}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
       ) : (
         <FlatList
           data={photos}
@@ -127,7 +149,12 @@ export default function PhotoGalleryScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    overflow: 'hidden',
+    ...(Platform.OS === 'web' ? {} : { overflow: 'hidden' }),
+  },
+  webGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
   },
   // ── Header ────────────────────────────────────────────────────
   header: {
