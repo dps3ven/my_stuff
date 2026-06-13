@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -11,12 +12,19 @@ import PhotoGalleryScreen from './screens/PhotoGalleryScreen';
 
 const Stack = createStackNavigator();
 
-export default function App() {
+// On web, let the page scroll instead of trapping content inside fixed-height cards
+const webScreenOptions = Platform.OS === 'web'
+  ? { cardStyle: { flex: 0, minHeight: '100vh', overflow: 'visible' } }
+  : {};
 
+export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{ headerShown: false, ...webScreenOptions }}
+        >
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
           <Stack.Screen name="Inventory" component={InventoryScreen} />
