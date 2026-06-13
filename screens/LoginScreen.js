@@ -235,6 +235,15 @@ export default function LoginScreen({ navigation }) {
           </View>
         ) : null}
 
+        <View style={styles.tipsCard}>
+          <Text style={styles.tipsTitle}>How it works</Text>
+          <Text style={styles.tipItem}>📸  Tap "Add Profile" then add your stuff with photos</Text>
+          <Text style={styles.tipItem}>📋  Fill in the type, make, model, and condition</Text>
+          <Text style={styles.tipItem}>🏷️  Give items a nickname so you can find them quickly</Text>
+          <Text style={styles.tipItem}>👀  Browse your inventory and tap items for full details</Text>
+          <Text style={styles.tipItem}>💾  Track how much photo storage you're using</Text>
+        </View>
+
         <TouchableOpacity onPress={resetAllData} style={styles.resetButton}>
           <Text style={styles.resetText}>Reset All Data</Text>
         </TouchableOpacity>
@@ -470,6 +479,26 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.4)',
     fontSize: 12,
     textDecorationLine: 'underline',
+  },
+  tipsCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 10,
+    padding: 14,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  tipsTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  tipItem: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.85)',
+    lineHeight: 22,
+    paddingLeft: 4,
   },
   modalOverlay: {
     flex: 1,

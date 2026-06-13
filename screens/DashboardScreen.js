@@ -23,6 +23,7 @@ export default function DashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
   const [allPhotos, setAllPhotos] = useState([]);
+  const [showTips, setShowTips] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -109,14 +110,19 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.whyText}>{happyMessage}</Text>
         </View>
 
-        <View style={styles.tipsCard}>
-          <Text style={styles.tipsTitle}>How it works</Text>
-          <Text style={styles.tipItem}>📸  Tap "Add Stuff" to catalog an item</Text>
-          <Text style={styles.tipItem}>📋  Fill in the type, make, model, and condition</Text>
-          <Text style={styles.tipItem}>🏷️  Give it a nickname so you can find it quickly</Text>
-          <Text style={styles.tipItem}>👀  Tap "View Stuff" to browse your inventory</Text>
-          <Text style={styles.tipItem}>💾  Photos card shows storage used — tap it to see all photos</Text>
-        </View>
+        <TouchableOpacity onPress={() => setShowTips(!showTips)} style={styles.tipsToggle}>
+          <Text style={styles.tipsToggleText}>{showTips ? '▾ Hide tips' : '▸ How it works'}</Text>
+        </TouchableOpacity>
+
+        {showTips && (
+          <View style={styles.tipsCard}>
+            <Text style={styles.tipItem}>📸  Tap "Add Stuff" to photograph and catalog an item</Text>
+            <Text style={styles.tipItem}>📋  Fill in the type, make, model, and condition</Text>
+            <Text style={styles.tipItem}>🏷️  Give it a nickname so you can find it quickly</Text>
+            <Text style={styles.tipItem}>👀  Tap "View Stuff" to browse your inventory</Text>
+            <Text style={styles.tipItem}>💾  Photos card shows storage used — tap it to see all photos</Text>
+          </View>
+        )}
 
         <View style={styles.statsContainer}>
           <TouchableOpacity 
@@ -240,11 +246,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
-  tipsTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 8,
+  tipsToggle: {
+    marginBottom: 10,
+    padding: 8,
+  },
+  tipsToggleText: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontWeight: '600',
   },
   tipItem: {
     fontSize: 13,
