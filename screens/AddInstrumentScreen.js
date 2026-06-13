@@ -358,57 +358,72 @@ export default function AddInstrumentScreen({ navigation, route }) {
   );
 
   // ── Mobile: wizard ─────────────────────────────────────────────
-  const renderMobileWizard = () => (
-    <View style={{ flex: 1 }}>
-      {/* Header */}
-      <View style={[styles.wizardHeader, { paddingTop: insets.top + 12 }, isWide && { maxWidth: 700 }]}>
-        <TouchableOpacity onPress={() => step > 0 ? setStep(step - 1) : navigation.navigate('Dashboard')}>
-          <Text style={styles.wizardBack}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.wizardTitle}>{isEditing ? 'Edit Stuff' : 'Add New Stuff'}</Text>
-        <TouchableOpacity onPress={saveInstrument}>
-          <Text style={styles.wizardSave}>Save</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Progress bar */}
-      <View style={styles.progressBar}>
-        {STEPS.map((s, i) => (
-          <TouchableOpacity key={i} style={styles.progressStep} onPress={() => setStep(i)}>
-            <View style={[styles.progressDot, i <= step && styles.progressDotActive]} />
-            <Text style={[styles.progressLabel, i === step && styles.progressLabelActive]}>{s}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Step content */}
-      <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={[styles.wizardContent, isWide && { maxWidth: 700 }]}
-        keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={true}>
+  const renderMobileWizard = () => {
+    const isWebPlatform = Platform.OS === 'web';
+    const stepBody = (
+      <>
         {step === 0 && renderStep1()}
         {step === 1 && renderStep0()}
         {step === 2 && renderStep2()}
         {errorMessage ? <View style={styles.errorContainer}><Text style={styles.errorText}>{errorMessage}</Text></View> : null}
-      </ScrollView>
+      </>
+    );
 
-      {/* Footer nav */}
-      <View style={styles.wizardFooter}>
-        {step < STEPS.length - 1 ? (
-          <TouchableOpacity style={[styles.nextButton, isWide && { maxWidth: 700 }]} onPress={() => { setErrorMessage(''); setStep(step + 1); }}>
-            <Text style={styles.nextButtonText}>Next: {STEPS[step + 1]} →</Text>
+    return (
+      <View style={isWebPlatform ? styles.webWizardRoot : { flex: 1 }}>
+        {/* Header */}
+        <View style={[styles.wizardHeader, { paddingTop: insets.top + 12 }, isWide && { maxWidth: 700 }]}>
+          <TouchableOpacity onPress={() => step > 0 ? setStep(step - 1) : navigation.navigate('Dashboard')}>
+            <Text style={styles.wizardBack}>← Back</Text>
           </TouchableOpacity>
+          <Text style={styles.wizardTitle}>{isEditing ? 'Edit Stuff' : 'Add New Stuff'}</Text>
+          <TouchableOpacity onPress={saveInstrument}>
+            <Text style={styles.wizardSave}>Save</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Progress bar */}
+        <View style={styles.progressBar}>
+          {STEPS.map((s, i) => (
+            <TouchableOpacity key={i} style={styles.progressStep} onPress={() => setStep(i)}>
+              <View style={[styles.progressDot, i <= step && styles.progressDotActive]} />
+              <Text style={[styles.progressLabel, i === step && styles.progressLabelActive]}>{s}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Step content — page-level scroll on web, inner ScrollView on native */}
+        {isWebPlatform ? (
+          <View style={[styles.wizardContent, isWide && { maxWidth: 700 }]}>
+            {stepBody}
+          </View>
         ) : (
-          <TouchableOpacity style={styles.saveButtonFull} onPress={saveInstrument}>
-            <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
-          </TouchableOpacity>
+          <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={[styles.wizardContent, isWide && { maxWidth: 700 }]}
+            keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={true}>
+            {stepBody}
+          </ScrollView>
         )}
+
+        {/* Footer nav */}
+        <View style={styles.wizardFooter}>
+          {step < STEPS.length - 1 ? (
+            <TouchableOpacity style={[styles.nextButton, isWide && { maxWidth: 700 }]} onPress={() => { setErrorMessage(''); setStep(step + 1); }}>
+              <Text style={styles.nextButtonText}>Next: {STEPS[step + 1]} →</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.saveButtonFull} onPress={saveInstrument}>
+              <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1, height: Platform.OS === 'web' ? '100%' : undefined }}
+        style={Platform.OS === 'web' ? styles.webWizardRoot : { flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         enabled={Platform.OS !== 'web'}
       >
@@ -445,6 +460,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  // ── Web page-level scroll root ───────────────────────────────
+  webWizardRoot: {
+    minHeight: '100vh',
+    width: '100%',
+  },
   // ── Web desktop ──────────────────────────────────────────────
   webContainer: {
     flex: 1,
