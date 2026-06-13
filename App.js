@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import LoginScreen from './screens/LoginScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import InventoryScreen from './screens/InventoryScreen';
@@ -16,6 +17,13 @@ const Stack = createStackNavigator();
 const webScreenOptions = Platform.OS === 'web'
   ? { cardStyle: { overflow: 'visible', backgroundColor: 'transparent' } }
   : {};
+
+export default function App() {
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      ScreenOrientation.unlockAsync();
+    }
+  }, []);
 
 export default function App() {
   return (

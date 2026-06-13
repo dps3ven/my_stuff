@@ -4,6 +4,9 @@
     "slug": "musical-inventory-rn",
     "version": "1.0.0",
     "orientation": "default",
+    "plugins": [
+      "expo-screen-orientation"
+    ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
