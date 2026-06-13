@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, useWindowDimensions, Modal, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -82,9 +82,6 @@ export default function AddInstrumentScreen({ navigation, route }) {
     images: editItem?.images || [],
   });
   const [errorMessage, setErrorMessage] = useState('');
-  const [activePicker, setActivePicker] = useState(null);
-  const [activePickerItems, setActivePickerItems] = useState([]);
-  const [activePickerCallback, setActivePickerCallback] = useState(null);
   const scrollViewRef = useRef(null);
 
   useEffect(() => {
@@ -159,26 +156,29 @@ export default function AddInstrumentScreen({ navigation, route }) {
   };
 
   // ── Picker helpers ─────────────────────────────────────────────
-  const openPicker = (title, items, onSelect) => {
-    setActivePicker(title);
-    setActivePickerItems(items.filter(i => i.value !== ''));
-    setActivePickerCallback(() => onSelect);
+  // Inline chip-style picker — keeps options in the page flow so they scroll
+  // with the rest of the form regardless of screen size or orientation.
+  const renderPickerButton = (label, selectedValue, title, items, onSelect) => {
+    const options = items.filter(i => i.value !== '');
+    return (
+      <View style={styles.chipPickerRow}>
+        {options.map(opt => {
+          const active = selectedValue === opt.value;
+          return (
+            <TouchableOpacity
+              key={opt.value}
+              style={[styles.chipOption, active && styles.chipOptionActive]}
+              onPress={() => onSelect(opt.value)}
+            >
+              <Text style={[styles.chipOptionText, active && styles.chipOptionTextActive]}>
+                {opt.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
   };
-
-  const closePicker = (value) => {
-    if (value !== undefined && activePickerCallback) activePickerCallback(value);
-    setActivePicker(null);
-    setActivePickerItems([]);
-    setActivePickerCallback(null);
-    setTimeout(() => scrollViewRef.current?.flashScrollIndicators?.(), 100);
-  };
-
-  const renderPickerButton = (label, selectedValue, title, items, onSelect) => (
-    <TouchableOpacity style={styles.pickerButton} onPress={() => openPicker(title, items, onSelect)}>
-      <Text style={[styles.pickerButtonText, !selectedValue && { color: '#999' }]}>{selectedValue || label}</Text>
-      <Text style={styles.pickerArrow}>▼</Text>
-    </TouchableOpacity>
-  );
 
   // ── Save ───────────────────────────────────────────────────────
   const saveInstrument = async () => {
@@ -433,28 +433,6 @@ export default function AddInstrumentScreen({ navigation, route }) {
         />
         {renderMobileWizard()}
       </KeyboardAvoidingView>
-
-      {/* Picker Modal */}
-      <Modal visible={activePicker !== null} transparent animationType="slide"
-        onRequestClose={() => closePicker()} hardwareAccelerated>
-        <View style={styles.modalOverlay}>
-          <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={() => closePicker()} />
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{activePicker}</Text>
-              <TouchableOpacity onPress={() => closePicker()}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-            <FlatList data={activePickerItems} keyExtractor={item => item.value}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.modalItem} onPress={() => closePicker(item.value)}>
-                  <Text style={styles.modalItemText}>{item.label}</Text>
-                </TouchableOpacity>
-              )} />
-          </View>
-        </View>
-      </Modal>
     </>
   );
 }
@@ -626,6 +604,33 @@ const styles = StyleSheet.create({
   },
   pickerButtonText: { fontSize: 15, color: '#333' },
   pickerArrow: { fontSize: 12, color: '#28a745', fontWeight: 'bold' },
+  // Inline chip-style picker — replaces modal-based dropdown so options
+  // flow with the page rather than overlay it.
+  chipPickerRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chipOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 18,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  chipOptionActive: {
+    backgroundColor: '#0064d2',
+    borderColor: '#0064d2',
+  },
+  chipOptionText: {
+    fontSize: 13,
+    color: '#444',
+    fontWeight: '600',
+  },
+  chipOptionTextActive: {
+    color: '#fff',
+  },
   disabledField: { opacity: 0.5 },
   disabledText: { color: '#aaa', fontSize: 15 },
   otherInput: {
@@ -654,23 +659,4 @@ const styles = StyleSheet.create({
     marginBottom: 16, borderWidth: 1, borderColor: '#ffcdd2',
   },
   errorText: { color: '#c62828', textAlign: 'center', fontSize: 14, fontWeight: '600' },
-
-  // ── Modal ────────────────────────────────────────────────────
-  modalOverlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end', flexDirection: 'column',
-  },
-  modalContent: {
-    backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    maxHeight: '60%', paddingBottom: 30,
-    width: '90%', maxWidth: 500, alignSelf: 'center',
-  },
-  modalHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    padding: 16, borderBottomWidth: 1, borderBottomColor: '#eee',
-  },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#333' },
-  modalClose: { fontSize: 20, color: '#999', padding: 4 },
-  modalItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#f5f5f5' },
-  modalItemText: { fontSize: 16, color: '#333' },
 });
