@@ -132,7 +132,6 @@ export default function InventoryScreen({ navigation }) {
       </View>
       
       <View style={styles.itemDetails}>
-        {item.nickname ? <Text style={[styles.itemInfo, { fontWeight: '700', color: '#333' }]}>"{item.nickname}"</Text> : null}
         <Text style={styles.itemInfo}>{item.brand || 'N/A'}</Text>
         <Text style={styles.itemInfo}>{item.model || 'N/A'}</Text>
         {item.year ? <Text style={styles.itemInfo}>{item.year}</Text> : null}
