@@ -79,6 +79,12 @@ export default function InstrumentDetailScreen({ navigation, route }) {
 
           {/* Instrument Details */}
           <View style={styles.detailsCard}>
+          {item.nickname ? (
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Nickname:</Text>
+            <Text style={styles.detailValue}>"{item.nickname}"</Text>
+          </View>
+          ) : null}
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Type:</Text>
             <Text style={styles.detailValue}>{item.type}</Text>
