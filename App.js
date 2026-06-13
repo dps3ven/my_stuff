@@ -18,14 +18,57 @@ const webScreenOptions = Platform.OS === 'web'
   ? { cardStyle: { overflow: 'visible', backgroundColor: 'transparent' } }
   : {};
 
+// Expo's Metro web export generates its own index.html with a reset that sets
+// `body { overflow: hidden }` and locks everything to height:100%. That traps
+// scrolling and breaks rotation reflow. Since the generated template ignores
+// web/index.html, we override those rules at runtime so the document body is
+// the single scroll + rotation container for the whole app.
+function applyWebGlobalLayout() {
+  if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+  const style = document.createElement('style');
+  style.id = 'global-container-layout';
+  style.textContent = `
+    html, body {
+      height: auto !important;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    #root {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      height: auto !important;
+      flex: 0 1 auto !important;
+      width: 100%;
+    }
+    /* Force React Navigation's nested screen wrappers to grow with content
+       instead of clipping it, so the body owns the scroll. */
+    #root > div,
+    #root > div > div,
+    #root > div > div > div,
+    #root > div > div > div > div {
+      min-height: 100vh;
+      height: auto !important;
+      overflow: visible !important;
+      flex-shrink: 0;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 export default function App() {
   useEffect(() => {
     if (Platform.OS !== 'web') {
       ScreenOrientation.unlockAsync();
+    } else {
+      applyWebGlobalLayout();
     }
   }, []);
 
-export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>

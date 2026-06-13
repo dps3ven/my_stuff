@@ -1,6 +1,46 @@
-.vscode
+# ── Dependencies ──────────────────────────────────────────────
 /node_modules
-*.log
-.expo
-.env
 yarn.lock
+
+# ── Expo ──────────────────────────────────────────────────────
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# ── Native builds ─────────────────────────────────────────────
+/ios
+/android
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# ── Metro ─────────────────────────────────────────────────────
+.metro-health-check*
+.metro-cache/
+
+# ── Build / cache ─────────────────────────────────────────────
+.cache/
+*.tsbuildinfo
+
+# ── Environment / secrets ─────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# ── Editor / OS ───────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+*.pem
+Thumbs.db
