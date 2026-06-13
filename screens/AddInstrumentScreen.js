@@ -188,7 +188,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     if (!instrument.model) missingFields.push('Model');
     if (missingFields.length > 0) {
       setErrorMessage(`Please fill in: ${missingFields.join(', ')}`);
-      if (!isWide) setStep(1);
+      if (!isWide) setStep(0);
       return;
     }
     setErrorMessage('');
