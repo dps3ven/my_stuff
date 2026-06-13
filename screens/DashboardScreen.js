@@ -23,7 +23,6 @@ export default function DashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
   const [allPhotos, setAllPhotos] = useState([]);
-  const [showTips, setShowTips] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -110,19 +109,21 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.whyText}>{happyMessage}</Text>
         </View>
 
-        <TouchableOpacity onPress={() => setShowTips(!showTips)} style={styles.tipsToggle}>
-          <Text style={styles.tipsToggleText}>{showTips ? '▾ Hide tips' : '▸ How it works'}</Text>
-        </TouchableOpacity>
-
-        {showTips && (
-          <View style={styles.tipsCard}>
-            <Text style={styles.tipItem}>📸  Tap "Add Stuff" to photograph and catalog an item</Text>
-            <Text style={styles.tipItem}>📋  Fill in the type, make, model, and condition</Text>
-            <Text style={styles.tipItem}>🏷️  Give it a nickname so you can find it quickly</Text>
-            <Text style={styles.tipItem}>👀  Tap "View Stuff" to browse your inventory</Text>
-            <Text style={styles.tipItem}>💾  Photos card shows storage used — tap it to see all photos</Text>
-          </View>
-        )}
+        <View style={styles.instructionsCard}>
+          <Text style={styles.instructionsTitle}>📖 Quick Guide</Text>
+          <Text style={styles.instructionsText}>
+            <Text style={styles.instructionsBold}>Add Stuff</Text> — Photograph and catalog your gear with type, make, model, serial number, condition, and value.
+          </Text>
+          <Text style={styles.instructionsText}>
+            <Text style={styles.instructionsBold}>View Stuff</Text> — Browse your inventory grouped by category. Tap an item for full details, or use Edit/Delete.
+          </Text>
+          <Text style={styles.instructionsText}>
+            <Text style={styles.instructionsBold}>Photos card</Text> — Tap the 💾 stat above to see all saved photos in a gallery.
+          </Text>
+          <Text style={styles.instructionsText}>
+            <Text style={styles.instructionsBold}>Tip:</Text> Add a nickname to give your gear a personal touch.
+          </Text>
+        </View>
 
         <View style={styles.statsContainer}>
           <TouchableOpacity 
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
     padding: 12,
-    marginBottom: 10,
+    marginBottom: 15,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
@@ -238,28 +239,29 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'center',
   },
-  tipsCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  instructionsCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 10,
     padding: 14,
     marginBottom: 15,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
-  tipsToggle: {
+  instructionsTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
     marginBottom: 10,
-    padding: 8,
   },
-  tipsToggleText: {
+  instructionsText: {
     fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: 20,
+    marginBottom: 8,
   },
-  tipItem: {
-    fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.85)',
-    lineHeight: 22,
-    paddingLeft: 4,
+  instructionsBold: {
+    fontWeight: '700',
+    color: '#fff',
   },
   statsContainer: {
     flexDirection: 'row',
