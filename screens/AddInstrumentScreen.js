@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, Dimensions, Modal, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, KeyboardAvoidingView, Platform, useWindowDimensions, Modal, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import storage from '../utils/storage';
-
-const isWebDesktop = Platform.OS === 'web' && Dimensions.get('window').width > 768;
 
 const INSTRUMENT_TYPES = [
   { label: 'Select Type', value: '' },
@@ -65,6 +64,9 @@ const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', GBP: '£', JPY: '¥', CAD: '$',
 export default function AddInstrumentScreen({ navigation, route }) {
   const editItem = route?.params?.editItem;
   const isEditing = !!editItem;
+  const { width } = useWindowDimensions();
+  const isWide = Platform.OS === 'web' && width > 768;
+  const insets = useSafeAreaInsets();
 
   const [step, setStep] = useState(0);
   const [userPrefs, setUserPrefs] = useState({ primaryInstrument: '', currency: 'USD' });
@@ -186,7 +188,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     if (!instrument.model) missingFields.push('Model');
     if (missingFields.length > 0) {
       setErrorMessage(`Please fill in: ${missingFields.join(', ')}`);
-      if (!isWebDesktop) setStep(1);
+      if (!isWide) setStep(1);
       return;
     }
     setErrorMessage('');
@@ -359,7 +361,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
   const renderMobileWizard = () => (
     <View style={{ flex: 1 }}>
       {/* Header */}
-      <View style={styles.wizardHeader}>
+      <View style={[styles.wizardHeader, { paddingTop: insets.top + 12 }, isWide && { maxWidth: 700 }]}>
         <TouchableOpacity onPress={() => step > 0 ? setStep(step - 1) : navigation.navigate('Dashboard')}>
           <Text style={styles.wizardBack}>← Back</Text>
         </TouchableOpacity>
@@ -380,7 +382,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       </View>
 
       {/* Step content */}
-      <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={styles.wizardContent}
+      <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={[styles.wizardContent, isWide && { maxWidth: 700 }]}
         keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={true}>
         {step === 0 && renderStep1()}
         {step === 1 && renderStep0()}
@@ -391,7 +393,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       {/* Footer nav */}
       <View style={styles.wizardFooter}>
         {step < STEPS.length - 1 ? (
-          <TouchableOpacity style={styles.nextButton} onPress={() => { setErrorMessage(''); setStep(step + 1); }}>
+          <TouchableOpacity style={[styles.nextButton, isWide && { maxWidth: 700 }]} onPress={() => { setErrorMessage(''); setStep(step + 1); }}>
             <Text style={styles.nextButtonText}>Next: {STEPS[step + 1]} →</Text>
           </TouchableOpacity>
         ) : (
@@ -483,10 +485,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     paddingHorizontal: 20,
     paddingVertical: 12,
-    paddingTop: Platform.OS === 'ios' ? 50 : 12,
+    paddingTop: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.15)',
-    maxWidth: isWebDesktop ? 700 : '100%',
     alignSelf: 'center',
     width: '100%',
   },
@@ -511,7 +512,6 @@ const styles = StyleSheet.create({
   wizardContent: {
     padding: 16,
     paddingBottom: 20,
-    maxWidth: isWebDesktop ? 700 : '100%',
     alignSelf: 'center',
     width: '100%',
   },
@@ -528,7 +528,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     width: '100%',
-    maxWidth: isWebDesktop ? 700 : '100%',
   },
   nextButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView, Modal, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView, Modal, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 
-const isWebDesktop = Platform.OS === 'web' && Dimensions.get('window').width > 768;
-
 const INSTRUMENT_OPTIONS = ['Guitar', 'Bass', 'Drums', 'Piano', 'Violin', 'Microphone', 'Amplifier', 'Other'];
 
 export default function LoginScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const isWide = Platform.OS === 'web' && width > 768;
+
   const [profiles, setProfiles] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -187,11 +188,11 @@ export default function LoginScreen({ navigation }) {
         style={StyleSheet.absoluteFillObject}
       />
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, isWide && { maxWidth: 600 }]}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
       >
-        <Text style={styles.title}>My Stuff</Text>
+        <Text style={[styles.title, isWide && { fontSize: 48 }]}>My Stuff</Text>
         <Text style={styles.subtitle}>Who's here?</Text>
 
         <View style={styles.profileGrid}>
@@ -369,11 +370,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 30,
     width: '100%',
-    maxWidth: isWebDesktop ? 600 : '100%',
     alignSelf: 'center',
   },
   title: {
-    fontSize: isWebDesktop ? 48 : 36,
+    fontSize: 36,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#fff',
