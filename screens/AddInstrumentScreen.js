@@ -440,8 +440,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   // ── Web page-level scroll root ───────────────────────────────
   webWizardRoot: {
-    minHeight: '100vh',
     width: '100%',
+    overflow: 'visible',
   },
   // ── Web desktop ──────────────────────────────────────────────
   webContainer: {

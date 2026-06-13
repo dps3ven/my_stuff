@@ -14,7 +14,7 @@ const Stack = createStackNavigator();
 
 // On web, let the page scroll instead of trapping content inside fixed-height cards
 const webScreenOptions = Platform.OS === 'web'
-  ? { cardStyle: { flex: 0, minHeight: '100vh', overflow: 'visible' } }
+  ? { cardStyle: { overflow: 'visible', backgroundColor: 'transparent' } }
   : {};
 
 export default function App() {
