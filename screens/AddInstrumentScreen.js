@@ -509,16 +509,23 @@ const styles = StyleSheet.create({
   progressLabelActive: { color: '#fff', fontWeight: '700' },
   wizardContent: {
     padding: 16,
-    paddingBottom: 20,
+    paddingBottom: Platform.OS === 'web' ? 110 : 20,
     alignSelf: 'center',
     width: '100%',
   },
   wizardFooter: {
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(15, 45, 82, 0.95)',
     padding: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.15)',
     alignItems: 'center',
+    ...(Platform.OS === 'web' ? {
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
+    } : {}),
   },
   nextButton: {
     backgroundColor: '#007bff',
