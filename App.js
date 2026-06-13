@@ -37,6 +37,18 @@ function applyWebGlobalLayout() {
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
     }
+    /* Matching gradient backdrop so scroll areas taller than the viewport
+       never reveal a blank strip below the per-screen gradient. Fixed so it
+       always fills the viewport behind the app content while scrolling. */
+    html {
+      background-color: #0a1f3d;
+    }
+    body {
+      background-image: linear-gradient(to bottom, #0a1f3d 0%, #1e4d8c 50%, #4ECDC4 100%);
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
     #root {
       display: flex;
       flex-direction: column;
