@@ -111,7 +111,7 @@ export default function DashboardScreen({ navigation }) {
 
         <View style={styles.tipsCard}>
           <Text style={styles.tipsTitle}>How it works</Text>
-          <Text style={styles.tipItem}>📸  Tap "Add Stuff" to photograph and catalog an item</Text>
+          <Text style={styles.tipItem}>📸  Tap "Add Stuff" to catalog an item</Text>
           <Text style={styles.tipItem}>📋  Fill in the type, make, model, and condition</Text>
           <Text style={styles.tipItem}>🏷️  Give it a nickname so you can find it quickly</Text>
           <Text style={styles.tipItem}>👀  Tap "View Stuff" to browse your inventory</Text>
