@@ -109,6 +109,15 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.whyText}>{happyMessage}</Text>
         </View>
 
+        <View style={styles.tipsCard}>
+          <Text style={styles.tipsTitle}>How it works</Text>
+          <Text style={styles.tipItem}>📸  Tap "Add Stuff" to photograph and catalog an item</Text>
+          <Text style={styles.tipItem}>📋  Fill in the type, make, model, and condition</Text>
+          <Text style={styles.tipItem}>🏷️  Give it a nickname so you can find it quickly</Text>
+          <Text style={styles.tipItem}>👀  Tap "View Stuff" to browse your inventory</Text>
+          <Text style={styles.tipItem}>💾  Photos card shows storage used — tap it to see all photos</Text>
+        </View>
+
         <View style={styles.statsContainer}>
           <TouchableOpacity 
             style={styles.statCard}
@@ -213,7 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
     padding: 12,
-    marginBottom: 15,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
@@ -222,6 +231,26 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.85)',
     lineHeight: 20,
     textAlign: 'center',
+  },
+  tipsCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  tipsTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  tipItem: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.85)',
+    lineHeight: 22,
+    paddingLeft: 4,
   },
   statsContainer: {
     flexDirection: 'row',
