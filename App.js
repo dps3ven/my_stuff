@@ -39,6 +39,7 @@ function applyWebGlobalLayout() {
       overflow-x: hidden;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none;
     }
     /* Matching gradient backdrop so scroll areas taller than the viewport
        never reveal a blank strip below the per-screen gradient. Fixed so it
