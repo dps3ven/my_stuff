@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import LoginScreen from './screens/LoginScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import InventoryScreen from './screens/InventoryScreen';
@@ -13,6 +14,10 @@ import PhotoGalleryScreen from './screens/PhotoGalleryScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    ScreenOrientation.unlockAsync();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
