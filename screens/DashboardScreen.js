@@ -23,6 +23,7 @@ export default function DashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
   const [allPhotos, setAllPhotos] = useState([]);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -109,21 +110,28 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.whyText}>{happyMessage}</Text>
         </View>
 
-        <View style={styles.instructionsCard}>
-          <Text style={styles.instructionsTitle}>📖 Quick Guide</Text>
-          <Text style={styles.instructionsText}>
-            <Text style={styles.instructionsBold}>Add Stuff</Text> — Photograph and catalog your gear with type, make, model, serial number, condition, and value.
-          </Text>
-          <Text style={styles.instructionsText}>
-            <Text style={styles.instructionsBold}>View Stuff</Text> — Browse your inventory grouped by category. Tap an item for full details, or use Edit/Delete.
-          </Text>
-          <Text style={styles.instructionsText}>
-            <Text style={styles.instructionsBold}>Photos card</Text> — Tap the 💾 stat above to see all saved photos in a gallery.
-          </Text>
-          <Text style={styles.instructionsText}>
-            <Text style={styles.instructionsBold}>Tip:</Text> Add a nickname to give your gear a personal touch.
-          </Text>
-        </View>
+        <TouchableOpacity style={styles.instructionsCard} onPress={() => setGuideOpen(!guideOpen)} activeOpacity={0.7}>
+          <View style={styles.instructionsHeader}>
+            <Text style={styles.instructionsTitle}>📖 Quick Guide</Text>
+            <Text style={styles.instructionsArrow}>{guideOpen ? '▲' : '▼'}</Text>
+          </View>
+          {guideOpen && (
+            <View style={styles.instructionsBody}>
+              <Text style={styles.instructionsText}>
+                <Text style={styles.instructionsBold}>Add Stuff</Text> — Photograph and catalog your gear with type, make, model, serial number, condition, and value.
+              </Text>
+              <Text style={styles.instructionsText}>
+                <Text style={styles.instructionsBold}>View Stuff</Text> — Browse your inventory grouped by category. Tap an item for full details, or use Edit/Delete.
+              </Text>
+              <Text style={styles.instructionsText}>
+                <Text style={styles.instructionsBold}>Photos card</Text> — Tap the 💾 stat above to see all saved photos in a gallery.
+              </Text>
+              <Text style={styles.instructionsText}>
+                <Text style={styles.instructionsBold}>Tip:</Text> Add a nickname to give your gear a personal touch.
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         <View style={styles.statsContainer}>
           <TouchableOpacity 
@@ -247,11 +255,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
+  instructionsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   instructionsTitle: {
     fontSize: 15,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 10,
+  },
+  instructionsArrow: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.6)',
+  },
+  instructionsBody: {
+    marginTop: 10,
   },
   instructionsText: {
     fontSize: 13,
