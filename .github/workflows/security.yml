@@ -12,5 +12,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci
-      - run: npm audit --audit-level=high
+      - run: npm ci --ignore-scripts
+      - name: Check for high/critical vulnerabilities
+        run: |
+          # Run audit and fail only on high+ severity
+          npm audit --audit-level=high --json > audit-results.json 2>&1 || true
+          HIGH=$(node -e "const r=require('./audit-results.json'); const v=r.metadata?.vulnerabilities||{}; console.log((v.high||0)+(v.critical||0))")
+          echo "High/Critical vulnerabilities: $HIGH"
+          if [ "$HIGH" -gt 0 ]; then
+            echo "::error::Found $HIGH high/critical vulnerabilities"
+            npm audit --audit-level=high
+            exit 1
+          fi
+          echo "No high/critical vulnerabilities found"
