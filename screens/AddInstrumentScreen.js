@@ -404,13 +404,9 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
     return (
       <View style={isWebPlatform ? styles.webWizardRoot : { flex: 1 }}>
-        {/* Header */}
+        {/* Header — title only; navigation lives in the footer */}
         <View style={[styles.wizardHeader, { paddingTop: insets.top + 12 }, isWide && { maxWidth: 700 }]}>
-          <TouchableOpacity onPress={() => step > 0 ? setStep(step - 1) : navigation.navigate('Dashboard')}>
-            <Text style={styles.wizardBack}>← Back</Text>
-          </TouchableOpacity>
           <Text style={styles.wizardTitle}>{isEditing ? 'Edit Stuff' : 'Add New Stuff'}</Text>
-          <View style={styles.wizardHeaderSpacer} />
         </View>
 
         {/* Progress bar */}
@@ -442,32 +438,52 @@ export default function AddInstrumentScreen({ navigation, route }) {
           </ScrollView>
         )}
 
-        {/* Footer nav */}
+        {/* Footer nav — Previous/Cancel on the left, Next/Save on the right */}
         <View style={styles.wizardFooter}>
-          {step < STEPS.length - 1 ? (
-            <TouchableOpacity style={[styles.nextButton, isWide && { maxWidth: 700 }]} onPress={() => {
-              // Block navigation from Category step until required fields are filled
-              if (step === 0) {
-                const missing = [];
-                if (!instrument.type) missing.push('Type');
-                if (!instrument.brand) missing.push('Make');
-                if (!instrument.model) missing.push('Model');
-                if (missing.length > 0) {
-                  setErrorMessage(`Please fill in: ${missing.join(', ')}`);
-                  if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
-                  return;
+          <View style={[styles.footerRow, isWide && { maxWidth: 700 }]}>
+            {/* Previous step, or Cancel/exit on the first step */}
+            {step > 0 ? (
+              <TouchableOpacity
+                style={[styles.navButton, styles.prevButton]}
+                onPress={() => { setErrorMessage(''); setStep(step - 1); }}
+              >
+                <Text style={styles.prevButtonText}>← {STEPS[step - 1]}</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[styles.navButton, styles.prevButton]}
+                onPress={() => navigation.navigate('Dashboard')}
+              >
+                <Text style={styles.prevButtonText}>✕ Cancel</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Next step, or Save on the last step */}
+            {step < STEPS.length - 1 ? (
+              <TouchableOpacity style={[styles.navButton, styles.nextButton]} onPress={() => {
+                // Block navigation from Category step until required fields are filled
+                if (step === 0) {
+                  const missing = [];
+                  if (!instrument.type) missing.push('Type');
+                  if (!instrument.brand) missing.push('Make');
+                  if (!instrument.model) missing.push('Model');
+                  if (missing.length > 0) {
+                    setErrorMessage(`Please fill in: ${missing.join(', ')}`);
+                    if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                  }
                 }
-              }
-              setErrorMessage('');
-              setStep(step + 1);
-            }}>
-              <Text style={styles.nextButtonText}>Next: {STEPS[step + 1]} →</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.saveButtonFull} onPress={saveInstrument}>
-              <Text style={styles.saveButtonText}>{isEditing ? '✅ Save Changes' : '➕ Add to My Stuff'}</Text>
-            </TouchableOpacity>
-          )}
+                setErrorMessage('');
+                setStep(step + 1);
+              }}>
+                <Text style={styles.nextButtonText}>{STEPS[step + 1]} →</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={[styles.navButton, styles.saveButton]} onPress={saveInstrument}>
+                <Text style={styles.saveButtonText}>{isEditing ? '✅ Save' : '➕ Add'}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
     );
@@ -580,14 +596,32 @@ const styles = StyleSheet.create({
       zIndex: 100,
     } : {}),
   },
-  nextButton: {
-    backgroundColor: '#007bff',
+  footerRow: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  navButton: {
+    flex: 1,
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'center',
+  },
+  prevButton: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  prevButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  nextButton: {
+    backgroundColor: '#007bff',
   },
   nextButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  saveButton: {
+    backgroundColor: '#0064d2',
+  },
 
   // ── Shared step content ──────────────────────────────────────
   stepContent: {
