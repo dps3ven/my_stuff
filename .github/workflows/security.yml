@@ -3,6 +3,9 @@ name: Security Checks
 on:
   pull_request:
     branches: [main, develop]
+  schedule:
+    # Run weekly on Monday at 9am UTC to catch new vulnerabilities
+    - cron: '0 9 * * 1'
 
 jobs:
   audit:
