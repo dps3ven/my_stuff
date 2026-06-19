@@ -98,6 +98,12 @@ function suppressAutofill() {
       el.setAttribute('name', `field_${rand}`);
       el.setAttribute('id', `field_${rand}`);
       el.dataset.autofillHardened = '1';
+      // iOS decides whether to offer contact autofill at the moment a field
+      // receives focus. If the field is readOnly at that instant, iOS skips
+      // the contact bar. We remove readOnly inside the focus handler, which
+      // runs after iOS has already made that decision, so typing still works.
+      el.readOnly = true;
+      el.addEventListener('focus', () => { el.readOnly = false; });
     }
   };
 
