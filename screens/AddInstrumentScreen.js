@@ -454,7 +454,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 style={[styles.navButton, styles.prevButton]}
                 onPress={() => navigation.navigate('Dashboard')}
               >
-                <Text style={styles.prevButtonText}>✕ Cancel</Text>
+                <Text style={styles.prevButtonText}>← Back</Text>
               </TouchableOpacity>
             )}
 
@@ -610,11 +610,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   prevButton: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: '#007bff',
   },
-  prevButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  prevButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   nextButton: {
     backgroundColor: '#007bff',
   },
