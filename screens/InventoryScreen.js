@@ -178,12 +178,6 @@ export default function InventoryScreen({ navigation }) {
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>My Stuff</Text>
-          <TouchableOpacity 
-            style={styles.addButton}
-            onPress={() => navigation.navigate('AddInstrument')}
-          >
-            <Text style={styles.addButtonText}>Add</Text>
-          </TouchableOpacity>
         </View>
         
         {loading ? (
@@ -263,17 +257,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  addButton: {
-    backgroundColor: '#28a745',
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 6,
-  },
-  addButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
   },
   itemContainer: {
     backgroundColor: 'white',
