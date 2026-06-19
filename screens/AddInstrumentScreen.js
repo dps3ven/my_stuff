@@ -211,6 +211,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     if (missingFields.length > 0) {
       setErrorMessage(`Please fill in: ${missingFields.join(', ')}`);
       if (!isWide) setStep(0);
+      if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     setErrorMessage('');
@@ -455,6 +456,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 if (!instrument.model) missing.push('Model');
                 if (missing.length > 0) {
                   setErrorMessage(`Please fill in: ${missing.join(', ')}`);
+                  if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
                   return;
                 }
               }
