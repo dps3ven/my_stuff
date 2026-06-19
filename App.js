@@ -78,23 +78,25 @@ function applyWebGlobalLayout() {
 }
 
 // Mobile browsers (esp. iOS Safari) show a contact-autofill bar above the
-// keyboard, driven by the DOM input's autocomplete/name heuristics. The RN
-// `textContentType` prop is iOS-native only and does nothing on web, and
-// `autoComplete="off"` is frequently ignored. To reliably suppress it we set
-// the real DOM attributes on every input — including ones mounted later
-// (modals, wizard steps) — via a MutationObserver.
+// keyboard. iOS *ignores* autocomplete="off", so we instead assign a unique,
+// non-standard autocomplete token plus a randomized name/id, which defeats the
+// heuristic that matches a field to a contact (name/email/tel/address). We do
+// this on focus (right before the keyboard's suggestions are computed) and for
+// any inputs mounted later via a MutationObserver.
 function suppressAutofill() {
   if (Platform.OS !== 'web' || typeof document === 'undefined') return;
 
   const harden = (el) => {
     if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
-    el.setAttribute('autocomplete', 'off');
+    const token = `nofill-${Math.random().toString(36).slice(2)}`;
+    el.setAttribute('autocomplete', token);
     el.setAttribute('autocorrect', 'off');
     el.setAttribute('autocapitalize', 'off');
     el.setAttribute('spellcheck', 'false');
-    // A randomized, non-semantic name stops heuristic contact matching.
     if (!el.dataset.autofillHardened) {
-      el.setAttribute('name', `field_${Math.random().toString(36).slice(2)}`);
+      const rand = Math.random().toString(36).slice(2);
+      el.setAttribute('name', `field_${rand}`);
+      el.setAttribute('id', `field_${rand}`);
       el.dataset.autofillHardened = '1';
     }
   };
@@ -105,6 +107,9 @@ function suppressAutofill() {
   };
 
   scan(document);
+
+  // Re-apply the moment a field is focused, before iOS computes suggestions.
+  document.addEventListener('focusin', (e) => harden(e.target), true);
 
   const observer = new MutationObserver((mutations) => {
     for (const m of mutations) {
