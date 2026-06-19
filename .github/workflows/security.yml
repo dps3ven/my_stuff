@@ -7,6 +7,9 @@ on:
     # Run weekly on Monday at 9am UTC to catch new vulnerabilities
     - cron: '0 9 * * 1'
 
+permissions:
+  contents: read
+
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -18,9 +21,22 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Check for high/critical vulnerabilities
         run: |
-          # Run audit and fail only on high+ severity
-          npm audit --audit-level=high --json > audit-results.json 2>&1 || true
-          HIGH=$(node -e "const r=require('./audit-results.json'); const v=r.metadata?.vulnerabilities||{}; console.log((v.high||0)+(v.critical||0))")
+          # Capture JSON on stdout only; keep stderr out of the file so the
+          # JSON stays parseable. `|| true` because npm audit exits non-zero
+          # when vulnerabilities are present.
+          npm audit --json > audit-results.json 2>/dev/null || true
+
+          HIGH=$(node -e "
+            try {
+              const r = require('./audit-results.json');
+              const v = (r && r.metadata && r.metadata.vulnerabilities) || {};
+              console.log((v.high || 0) + (v.critical || 0));
+            } catch (e) {
+              console.error('Could not parse audit results:', e.message);
+              process.exit(2);
+            }
+          ")
+
           echo "High/Critical vulnerabilities: $HIGH"
           if [ "$HIGH" -gt 0 ]; then
             echo "::error::Found $HIGH high/critical vulnerabilities"
