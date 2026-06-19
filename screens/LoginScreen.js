@@ -247,48 +247,50 @@ export default function LoginScreen({ navigation }) {
         onRequestClose={() => setShowCreateModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>New Profile</Text>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Your profile name"
-              value={newProfileName}
-              onChangeText={setNewProfileName}
-              autoComplete="off"
-              textContentType="none"
-              autoCorrect={false}
-              autoFocus
-            />
+          <ScrollView contentContainerStyle={styles.modalScrollContent} keyboardShouldPersistTaps="handled">
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>New Profile</Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Your profile name"
+                value={newProfileName}
+                onChangeText={setNewProfileName}
+                autoComplete="off"
+                textContentType="none"
+                autoCorrect={false}
+                autoFocus
+              />
 
-            <Text style={styles.prefLabel}>What do you mostly collect?</Text>
-            <View style={styles.chipRow}>
-              {INSTRUMENT_OPTIONS.map(opt => (
+              <Text style={styles.prefLabel}>What do you mostly collect?</Text>
+              <View style={styles.chipRow}>
+                {INSTRUMENT_OPTIONS.map(opt => (
+                  <TouchableOpacity
+                    key={opt}
+                    style={[styles.chip, newPrimaryInstrument === opt && styles.chipActive]}
+                    onPress={() => setNewPrimaryInstrument(newPrimaryInstrument === opt ? '' : opt)}
+                  >
+                    <Text style={[styles.chipText, newPrimaryInstrument === opt && styles.chipTextActive]}>{opt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {errorMessage ? <Text style={styles.modalError}>{errorMessage}</Text> : null}
+              <View style={styles.modalButtons}>
                 <TouchableOpacity
-                  key={opt}
-                  style={[styles.chip, newPrimaryInstrument === opt && styles.chipActive]}
-                  onPress={() => setNewPrimaryInstrument(newPrimaryInstrument === opt ? '' : opt)}
+                  style={[styles.modalButton, styles.modalCancelButton]}
+                  onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
                 >
-                  <Text style={[styles.chipText, newPrimaryInstrument === opt && styles.chipTextActive]}>{opt}</Text>
+                  <Text style={styles.modalCancelText}>Cancel</Text>
                 </TouchableOpacity>
-              ))}
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalCreateButton]}
+                  onPress={createProfile}
+                >
+                  <Text style={styles.modalCreateText}>Create</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-
-            {errorMessage ? <Text style={styles.modalError}>{errorMessage}</Text> : null}
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalCancelButton]}
-                onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
-              >
-                <Text style={styles.modalCancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalCreateButton]}
-                onPress={createProfile}
-              >
-                <Text style={styles.modalCreateText}>Create</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          </ScrollView>
         </View>
       </Modal>
 
@@ -482,14 +484,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 10,
+  },
+  modalScrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 10,
   },
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 24,
+    padding: 20,
     width: '100%',
     maxWidth: 400,
+    alignSelf: 'center',
   },
   modalTitle: {
     fontSize: 20,

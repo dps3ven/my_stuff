@@ -96,58 +96,6 @@ function handleVisualViewport() {
   window.visualViewport.addEventListener('scroll', update);
 }
 
-// Mobile browsers (esp. iOS Safari) show a contact-autofill bar above the
-// keyboard. iOS *ignores* autocomplete="off", so we instead assign a unique,
-// non-standard autocomplete token plus a randomized name/id, which defeats the
-// heuristic that matches a field to a contact (name/email/tel/address). We do
-// this on focus (right before the keyboard's suggestions are computed) and for
-// any inputs mounted later via a MutationObserver.
-function suppressAutofill() {
-  if (Platform.OS !== 'web' || typeof document === 'undefined') return;
-
-  const harden = (el) => {
-    if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
-    const token = `nofill-${Math.random().toString(36).slice(2)}`;
-    el.setAttribute('autocomplete', token);
-    el.setAttribute('autocorrect', 'off');
-    el.setAttribute('autocapitalize', 'off');
-    el.setAttribute('spellcheck', 'false');
-    if (!el.dataset.autofillHardened) {
-      const rand = Math.random().toString(36).slice(2);
-      el.setAttribute('name', `field_${rand}`);
-      el.setAttribute('id', `field_${rand}`);
-      el.dataset.autofillHardened = '1';
-      // iOS decides whether to offer contact autofill at the moment a field
-      // receives focus. If the field is readOnly at that instant, iOS skips
-      // the contact bar. We remove readOnly inside the focus handler, which
-      // runs after iOS has already made that decision, so typing still works.
-      el.readOnly = true;
-      el.addEventListener('focus', () => { el.readOnly = false; });
-    }
-  };
-
-  const scan = (root) => {
-    if (!root || !root.querySelectorAll) return;
-    root.querySelectorAll('input, textarea').forEach(harden);
-  };
-
-  scan(document);
-
-  // Re-apply the moment a field is focused, before iOS computes suggestions.
-  document.addEventListener('focusin', (e) => harden(e.target), true);
-
-  const observer = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      m.addedNodes.forEach((node) => {
-        if (node.nodeType !== 1) return;
-        harden(node);
-        scan(node);
-      });
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-}
-
 export default function App() {
   useEffect(() => {
     if (Platform.OS !== 'web') {
@@ -155,7 +103,6 @@ export default function App() {
     } else {
       applyWebGlobalLayout();
       handleVisualViewport();
-      suppressAutofill();
     }
   }, []);
 
