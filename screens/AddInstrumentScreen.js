@@ -734,10 +734,6 @@ const styles = StyleSheet.create({
   },
 
   // ── Save / footer ────────────────────────────────────────────
-  saveButtonFull: {
-    backgroundColor: '#0064d2', padding: 16, borderRadius: 10,
-    alignItems: 'center', width: '100%', maxWidth: 400, alignSelf: 'center',
-  },
   saveButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   fixedFooter: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
