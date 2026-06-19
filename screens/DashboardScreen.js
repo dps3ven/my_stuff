@@ -24,7 +24,6 @@ export default function DashboardScreen({ navigation }) {
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
   const [allPhotos, setAllPhotos] = useState([]);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [privacyOpen, setPrivacyOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -130,31 +129,19 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.instructionsText}>
                 <Text style={styles.instructionsBold}>Tip:</Text> Add a nickname to give your gear a personal touch.
               </Text>
-            </View>
-          )}
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.instructionsCard} onPress={() => setPrivacyOpen(!privacyOpen)} activeOpacity={0.7}>
-          <View style={styles.instructionsHeader}>
-            <Text style={styles.instructionsTitle}>🔒 Privacy & Security</Text>
-            <Text style={styles.instructionsArrow}>{privacyOpen ? '▲' : '▼'}</Text>
-          </View>
-          {privacyOpen && (
-            <View style={styles.instructionsBody}>
+              <Text style={styles.instructionsSectionTitle}>🔒 Privacy & Security</Text>
               <Text style={styles.instructionsText}>
-                <Text style={styles.instructionsBold}>On your device</Text> — Your profiles, inventory, and photos are stored locally on your device. There's no account to create.
+                <Text style={styles.instructionsBold}>On your device</Text> — Profiles, inventory, and photos are stored locally. No account, no servers, nothing uploaded.
               </Text>
               <Text style={styles.instructionsText}>
-                <Text style={styles.instructionsBold}>No servers</Text> — Your data isn't uploaded or shared. Nothing leaves your device.
+                <Text style={styles.instructionsBold}>Biometric lock</Text> — On supported phones, Face ID / Touch ID protects your profile.
               </Text>
               <Text style={styles.instructionsText}>
-                <Text style={styles.instructionsBold}>Biometric lock</Text> — On supported phones, Face ID / Touch ID protects access to your profile.
+                <Text style={styles.instructionsBold}>Photo access</Text> — Only photos you choose, and the app asks permission first.
               </Text>
               <Text style={styles.instructionsText}>
-                <Text style={styles.instructionsBold}>Photo access</Text> — The app only reads photos you explicitly choose, and asks permission first.
-              </Text>
-              <Text style={styles.instructionsText}>
-                <Text style={styles.instructionsBold}>Encrypted in transit</Text> — The web version is served over HTTPS with strict security headers.
+                <Text style={styles.instructionsBold}>Securely delivered</Text> — The web app loads over HTTPS with strict headers, so the app code can't be tampered with in transit.
               </Text>
             </View>
           )}
@@ -298,6 +285,13 @@ const styles = StyleSheet.create({
   },
   instructionsBody: {
     marginTop: 10,
+  },
+  instructionsSectionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    marginTop: 14,
+    marginBottom: 8,
   },
   instructionsText: {
     fontSize: 13,

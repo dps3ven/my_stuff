@@ -24,7 +24,7 @@ Your data never leaves your device. Everything is stored locally using AsyncStor
 
 - **Biometric unlock** (Face ID / Touch ID / fingerprint) gates profile access on mobile
 - **Permission-gated media** — the app requests photo library / camera access before use and only reads photos you explicitly choose
-- **HTTPS + hardened headers** on the web build (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy) via `customHttp.yml`
+- **Securely delivered** — the web app loads over HTTPS with hardened headers (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy) via `customHttp.yml`, so the app code can't be tampered with in transit
 - **Dependency & code scanning** in CI (npm audit, CodeQL, Checkov)
 
 ### Known limitations (beta)
