@@ -112,7 +112,7 @@ export default function DashboardScreen({ navigation }) {
 
         <TouchableOpacity style={styles.instructionsCard} onPress={() => setGuideOpen(!guideOpen)} activeOpacity={0.7}>
           <View style={styles.instructionsHeader}>
-            <Text style={styles.instructionsTitle}>📖 Quick Guide</Text>
+            <Text style={styles.instructionsTitle}>📖 User Guide</Text>
             <Text style={styles.instructionsArrow}>{guideOpen ? '▲' : '▼'}</Text>
           </View>
           {guideOpen && (
