@@ -77,12 +77,54 @@ function applyWebGlobalLayout() {
   document.head.appendChild(style);
 }
 
+// Mobile browsers (esp. iOS Safari) show a contact-autofill bar above the
+// keyboard, driven by the DOM input's autocomplete/name heuristics. The RN
+// `textContentType` prop is iOS-native only and does nothing on web, and
+// `autoComplete="off"` is frequently ignored. To reliably suppress it we set
+// the real DOM attributes on every input — including ones mounted later
+// (modals, wizard steps) — via a MutationObserver.
+function suppressAutofill() {
+  if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+
+  const harden = (el) => {
+    if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
+    el.setAttribute('autocomplete', 'off');
+    el.setAttribute('autocorrect', 'off');
+    el.setAttribute('autocapitalize', 'off');
+    el.setAttribute('spellcheck', 'false');
+    // A randomized, non-semantic name stops heuristic contact matching.
+    if (!el.dataset.autofillHardened) {
+      el.setAttribute('name', `field_${Math.random().toString(36).slice(2)}`);
+      el.dataset.autofillHardened = '1';
+    }
+  };
+
+  const scan = (root) => {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('input, textarea').forEach(harden);
+  };
+
+  scan(document);
+
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      m.addedNodes.forEach((node) => {
+        if (node.nodeType !== 1) return;
+        harden(node);
+        scan(node);
+      });
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
 export default function App() {
   useEffect(() => {
     if (Platform.OS !== 'web') {
       ScreenOrientation.unlockAsync();
     } else {
       applyWebGlobalLayout();
+      suppressAutofill();
     }
   }, []);
 
