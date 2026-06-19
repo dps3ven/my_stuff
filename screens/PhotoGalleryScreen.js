@@ -80,18 +80,14 @@ export default function PhotoGalleryScreen({ navigation, route }) {
 
   return (
     <Wrapper {...wrapperProps}>
-      {/* Header */}
+      {/* Header — title only; navigation lives at the bottom */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerSide}>
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>All Photos</Text>
           <Text style={styles.headerSub}>
             {photos.length} photo{photos.length !== 1 ? 's' : ''} · {formatStorage(storageUsed)} used
           </Text>
         </View>
-        <View style={styles.headerSide} />
       </View>
 
       {photos.length === 0 ? (
@@ -147,6 +143,13 @@ export default function PhotoGalleryScreen({ navigation, route }) {
           )}
         />
       )}
+
+      {/* Bottom navigation */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
+      </View>
     </Wrapper>
   );
 }
@@ -170,13 +173,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.15)',
   },
-  headerSide: {
-    minWidth: 70,
+  footer: {
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: Platform.OS === 'web' ? 'rgba(15, 45, 82, 0.95)' : 'rgba(0,0,0,0.2)',
+    alignItems: 'center',
   },
-  backText: {
+  backButton: {
+    backgroundColor: '#007bff',
+    padding: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 700,
+  },
+  backButtonText: {
     color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
   },
   headerCenter: {
     flex: 1,
