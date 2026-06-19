@@ -376,7 +376,6 @@ export default function AddInstrumentScreen({ navigation, route }) {
         {step === 0 && renderStep1()}
         {step === 1 && renderStep0()}
         {step === 2 && renderStep2()}
-        {errorMessage ? <View style={styles.errorContainer}><Text style={styles.errorText}>{errorMessage}</Text></View> : null}
       </>
     );
 
@@ -402,6 +401,13 @@ export default function AddInstrumentScreen({ navigation, route }) {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Error message — pinned above scroll content so it's always visible */}
+        {errorMessage ? (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
 
         {/* Step content — page-level scroll on web, inner ScrollView on native */}
         {isWebPlatform ? (
@@ -686,6 +692,15 @@ const styles = StyleSheet.create({
   dashboardButtonText: { color: 'rgba(255,255,255,0.6)', fontSize: 14 },
 
   // ── Error ────────────────────────────────────────────────────
+  errorBanner: {
+    backgroundColor: '#fff3f3',
+    padding: 12,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ffcdd2',
+  },
   errorContainer: {
     backgroundColor: '#fff3f3', padding: 14, borderRadius: 10,
     marginBottom: 16, borderWidth: 1, borderColor: '#ffcdd2',
