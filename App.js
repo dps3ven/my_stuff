@@ -56,7 +56,7 @@ function applyWebGlobalLayout() {
     #root {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      min-height: var(--app-height, 100vh);
       height: auto !important;
       flex: 0 1 auto !important;
       width: 100%;
@@ -67,7 +67,7 @@ function applyWebGlobalLayout() {
     #root > div > div,
     #root > div > div > div,
     #root > div > div > div > div {
-      min-height: 100vh;
+      min-height: var(--app-height, 100vh);
       height: auto !important;
       overflow: visible !important;
       flex-shrink: 0;
@@ -75,6 +75,25 @@ function applyWebGlobalLayout() {
     }
   `;
   document.head.appendChild(style);
+}
+
+// On iOS Safari, the virtual keyboard + contact bar reduces the visible area
+// but doesn't fire a standard resize event that CSS viewport units respond to.
+// We listen to the visualViewport resize and adjust a CSS variable that the
+// min-height rules use, so the app content area always fits the actual visible
+// space — nothing gets hidden behind the keyboard/autofill bar.
+function handleVisualViewport() {
+  if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+  if (!window.visualViewport) return;
+
+  const update = () => {
+    const vh = window.visualViewport.height;
+    document.documentElement.style.setProperty('--app-height', `${vh}px`);
+  };
+
+  update();
+  window.visualViewport.addEventListener('resize', update);
+  window.visualViewport.addEventListener('scroll', update);
 }
 
 // Mobile browsers (esp. iOS Safari) show a contact-autofill bar above the
@@ -135,6 +154,7 @@ export default function App() {
       ScreenOrientation.unlockAsync();
     } else {
       applyWebGlobalLayout();
+      handleVisualViewport();
       suppressAutofill();
     }
   }, []);
