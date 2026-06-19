@@ -488,7 +488,8 @@ const styles = StyleSheet.create({
   },
   modalScrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 40,
     padding: 10,
   },
   modalContent: {
