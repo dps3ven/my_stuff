@@ -3,6 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 import * as LocalAuthentication from 'expo-local-authentication';
+import appConfig from '../app.json';
+
+const APP_VERSION = appConfig.expo.version;
 
 const INSTRUMENT_OPTIONS = ['Guitar', 'Bass', 'Drums', 'Piano', 'Violin', 'Microphone', 'Amplifier', 'Other'];
 
@@ -238,6 +241,8 @@ export default function LoginScreen({ navigation }) {
         <TouchableOpacity onPress={resetAllData} style={styles.resetButton}>
           <Text style={styles.resetText}>Reset All Data</Text>
         </TouchableOpacity>
+
+        <Text style={styles.versionText}>v{APP_VERSION}</Text>
       </ScrollView>
 
       <Modal
@@ -478,6 +483,12 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.4)',
     fontSize: 12,
     textDecorationLine: 'underline',
+  },
+  versionText: {
+    color: 'rgba(255, 255, 255, 0.35)',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 16,
   },
   modalOverlay: {
     flex: 1,

@@ -544,7 +544,6 @@ const styles = StyleSheet.create({
   },
   wizardBack: { color: '#fff', fontSize: 15, fontWeight: '600', minWidth: 70 },
   wizardTitle: { color: '#fff', fontSize: 17, fontWeight: '700', flex: 1, textAlign: 'center' },
-  wizardSave: { color: '#28a745', fontSize: 15, fontWeight: '700', minWidth: 50, textAlign: 'right' },
   wizardHeaderSpacer: { minWidth: 70 },
   progressBar: {
     flexDirection: 'row',
