@@ -15,14 +15,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
       - name: Check for syntax errors
-        run: node --check screens/LoginScreen.js screens/DashboardScreen.js screens/InventoryScreen.js screens/AddInstrumentScreen.js screens/InstrumentDetailScreen.js utils/storage.js App.js
+        run: node --check screens/LoginScreen.js screens/DashboardScreen.js screens/InventoryScreen.js screens/AddInstrumentScreen.js screens/InstrumentDetailScreen.js screens/PhotoGalleryScreen.js utils/storage.js App.js
 
   web-build:
     name: Web Build Check
@@ -32,7 +32,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
