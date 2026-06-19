@@ -6,34 +6,40 @@ Keep track of your musical instrument collection — from that beat-up acoustic 
 
 ## What it does
 
-- **Add instruments** with type, make, model, serial number, condition, and estimated value
-- **Attach photos** from your camera roll or take a new one right in the app
-- **Browse your collection** organized by instrument type with inline image previews
+- **Profiles** — pick or create a profile; no account or password required
+- **Add instruments** with type, make, model, nickname, year, serial number, condition, and estimated value
+- **Attach photos** from your library, or take a new one with the camera (mobile)
+- **Browse your collection** grouped by instrument type with inline image previews
 - **Tap any item** for a full detail view with a scrollable image gallery
+- **All Photos gallery** — see every photo across your collection, with total storage used
+- **Dashboard stats** — item count, total value, and photo storage at a glance
 - **Edit or delete** instruments at any time
-- **Reset your password** if you forget it
-- Works on **iOS, Android, and web** — install it as a PWA on any browser
+- Works on **iOS, Android, and web**
 
 ---
 
-## Security
+## Security & privacy
 
-Your data never leaves your device. Everything is stored locally using AsyncStorage on mobile and localStorage on web.
+Your data never leaves your device. Everything is stored locally using AsyncStorage on mobile and localStorage on web — there is no backend, account, or server.
 
-- Passwords are hashed with SHA-256 — never stored in plain text
-- Biometric MFA (Face ID / Touch ID / fingerprint) required on mobile login
-- Minimum 12-character password on signup
-- Input sanitization to prevent XSS
-- Session cleared on logout
+- **Biometric unlock** (Face ID / Touch ID / fingerprint) gates profile access on mobile
+- **Permission-gated media** — the app requests photo library / camera access before use and only reads photos you explicitly choose
+- **HTTPS + hardened headers** on the web build (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy) via `customHttp.yml`
+- **Dependency & code scanning** in CI (npm audit, CodeQL, Checkov)
+
+### Known limitations (beta)
+
+- **No at-rest encryption yet.** Data is stored locally in plain `AsyncStorage` (mobile) / `localStorage` (web). It isn't uploaded anywhere, but it isn't encrypted on disk either. Planned post-beta: passphrase-derived key (PBKDF2) with AES encryption of stored data.
+- On web there is no biometric/hardware keystore, so the native-only protections (Face ID / Touch ID) don't apply to the browser version.
 
 ---
 
 ## Getting started
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 20+
 - npm
-- Expo Go app on your phone ([iOS](https://apps.apple.com/app/expo-go/id982107779) / [Android](https://play.google.com/store/apps/details?id=host.exp.exponent))
+- Expo Go app, or a dev build, on your phone ([iOS](https://apps.apple.com/app/expo-go/id982107779) / [Android](https://play.google.com/store/apps/details?id=host.exp.exponent))
 
 ### Install and run
 
@@ -58,31 +64,42 @@ npx expo start --web
 ## Project layout
 
 ```
-├── App.js                        # Navigation setup
+├── App.js                        # Navigation + web layout/scroll setup
 ├── screens/
-│   ├── LoginScreen.js            # Sign up, login, password reset
-│   ├── DashboardScreen.js        # Home with stats and quick actions
-│   ├── AddInstrumentScreen.js    # Add or edit an instrument
-│   ├── InventoryScreen.js        # Full collection view
-│   └── InstrumentDetailScreen.js # Detail view with image gallery
+│   ├── LoginScreen.js            # Profile select / create, biometric unlock
+│   ├── DashboardScreen.js        # Home with stats, quick guide, privacy info
+│   ├── AddInstrumentScreen.js    # Add or edit an instrument (step wizard)
+│   ├── InventoryScreen.js        # Full collection view, grouped by type
+│   ├── InstrumentDetailScreen.js # Detail view with image gallery
+│   └── PhotoGalleryScreen.js     # All photos across the collection
 ├── utils/
 │   └── storage.js                # localStorage on web, AsyncStorage on mobile
-├── web/
-│   ├── index.html                # PWA shell
-│   ├── manifest.json             # PWA manifest
-│   └── service-worker.js         # Offline caching
-└── app.json                      # Expo config
+├── scripts/
+│   └── sync-version.js           # Syncs app.json version with package.json
+├── amplify.yml                   # AWS Amplify build config
+├── customHttp.yml                # Security response headers for Amplify Hosting
+└── app.json                      # Expo config (version shown on login screen)
 ```
 
 ---
 
-## Install as a web app (PWA)
+## Versioning
 
-No app store needed — install directly from your browser:
+The app version (shown at the bottom of the login screen) is sourced from `app.json`. Bump it with a single command — `scripts/sync-version.js` keeps `app.json` in sync with `package.json` and bumps native build numbers:
 
-- **Chrome / Edge**: Click the install icon in the address bar
-- **iOS Safari**: Tap Share → Add to Home Screen
-- **Android Chrome**: Tap Menu → Add to Home Screen
+```bash
+npm version patch   # bug fixes      (1.0.0 → 1.0.1)
+npm version minor   # new features   (1.0.0 → 1.1.0)
+npm version major   # breaking change (1.0.0 → 2.0.0)
+```
+
+A GitHub Actions workflow (`Auto Version`) can also bump the version automatically on merges to `main`, based on [conventional commit](https://www.conventionalcommits.org/) prefixes (`feat:`, `fix:`, `BREAKING CHANGE`).
+
+---
+
+## Deployment (AWS Amplify)
+
+The web app is built and hosted on AWS Amplify. The build runs `npx expo export --platform web` and serves the `dist/` output (see `amplify.yml`). Security headers are applied via `customHttp.yml`.
 
 ---
 
@@ -108,9 +125,13 @@ eas submit --platform android
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| **CI** | Push / PR to main | Syntax check + web build |
-| **CodeQL** | Push / PR to main | Static security analysis |
-| **Security** | PR to main | `npm audit` for high severity vulnerabilities |
+| **CI** | Push / PR to main, develop | Syntax check + web build |
+| **CodeQL** | Push / PR to main, develop | Static security analysis |
+| **Security** | PR to main, develop + weekly | `npm audit` — fails on high/critical |
+| **Checkov** | Push / PR to main, develop | IaC, workflow, and secret scanning |
+| **Auto Version** | Push to main | Bumps version from conventional commits |
+
+Dependabot (`.github/dependabot.yml`) opens weekly PRs for security updates.
 
 ---
 
@@ -118,17 +139,15 @@ eas submit --platform android
 
 | | |
 |---|---|
-| Framework | React Native + Expo SDK 54 |
+| Framework | React Native + Expo SDK 55 |
 | Navigation | React Navigation (Stack) |
 | Camera / Photos | expo-image-picker |
 | Biometrics | expo-local-authentication |
-| Password hashing | crypto-js (SHA-256) |
 | Storage | AsyncStorage (mobile) / localStorage (web) |
+| Hosting | AWS Amplify (web) |
 
 ---
 
 ## License
 
 MIT
-
-This might need some help

@@ -162,6 +162,18 @@ export default function AddInstrumentScreen({ navigation, route }) {
   };
 
   const pickImage = async () => {
+    // Request photo library access on native platforms (web uses a file picker
+    // and needs no permission). Mirrors how apps like Instagram gate access.
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Required',
+          'My Stuff needs access to your photo library to attach images. You can enable it in Settings.'
+        );
+        return;
+      }
+    }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, quality: 1 });
     if (!result.canceled) {
       let newImages;
