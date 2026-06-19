@@ -56,7 +56,7 @@ function applyWebGlobalLayout() {
     #root {
       display: flex;
       flex-direction: column;
-      min-height: var(--app-height, 100vh);
+      min-height: 100vh;
       height: auto !important;
       flex: 0 1 auto !important;
       width: 100%;
@@ -67,7 +67,6 @@ function applyWebGlobalLayout() {
     #root > div > div,
     #root > div > div > div,
     #root > div > div > div > div {
-      min-height: var(--app-height, 100vh);
       height: auto !important;
       overflow: visible !important;
       flex-shrink: 0;
