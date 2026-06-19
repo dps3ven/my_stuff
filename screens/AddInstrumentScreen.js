@@ -277,6 +277,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
           {instrument.brand === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customBrand || ''}
               onChangeText={(t) => setInstrument(prev => ({ ...prev, customBrand: t }))}
+              autoComplete="off" textContentType="none" autoCorrect={false}
               placeholder="Enter brand name" />
           )}
         </>
@@ -296,6 +297,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
           {instrument.model === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customModel || ''}
               onChangeText={(t) => setInstrument(prev => ({ ...prev, customModel: t }))}
+              autoComplete="off" textContentType="none" autoCorrect={false}
               placeholder="Enter model name" />
           )}
         </>
@@ -315,6 +317,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       <Text style={styles.fieldLabel}>Nickname</Text>
       <TextInput style={styles.input} value={instrument.nickname}
         onChangeText={(t) => setInstrument(prev => ({ ...prev, nickname: t }))}
+        autoComplete="off" textContentType="none" autoCorrect={false}
         placeholder="e.g. Old Faithful" />
 
       <Text style={styles.fieldLabel}>Year</Text>
@@ -322,6 +325,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         style={styles.input}
         value={instrument.year}
         onChangeText={(t) => setInstrument(prev => ({ ...prev, year: t }))}
+        autoComplete="off" textContentType="none" autoCorrect={false}
         placeholder="e.g. 2015"
         keyboardType="numeric"
         maxLength={4}
@@ -330,6 +334,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       <Text style={styles.fieldLabel}>Serial Number</Text>
       <TextInput style={styles.input} value={instrument.serialNumber}
         onChangeText={(t) => setInstrument(prev => ({ ...prev, serialNumber: t }))}
+        autoComplete="off" textContentType="none" autoCorrect={false}
         placeholder="e.g. US12345678" />
 
       <Text style={styles.fieldLabel}>Condition</Text>
@@ -340,6 +345,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       <Text style={styles.fieldLabel}>Value: ({CURRENCY_SYMBOLS[userPrefs.currency] || '$'})</Text>
       <TextInput style={styles.input} value={instrument.value}
         onChangeText={(t) => setInstrument(prev => ({ ...prev, value: t }))}
+        autoComplete="off" textContentType="none" autoCorrect={false}
         placeholder="0.00" keyboardType="numeric" />
     </View>
   );

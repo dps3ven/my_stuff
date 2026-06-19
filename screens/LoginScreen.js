@@ -254,6 +254,9 @@ export default function LoginScreen({ navigation }) {
               placeholder="Your profile name"
               value={newProfileName}
               onChangeText={setNewProfileName}
+              autoComplete="off"
+              textContentType="none"
+              autoCorrect={false}
               autoFocus
             />
 
@@ -304,6 +307,9 @@ export default function LoginScreen({ navigation }) {
               placeholder="Enter new name"
               value={editingName}
               onChangeText={setEditingName}
+              autoComplete="off"
+              textContentType="none"
+              autoCorrect={false}
               autoFocus
             />
             {errorMessage ? <Text style={styles.modalError}>{errorMessage}</Text> : null}
