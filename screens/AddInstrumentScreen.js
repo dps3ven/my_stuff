@@ -418,7 +418,21 @@ export default function AddInstrumentScreen({ navigation, route }) {
         {/* Footer nav */}
         <View style={styles.wizardFooter}>
           {step < STEPS.length - 1 ? (
-            <TouchableOpacity style={[styles.nextButton, isWide && { maxWidth: 700 }]} onPress={() => { setErrorMessage(''); setStep(step + 1); }}>
+            <TouchableOpacity style={[styles.nextButton, isWide && { maxWidth: 700 }]} onPress={() => {
+              // Block navigation from Category step until required fields are filled
+              if (step === 0) {
+                const missing = [];
+                if (!instrument.type) missing.push('Type');
+                if (!instrument.brand) missing.push('Make');
+                if (!instrument.model) missing.push('Model');
+                if (missing.length > 0) {
+                  setErrorMessage(`Please fill in: ${missing.join(', ')}`);
+                  return;
+                }
+              }
+              setErrorMessage('');
+              setStep(step + 1);
+            }}>
               <Text style={styles.nextButtonText}>Next: {STEPS[step + 1]} →</Text>
             </TouchableOpacity>
           ) : (
