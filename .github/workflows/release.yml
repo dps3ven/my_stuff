@@ -1,0 +1,70 @@
+name: Auto Version
+
+on:
+  push:
+    branches: [main]
+
+# Allow the workflow to push the version bump commit and tag back to the repo
+permissions:
+  contents: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    # Skip if this push is itself the automated release commit
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine version bump from commits
+        id: bump
+        run: |
+          # Find the most recent tag, or fall back to the first commit
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            RANGE=""
+            echo "No previous tag found; scanning all commits"
+          else
+            RANGE="${LAST_TAG}..HEAD"
+            echo "Scanning commits in ${RANGE}"
+          fi
+
+          COMMITS=$(git log ${RANGE} --pretty=format:"%s%n%b")
+
+          BUMP="none"
+          # Breaking change -> major
+          if echo "$COMMITS" | grep -qE "BREAKING CHANGE|^[a-zA-Z]+(\(.+\))?!:"; then
+            BUMP="major"
+          # New feature -> minor
+          elif echo "$COMMITS" | grep -qE "^feat(\(.+\))?:"; then
+            BUMP="minor"
+          # Fix / perf -> patch
+          elif echo "$COMMITS" | grep -qE "^(fix|perf)(\(.+\))?:"; then
+            BUMP="patch"
+          fi
+
+          echo "Determined bump: $BUMP"
+          echo "bump=$BUMP" >> "$GITHUB_OUTPUT"
+
+      - name: Apply version bump
+        if: steps.bump.outputs.bump != 'none'
+        run: |
+          npm ci --ignore-scripts
+          npm version ${{ steps.bump.outputs.bump }} -m "chore(release): %s [skip ci]"
+          git push --follow-tags origin main
+
+      - name: No release needed
+        if: steps.bump.outputs.bump == 'none'
+        run: echo "No feat/fix/breaking commits since last release — skipping version bump."
