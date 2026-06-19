@@ -70,10 +70,32 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
   const [step, setStep] = useState(0);
   const [userPrefs, setUserPrefs] = useState({ primaryInstrument: '', currency: 'USD' });
+
+  // When editing, if the saved brand/model isn't in the predefined list,
+  // treat it as "Other" with the custom value pre-filled.
+  const initBrand = (() => {
+    if (!editItem) return '';
+    const type = editItem.type || '';
+    const makes = MAKES_BY_TYPE[type] || [];
+    return makes.includes(editItem.brand) ? editItem.brand : (editItem.brand ? 'Other' : '');
+  })();
+  const initCustomBrand = (!editItem || initBrand !== 'Other') ? '' : editItem.brand;
+
+  const initModel = (() => {
+    if (!editItem) return '';
+    const type = editItem.type || '';
+    const models = MODELS_BY_TYPE[type] || [];
+    return models.includes(editItem.model) ? editItem.model : (editItem.model ? 'Other' : '');
+  })();
+  const initCustomModel = (!editItem || initModel !== 'Other') ? '' : editItem.model;
+
   const [instrument, setInstrument] = useState({
     type: editItem?.type || '',
-    brand: editItem?.brand || '',
-    model: editItem?.model || '',
+    brand: initBrand,
+    customBrand: initCustomBrand,
+    model: initModel,
+    customModel: initCustomModel,
+    nickname: editItem?.nickname || '',
     year: editItem?.year || '',
     serialNumber: editItem?.serialNumber || '',
     condition: editItem?.condition || '',
