@@ -104,6 +104,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     images: editItem?.images || [],
   });
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({ type: false, brand: false, model: false });
   const scrollViewRef = useRef(null);
 
   useEffect(() => {
@@ -180,24 +181,27 @@ export default function AddInstrumentScreen({ navigation, route }) {
   // ── Picker helpers ─────────────────────────────────────────────
   // Inline chip-style picker — keeps options in the page flow so they scroll
   // with the rest of the form regardless of screen size or orientation.
-  const renderPickerButton = (label, selectedValue, title, items, onSelect) => {
+  const renderPickerButton = (label, selectedValue, title, items, onSelect, hasError = false) => {
     const options = items.filter(i => i.value !== '');
     return (
-      <View style={styles.chipPickerRow}>
-        {options.map(opt => {
-          const active = selectedValue === opt.value;
-          return (
-            <TouchableOpacity
-              key={opt.value}
-              style={[styles.chipOption, active && styles.chipOptionActive]}
-              onPress={() => onSelect(opt.value)}
-            >
-              <Text style={[styles.chipOptionText, active && styles.chipOptionTextActive]}>
-                {opt.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <View>
+        <View style={[styles.chipPickerRow, hasError && styles.chipPickerRowError]}>
+          {options.map(opt => {
+            const active = selectedValue === opt.value;
+            return (
+              <TouchableOpacity
+                key={opt.value}
+                style={[styles.chipOption, active && styles.chipOptionActive]}
+                onPress={() => onSelect(opt.value)}
+              >
+                <Text style={[styles.chipOptionText, active && styles.chipOptionTextActive]}>
+                  {opt.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        {hasError && <Text style={styles.fieldErrorText}>Required</Text>}
       </View>
     );
   };
@@ -205,10 +209,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
   // ── Save ───────────────────────────────────────────────────────
   const saveInstrument = async () => {
     const missingFields = [];
-    if (!instrument.type) missingFields.push('Type');
-    if (!instrument.brand) missingFields.push('Make');
-    if (!instrument.model) missingFields.push('Model');
+    const errs = { type: false, brand: false, model: false };
+    if (!instrument.type) { missingFields.push('Type'); errs.type = true; }
+    if (!instrument.brand) { missingFields.push('Make'); errs.brand = true; }
+    if (!instrument.model) { missingFields.push('Model'); errs.model = true; }
     if (missingFields.length > 0) {
+      setFieldErrors(errs);
       setErrorMessage(`Please fill in: ${missingFields.join(', ')}`);
       if (!isWide) setStep(0);
       if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -287,7 +293,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
       <Text style={styles.fieldLabel}>Type <Text style={styles.required}>*</Text></Text>
       {renderPickerButton('Select type', instrument.type, 'Type', INSTRUMENT_TYPES,
-        (v) => setInstrument(prev => ({ ...prev, type: v, brand: '', model: '' }))
+        (v) => { setInstrument(prev => ({ ...prev, type: v, brand: '', model: '' })); setFieldErrors(prev => ({ ...prev, type: false })); },
+        fieldErrors.type
       )}
 
       <Text style={styles.fieldLabel}>Make / Brand <Text style={styles.required}>*</Text></Text>
@@ -295,7 +302,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
         <>
           {renderPickerButton('Select make', instrument.brand === 'Other' ? 'Other' : instrument.brand, 'Make',
             [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-            (v) => setInstrument(prev => ({ ...prev, brand: v }))
+            (v) => { setInstrument(prev => ({ ...prev, brand: v })); setFieldErrors(prev => ({ ...prev, brand: false })); },
+            fieldErrors.brand
           )}
           {instrument.brand === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customBrand || ''}
@@ -315,7 +323,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
         <>
           {renderPickerButton('Select model', instrument.model === 'Other' ? 'Other' : instrument.model, 'Model',
             [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-            (v) => setInstrument(prev => ({ ...prev, model: v }))
+            (v) => { setInstrument(prev => ({ ...prev, model: v })); setFieldErrors(prev => ({ ...prev, model: false })); },
+            fieldErrors.model
           )}
           {instrument.model === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customModel || ''}
@@ -464,10 +473,12 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 // Block navigation from Category step until required fields are filled
                 if (step === 0) {
                   const missing = [];
-                  if (!instrument.type) missing.push('Type');
-                  if (!instrument.brand) missing.push('Make');
-                  if (!instrument.model) missing.push('Model');
+                  const errs = { type: false, brand: false, model: false };
+                  if (!instrument.type) { missing.push('Type'); errs.type = true; }
+                  if (!instrument.brand) { missing.push('Make'); errs.brand = true; }
+                  if (!instrument.model) { missing.push('Model'); errs.model = true; }
                   if (missing.length > 0) {
+                    setFieldErrors(errs);
                     setErrorMessage(`Please fill in: ${missing.join(', ')}`);
                     if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
@@ -702,6 +713,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+  },
+  chipPickerRowError: {
+    borderWidth: 1,
+    borderColor: '#e53935',
+    borderRadius: 12,
+    padding: 8,
+    backgroundColor: '#fff5f5',
+  },
+  fieldErrorText: {
+    color: '#e53935',
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
   },
   chipOption: {
     paddingHorizontal: 12,
