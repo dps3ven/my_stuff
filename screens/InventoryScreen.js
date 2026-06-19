@@ -213,29 +213,30 @@ export default function InventoryScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         ) : (
-          <>
-            <SectionList
-              sections={inventory}
-              renderItem={renderItem}
-              renderSectionHeader={({ section: { title } }) => (
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionHeaderText}>{title}</Text>
-                </View>
-              )}
-              keyExtractor={(item) => item.id.toString()}
-              showsVerticalScrollIndicator={true}
-              contentContainerStyle={{ paddingBottom: 20 }}
-            />
-            <View style={styles.footer}>
-              <TouchableOpacity 
-                style={styles.footerButton}
-                onPress={() => navigation.navigate('Dashboard')}
-              >
-                <Text style={styles.footerText}>Back to Dashboard</Text>
-              </TouchableOpacity>
-            </View>
-          </>
+          <SectionList
+            style={{ flex: 1 }}
+            sections={inventory}
+            renderItem={renderItem}
+            renderSectionHeader={({ section: { title } }) => (
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>{title}</Text>
+              </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            showsVerticalScrollIndicator={true}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
         )}
+
+        {/* Persistent back navigation */}
+        <View style={styles.footer}>
+          <TouchableOpacity 
+            style={styles.footerButton}
+            onPress={() => navigation.navigate('Dashboard')}
+          >
+            <Text style={styles.footerText}>Back to Dashboard</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
