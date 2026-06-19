@@ -272,7 +272,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
         <>
           {renderPickerButton('Select make', instrument.brand === 'Other' ? 'Other' : instrument.brand, 'Make',
             [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-            (v) => setInstrument(prev => ({ ...prev, brand: v }))
+            (v) => {
+              const scrollY = Platform.OS === 'web' ? window.scrollY : 0;
+              setInstrument(prev => ({ ...prev, brand: v }));
+              if (Platform.OS === 'web') requestAnimationFrame(() => window.scrollTo(0, scrollY));
+            }
           )}
           {instrument.brand === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customBrand || ''}
@@ -292,7 +296,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
         <>
           {renderPickerButton('Select model', instrument.model === 'Other' ? 'Other' : instrument.model, 'Model',
             [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-            (v) => setInstrument(prev => ({ ...prev, model: v }))
+            (v) => {
+              const scrollY = Platform.OS === 'web' ? window.scrollY : 0;
+              setInstrument(prev => ({ ...prev, model: v }));
+              if (Platform.OS === 'web') requestAnimationFrame(() => window.scrollTo(0, scrollY));
+            }
           )}
           {instrument.model === 'Other' && (
             <TextInput style={styles.otherInput} value={instrument.customModel || ''}
