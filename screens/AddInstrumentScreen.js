@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   wizardBack: { color: '#fff', fontSize: 15, fontWeight: '600', minWidth: 70 },
-  wizardTitle: { color: '#fff', fontSize: 17, fontWeight: '700', flex: 1, textAlign: 'center' },
+  wizardTitle: { color: '#fff', fontSize: 20, fontWeight: '700', flex: 1, textAlign: 'center' },
   wizardHeaderSpacer: { minWidth: 70 },
   stepper: {
     flexDirection: 'row',
