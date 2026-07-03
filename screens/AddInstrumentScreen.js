@@ -342,7 +342,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     const model = watch('model');
     return (
       <View style={styles.stepContent}>
-        <Text style={styles.stepTitle}>🎸 What did you add?</Text>
+        <Text style={styles.stepTitle}>🎸Add some stuff here</Text>
         <Text style={styles.stepHint}>Pick the basics so we can file it in your collection.</Text>
 
         <Text style={styles.fieldLabel}>Type <Text style={styles.required}>*</Text></Text>
