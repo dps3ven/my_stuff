@@ -121,11 +121,27 @@ eas submit --platform android
 
 ---
 
+## Testing
+
+Unit and component tests run on [Jest](https://jestjs.io/) with the `jest-expo` preset and [React Native Testing Library](https://callstack.github.io/react-native-testing-library/).
+
+```bash
+npm test           # run once
+npm run test:watch # watch mode
+npm run test:ci    # CI mode (used by GitHub Actions)
+```
+
+- Tests live in `__tests__/` folders next to the code they cover (e.g. `utils/__tests__/`, `components/__tests__/`).
+- Native modules (AsyncStorage, image picker, biometrics, gesture handler, linear gradient, screen orientation) are mocked in `jest.setup.js`.
+- `react`, `react-dom`, and `react-test-renderer` are pinned to the exact version React Native 0.81.5 bundles (19.1.0); they must match or the renderer throws a version-mismatch error.
+
+---
+
 ## CI / GitHub Actions
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| **CI** | Push / PR to main, develop | Syntax check + web build |
+| **CI** | Push / PR to main, develop | Syntax check + Jest unit tests + web build |
 | **CodeQL** | Push / PR to main, develop | Static security analysis |
 | **Security** | PR to main, develop + weekly | `npm audit` — fails on high/critical |
 | **Checkov** | Push / PR to main, develop | IaC, workflow, and secret scanning |
