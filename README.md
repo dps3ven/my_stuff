@@ -148,6 +148,49 @@ Dependabot (`.github/dependabot.yml`) opens weekly PRs for security updates.
 
 ---
 
+## Beta & launch checklist
+
+Notes for moving from the Amplify web build toward native beta testing (TestFlight / Google Play) and, later, a public store launch.
+
+### Distributing the beta
+
+| Platform | Fastest beta path | Requires |
+|---|---|---|
+| iOS | **TestFlight** — testers install the TestFlight app and tap an invite link | Apple Developer Program ($99/yr). Internal testers (up to 100) are instant; external testers (up to 10,000, public link) need a one-time Beta App Review per version. Builds expire after 90 days |
+| Android | **EAS internal distribution** — share an APK via URL/QR, no store needed | Expo account (EAS free tier). No Play account required for direct-install APKs |
+| Android (store-like) | **Google Play internal testing** track | Play Console ($25 one-time). Near-instant for up to 100 testers |
+| Web | **Amplify URL** — zero install, instant | Already live; doesn't exercise native-only features (biometrics, camera, mobile image paths) |
+
+Build/submit with EAS (an `eas.json` with `preview` + `production` profiles is still needed — not yet in the repo):
+
+```bash
+eas build --platform ios --profile preview       # iOS ad-hoc / TestFlight
+eas build --platform android --profile preview   # direct-install APK
+```
+
+> **Tell testers up front:** the app currently has **no backup** and stores data locally with ephemeral image paths on mobile, so a reinstall or device change loses their catalog. See the data-loss note below.
+
+### Apple Developer account type
+
+- **Individual / Sole Proprietor** — enrolls under your **legal personal name**, which is shown publicly as the seller on the App Store. No D-U-N-S number, faster approval, cheapest. Best for getting the beta running.
+- **Organization** — shows a **company name** as the seller and supports team roles, but requires a registered legal entity **and** a D-U-N-S number (DBAs/trade names are rejected).
+- You **cannot cleanly convert** Individual → Organization later (separate enrollment + app transfer). If an LLC is the endgame, decide before public launch, not before the beta.
+
+### Keeping personal info private
+
+- Info collected by Apple at signup is **private to Apple**. Only the **App Store product page** is public — and that only exists at public launch, **not during TestFlight beta**.
+- **Seller name** (shown globally): pseudonyms aren't allowed for Individual accounts. Showing a company name instead of your legal name requires enrolling as an **Organization (LLC + D-U-N-S)**.
+- **EU DSA trader info** (address / phone / email, shown publicly on EU listings): for a sole proprietor this can default to your home address. Options: use a **business/registered-agent address** (not a PO box), a **VoIP number**, and a dedicated email; or **exclude the EU** from territory availability. Info must be truthful and verified — Apple removes listings with false trader data.
+
+### Data & storage caveats (pre-launch)
+
+- **No user-facing backup/restore yet.** Recommended path: local export/import to a shareable file (`expo-file-system` + `expo-sharing`, import via `expo-document-picker`).
+- **Mobile images are stored as ImagePicker cache URIs**, which the OS can purge and which don't survive reinstall. Fix before relying on native storage: copy picked/captured images into `FileSystem.documentDirectory` and store persistent relative paths.
+- **No at-rest encryption yet** (see Known limitations). The backup archive is the natural first place to apply the planned PBKDF2 + AES.
+- If going native-only long term, consider moving metadata to `expo-sqlite` and blobs to the filesystem so both the app and backups scale.
+
+---
+
 ## License
 
 MIT
