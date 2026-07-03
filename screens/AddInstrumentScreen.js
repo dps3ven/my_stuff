@@ -602,7 +602,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
               </TouchableOpacity>
             ) : (
               <TouchableOpacity style={[styles.navButton, styles.saveButton]} onPress={handleSubmit(onSubmit, onInvalid)}>
-                <Text style={styles.saveButtonText}>{isEditing ? '✅ Save' : '➕ Add'}</Text>
+                <Text style={styles.saveButtonText}>{isEditing ? '✅ Save' : '+ Add'}</Text>
               </TouchableOpacity>
             )}
           </View>
