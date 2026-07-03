@@ -3,7 +3,15 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert,
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import storage from '../utils/storage';
+import {
+  instrumentSchema,
+  instrumentBasicsSchema,
+  REQUIRED_FIELD_LABELS,
+  resolveInstrumentForStorage,
+} from '../utils/instrumentSchema';
 
 const INSTRUMENT_TYPES = [
   { label: 'Select Type', value: '' },
@@ -61,6 +69,36 @@ const STEPS = ['Category', 'Photos', 'Details'];
 
 const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', GBP: '£', JPY: '¥', CAD: '$', AUD: '$' };
 
+// Builds the form's initial values from an item being edited (or blanks for a
+// new one). When editing, a saved brand/model that isn't in the predefined
+// list is treated as "Other" with the custom value pre-filled.
+function buildDefaultValues(editItem) {
+  const type = editItem?.type || '';
+  const makes = MAKES_BY_TYPE[type] || [];
+  const models = MODELS_BY_TYPE[type] || [];
+
+  const brand = !editItem ? '' : (makes.includes(editItem.brand) ? editItem.brand : (editItem.brand ? 'Other' : ''));
+  const customBrand = (!editItem || brand !== 'Other') ? '' : editItem.brand;
+
+  const model = !editItem ? '' : (models.includes(editItem.model) ? editItem.model : (editItem.model ? 'Other' : ''));
+  const customModel = (!editItem || model !== 'Other') ? '' : editItem.model;
+
+  return {
+    type,
+    brand,
+    customBrand,
+    model,
+    customModel,
+    nickname: editItem?.nickname || '',
+    year: editItem?.year || '',
+    serialNumber: editItem?.serialNumber || '',
+    condition: editItem?.condition || '',
+    value: editItem?.value || '',
+    notes: editItem?.notes || '',
+    images: editItem?.images || [],
+  };
+}
+
 export default function AddInstrumentScreen({ navigation, route }) {
   const editItem = route?.params?.editItem;
   const isEditing = !!editItem;
@@ -70,42 +108,24 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
   const [step, setStep] = useState(0);
   const [userPrefs, setUserPrefs] = useState({ primaryInstrument: '', currency: 'USD' });
-
-  // When editing, if the saved brand/model isn't in the predefined list,
-  // treat it as "Other" with the custom value pre-filled.
-  const initBrand = (() => {
-    if (!editItem) return '';
-    const type = editItem.type || '';
-    const makes = MAKES_BY_TYPE[type] || [];
-    return makes.includes(editItem.brand) ? editItem.brand : (editItem.brand ? 'Other' : '');
-  })();
-  const initCustomBrand = (!editItem || initBrand !== 'Other') ? '' : editItem.brand;
-
-  const initModel = (() => {
-    if (!editItem) return '';
-    const type = editItem.type || '';
-    const models = MODELS_BY_TYPE[type] || [];
-    return models.includes(editItem.model) ? editItem.model : (editItem.model ? 'Other' : '');
-  })();
-  const initCustomModel = (!editItem || initModel !== 'Other') ? '' : editItem.model;
-
-  const [instrument, setInstrument] = useState({
-    type: editItem?.type || '',
-    brand: initBrand,
-    customBrand: initCustomBrand,
-    model: initModel,
-    customModel: initCustomModel,
-    nickname: editItem?.nickname || '',
-    year: editItem?.year || '',
-    serialNumber: editItem?.serialNumber || '',
-    condition: editItem?.condition || '',
-    value: editItem?.value || '',
-    notes: editItem?.notes || '',
-    images: editItem?.images || [],
-  });
   const [errorMessage, setErrorMessage] = useState('');
-  const [fieldErrors, setFieldErrors] = useState({ type: false, brand: false, model: false });
+  const [savedMessage, setSavedMessage] = useState('');
   const scrollViewRef = useRef(null);
+
+  // React Hook Form owns all field state; the Zod schema is the single source
+  // of truth for validation (no more per-field useState or duplicated checks).
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    getValues,
+    trigger,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(instrumentSchema),
+    defaultValues: buildDefaultValues(editItem),
+  });
 
   useEffect(() => {
     navigation.setOptions({ title: isEditing ? 'Edit Stuff' : 'Add Stuff' });
@@ -115,8 +135,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
         const currentUser = JSON.parse(await storage.getItem('currentUser'));
         if (currentUser?.preferences) {
           setUserPrefs(currentUser.preferences);
-          if (!isEditing && !instrument.type && currentUser.preferences.primaryInstrument) {
-            setInstrument(prev => ({ ...prev, type: currentUser.preferences.primaryInstrument }));
+          if (!isEditing && !getValues('type') && currentUser.preferences.primaryInstrument) {
+            setValue('type', currentUser.preferences.primaryInstrument);
           }
         }
       } catch (e) {
@@ -126,6 +146,11 @@ export default function AddInstrumentScreen({ navigation, route }) {
   }, [navigation, isEditing]);
 
   // ── Image helpers ──────────────────────────────────────────────
+  const addImages = (newImages) => {
+    const current = getValues('images') || [];
+    setValue('images', [...current, ...newImages], { shouldDirty: true });
+  };
+
   const compressImageForWeb = (blobUri, maxWidth = 800, quality = 0.7) => {
     return new Promise((resolve) => {
       if (typeof window === 'undefined' || typeof document === 'undefined') { resolve({ uri: blobUri, size: 0 }); return; }
@@ -154,10 +179,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
     const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.7 });
     if (!result.canceled) {
       const asset = result.assets[0];
-      setInstrument(prev => ({
-        ...prev,
-        images: [...prev.images, { uri: asset.uri, size: asset.fileSize || 0 }],
-      }));
+      addImages([{ uri: asset.uri, size: asset.fileSize || 0 }]);
     }
   };
 
@@ -182,12 +204,13 @@ export default function AddInstrumentScreen({ navigation, route }) {
       } else {
         newImages = result.assets.map(a => ({ uri: a.uri, size: a.fileSize || 0 }));
       }
-      setInstrument(prev => ({ ...prev, images: [...prev.images, ...newImages] }));
+      addImages(newImages);
     }
   };
 
   const removeImage = (index) => {
-    setInstrument(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+    const current = getValues('images') || [];
+    setValue('images', current.filter((_, i) => i !== index), { shouldDirty: true });
   };
 
   // ── Picker helpers ─────────────────────────────────────────────
@@ -218,31 +241,24 @@ export default function AddInstrumentScreen({ navigation, route }) {
     );
   };
 
+  // Derives the friendly "just need…" prompt from the schema so the message
+  // never drifts from the validation rules.
+  const buildBasicsMessage = () => {
+    const result = instrumentBasicsSchema.safeParse(getValues());
+    if (result.success) return '';
+    const missing = [...new Set(result.error.issues.map(i => REQUIRED_FIELD_LABELS[i.path[0]]).filter(Boolean))];
+    return `Just need a few basics first: ${missing.join(', ')}`;
+  };
+
   // ── Save ───────────────────────────────────────────────────────
-  const saveInstrument = async () => {
-    const missingFields = [];
-    const errs = { type: false, brand: false, model: false };
-    if (!instrument.type) { missingFields.push('Type'); errs.type = true; }
-    if (!instrument.brand) { missingFields.push('Make'); errs.brand = true; }
-    if (!instrument.model) { missingFields.push('Model'); errs.model = true; }
-    if (missingFields.length > 0) {
-      setFieldErrors(errs);
-      setErrorMessage(`Please fill in: ${missingFields.join(', ')}`);
-      if (!isWide) setStep(0);
-      if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
+  const onSubmit = async (data) => {
     setErrorMessage('');
     try {
       const currentUser = JSON.parse(await storage.getItem('currentUser'));
       const inventory = JSON.parse(await storage.getItem(`inventory_${currentUser.id}`) || '[]');
 
       // Resolve "Other" custom values before saving
-      const finalInstrument = {
-        ...instrument,
-        brand: instrument.brand === 'Other' && instrument.customBrand ? instrument.customBrand : instrument.brand,
-        model: instrument.model === 'Other' && instrument.customModel ? instrument.customModel : instrument.model,
-      };
+      const finalInstrument = resolveInstrumentForStorage(data);
 
       if (isEditing) {
         const updated = inventory.map(item => item.id === editItem.id ? { ...finalInstrument, id: editItem.id } : item);
@@ -251,146 +267,213 @@ export default function AddInstrumentScreen({ navigation, route }) {
         inventory.push({ ...finalInstrument, id: Date.now() });
         await storage.setItem(`inventory_${currentUser.id}`, JSON.stringify(inventory));
       }
-      navigation.navigate('Dashboard');
+
+      // Show a brief, friendly confirmation before heading back so the save
+      // feels like a small win rather than an abrupt jump.
+      const nickname = (data.nickname || '').trim();
+      setSavedMessage(
+        isEditing
+          ? 'Saved your changes!'
+          : nickname
+            ? `${nickname} joined your collection!`
+            : 'Added to your collection!'
+      );
+      setTimeout(() => navigation.navigate('Dashboard'), 1200);
     } catch (error) {
       setErrorMessage('Failed to save: ' + error.message);
     }
   };
 
+  // Called when a Save attempt fails schema validation — surfaces the friendly
+  // prompt and sends the user back to the Category step to fix the basics.
+  const onInvalid = () => {
+    setErrorMessage(buildBasicsMessage() || 'Please check the highlighted fields.');
+    if (!isWide) setStep(0);
+    if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // ── Step content ───────────────────────────────────────────────
-  const renderStep0 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>📸 Add Photos</Text>
-      <Text style={styles.stepHint}>First photo will be the cover image.</Text>
+  const renderStep0 = () => {
+    const images = watch('images') || [];
+    return (
+      <View style={styles.stepContent}>
+        <Text style={styles.stepTitle}>📸 Add a few photos</Text>
+        <Text style={styles.stepHint}>The first one becomes the cover — show it off!</Text>
 
-      {instrument.images.length > 0 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
-          {instrument.images.map((img, index) => (
-            <View key={index} style={styles.pinCard}>
-              <Image source={{ uri: img.uri }} style={styles.pinImage} resizeMode="cover" />
-              {index === 0 && <View style={styles.coverBadge}><Text style={styles.coverBadgeText}>Cover</Text></View>}
-              <TouchableOpacity style={styles.pinRemove} onPress={() => removeImage(index)}>
-                <Text style={styles.pinRemoveText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-          <TouchableOpacity style={styles.addMoreCard} onPress={pickImage}>
-            <Text style={styles.addMoreText}>+</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      ) : (
-        <TouchableOpacity style={styles.emptyImageCard} onPress={pickImage}>
-          <Text style={styles.emptyImageEmoji}>📷</Text>
-          <Text style={styles.emptyImageText}>Tap to add photos</Text>
-        </TouchableOpacity>
-      )}
-
-      <View style={styles.imageActions}>
-        {Platform.OS !== 'web' && (
-          <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
-            <Text style={styles.imageButtonText}>📷 Camera</Text>
+        {images.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
+            {images.map((img, index) => (
+              <View key={index} style={styles.pinCard}>
+                <Image source={{ uri: img.uri }} style={styles.pinImage} resizeMode="cover" />
+                {index === 0 && <View style={styles.coverBadge}><Text style={styles.coverBadgeText}>Cover</Text></View>}
+                <TouchableOpacity style={styles.pinRemove} onPress={() => removeImage(index)}>
+                  <Text style={styles.pinRemoveText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity style={styles.addMoreCard} onPress={pickImage}>
+              <Text style={styles.addMoreText}>+</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        ) : (
+          <TouchableOpacity style={styles.emptyImageCard} onPress={pickImage}>
+            <Text style={styles.emptyImageEmoji}>📷</Text>
+            <Text style={styles.emptyImageText}>Tap to add a photo or two</Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-          <Text style={styles.imageButtonText}>🖼️ Library</Text>
-        </TouchableOpacity>
+
+        <View style={styles.imageActions}>
+          {Platform.OS !== 'web' && (
+            <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
+              <Text style={styles.imageButtonText}>📷 Camera</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+            <Text style={styles.imageButtonText}>🖼️ Library</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
-  const renderStep1 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>🎸 Category</Text>
-      <Text style={styles.stepHint}>What kind of instrument is it?</Text>
+  const renderStep1 = () => {
+    const type = watch('type');
+    const brand = watch('brand');
+    const model = watch('model');
+    return (
+      <View style={styles.stepContent}>
+        <Text style={styles.stepTitle}>🎸 What did you add?</Text>
+        <Text style={styles.stepHint}>Pick the basics so we can file it in your collection.</Text>
 
-      <Text style={styles.fieldLabel}>Type <Text style={styles.required}>*</Text></Text>
-      {renderPickerButton('Select type', instrument.type, 'Type', INSTRUMENT_TYPES,
-        (v) => { setInstrument(prev => ({ ...prev, type: v, brand: '', model: '' })); setFieldErrors(prev => ({ ...prev, type: false })); },
-        fieldErrors.type
-      )}
+        <Text style={styles.fieldLabel}>Type <Text style={styles.required}>*</Text></Text>
+        {renderPickerButton('Select type', type, 'Type', INSTRUMENT_TYPES,
+          (v) => {
+            setValue('type', v, { shouldValidate: true });
+            setValue('brand', '');
+            setValue('model', '');
+          },
+          !!errors.type
+        )}
 
-      <Text style={styles.fieldLabel}>Make / Brand <Text style={styles.required}>*</Text></Text>
-      {instrument.type && MAKES_BY_TYPE[instrument.type] ? (
-        <>
-          {renderPickerButton('Select make', instrument.brand === 'Other' ? 'Other' : instrument.brand, 'Make',
-            [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-            (v) => { setInstrument(prev => ({ ...prev, brand: v })); setFieldErrors(prev => ({ ...prev, brand: false })); },
-            fieldErrors.brand
-          )}
-          {instrument.brand === 'Other' && (
-            <TextInput style={styles.otherInput} value={instrument.customBrand || ''}
-              onChangeText={(t) => setInstrument(prev => ({ ...prev, customBrand: t }))}
-              autoComplete="off" textContentType="none" autoCorrect={false}
-              placeholder="Enter brand name" />
-          )}
-        </>
-      ) : (
-        <View style={[styles.pickerButton, styles.disabledField]}>
-          <Text style={styles.disabledText}>Select a type first</Text>
-        </View>
-      )}
+        <Text style={styles.fieldLabel}>Make / Brand <Text style={styles.required}>*</Text></Text>
+        {type && MAKES_BY_TYPE[type] ? (
+          <>
+            {renderPickerButton('Select make', brand === 'Other' ? 'Other' : brand, 'Make',
+              [{ label: 'Select Make', value: '' }, ...MAKES_BY_TYPE[type].map(m => ({ label: m, value: m }))],
+              (v) => setValue('brand', v, { shouldValidate: true }),
+              !!errors.brand
+            )}
+            {brand === 'Other' && (
+              <Controller
+                control={control}
+                name="customBrand"
+                render={({ field: { value, onChange } }) => (
+                  <TextInput style={styles.otherInput} value={value || ''}
+                    onChangeText={onChange}
+                    autoComplete="off" textContentType="none" autoCorrect={false}
+                    placeholder="Enter brand name" />
+                )}
+              />
+            )}
+          </>
+        ) : (
+          <View style={[styles.pickerButton, styles.disabledField]}>
+            <Text style={styles.disabledText}>Select a type first</Text>
+          </View>
+        )}
 
-      <Text style={styles.fieldLabel}>Model <Text style={styles.required}>*</Text></Text>
-      {instrument.type && MODELS_BY_TYPE[instrument.type] ? (
-        <>
-          {renderPickerButton('Select model', instrument.model === 'Other' ? 'Other' : instrument.model, 'Model',
-            [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[instrument.type].map(m => ({ label: m, value: m }))],
-            (v) => { setInstrument(prev => ({ ...prev, model: v })); setFieldErrors(prev => ({ ...prev, model: false })); },
-            fieldErrors.model
-          )}
-          {instrument.model === 'Other' && (
-            <TextInput style={styles.otherInput} value={instrument.customModel || ''}
-              onChangeText={(t) => setInstrument(prev => ({ ...prev, customModel: t }))}
-              autoComplete="off" textContentType="none" autoCorrect={false}
-              placeholder="Enter model name" />
-          )}
-        </>
-      ) : (
-        <View style={[styles.pickerButton, styles.disabledField]}>
-          <Text style={styles.disabledText}>Select a type first</Text>
-        </View>
-      )}
-    </View>
-  );
+        <Text style={styles.fieldLabel}>Model <Text style={styles.required}>*</Text></Text>
+        {type && MODELS_BY_TYPE[type] ? (
+          <>
+            {renderPickerButton('Select model', model === 'Other' ? 'Other' : model, 'Model',
+              [{ label: 'Select Model', value: '' }, ...MODELS_BY_TYPE[type].map(m => ({ label: m, value: m }))],
+              (v) => setValue('model', v, { shouldValidate: true }),
+              !!errors.model
+            )}
+            {model === 'Other' && (
+              <Controller
+                control={control}
+                name="customModel"
+                render={({ field: { value, onChange } }) => (
+                  <TextInput style={styles.otherInput} value={value || ''}
+                    onChangeText={onChange}
+                    autoComplete="off" textContentType="none" autoCorrect={false}
+                    placeholder="Enter model name" />
+                )}
+              />
+            )}
+          </>
+        ) : (
+          <View style={[styles.pickerButton, styles.disabledField]}>
+            <Text style={styles.disabledText}>Select a type first</Text>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   const renderStep2 = () => (
     <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>📋 Details</Text>
-      <Text style={styles.stepHint}>Complete your listing</Text>
+      <Text style={styles.stepTitle}>📋 A few more details</Text>
+      <Text style={styles.stepHint}>All optional — add what you know, skip the rest.</Text>
 
       <Text style={styles.fieldLabel}>Nickname</Text>
-      <TextInput style={styles.input} value={instrument.nickname}
-        onChangeText={(t) => setInstrument(prev => ({ ...prev, nickname: t }))}
-        autoComplete="off" textContentType="none" autoCorrect={false}
-        placeholder="e.g. Old Faithful" />
+      <Controller
+        control={control}
+        name="nickname"
+        render={({ field: { value, onChange } }) => (
+          <TextInput style={styles.input} value={value}
+            onChangeText={onChange}
+            autoComplete="off" textContentType="none" autoCorrect={false}
+            placeholder="e.g. Old Faithful" />
+        )}
+      />
 
       <Text style={styles.fieldLabel}>Year</Text>
-      <TextInput
-        style={styles.input}
-        value={instrument.year}
-        onChangeText={(t) => setInstrument(prev => ({ ...prev, year: t }))}
-        autoComplete="off" textContentType="none" autoCorrect={false}
-        placeholder="e.g. 2015"
-        keyboardType="numeric"
-        maxLength={4}
+      <Controller
+        control={control}
+        name="year"
+        render={({ field: { value, onChange } }) => (
+          <TextInput
+            style={styles.input}
+            value={value}
+            onChangeText={onChange}
+            autoComplete="off" textContentType="none" autoCorrect={false}
+            placeholder="e.g. 2015"
+            keyboardType="numeric"
+            maxLength={4}
+          />
+        )}
       />
 
       <Text style={styles.fieldLabel}>Serial Number</Text>
-      <TextInput style={styles.input} value={instrument.serialNumber}
-        onChangeText={(t) => setInstrument(prev => ({ ...prev, serialNumber: t }))}
-        autoComplete="off" textContentType="none" autoCorrect={false}
-        placeholder="e.g. US12345678" />
+      <Controller
+        control={control}
+        name="serialNumber"
+        render={({ field: { value, onChange } }) => (
+          <TextInput style={styles.input} value={value}
+            onChangeText={onChange}
+            autoComplete="off" textContentType="none" autoCorrect={false}
+            placeholder="e.g. US12345678" />
+        )}
+      />
 
       <Text style={styles.fieldLabel}>Condition</Text>
-      {renderPickerButton('Select condition', instrument.condition, 'Condition', CONDITIONS,
-        (v) => setInstrument(prev => ({ ...prev, condition: v }))
+      {renderPickerButton('Select condition', watch('condition'), 'Condition', CONDITIONS,
+        (v) => setValue('condition', v)
       )}
 
       <Text style={styles.fieldLabel}>Value: ({CURRENCY_SYMBOLS[userPrefs.currency] || '$'})</Text>
-      <TextInput style={styles.input} value={instrument.value}
-        onChangeText={(t) => setInstrument(prev => ({ ...prev, value: t }))}
-        autoComplete="off" textContentType="none" autoCorrect={false}
-        placeholder="0.00" keyboardType="numeric" />
+      <Controller
+        control={control}
+        name="value"
+        render={({ field: { value, onChange } }) => (
+          <TextInput style={styles.input} value={value}
+            onChangeText={onChange}
+            autoComplete="off" textContentType="none" autoCorrect={false}
+            placeholder="0.00" keyboardType="numeric" />
+        )}
+      />
     </View>
   );
 
@@ -402,7 +485,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         <TouchableOpacity style={styles.backArrow} onPress={() => navigation.navigate('Dashboard')}>
           <Text style={styles.backArrowText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{isEditing ? 'Edit Stuff' : 'Add New Stuff'}</Text>
+        <Text style={styles.title}>{isEditing ? 'Edit Stuff' : 'Add to your collection'}</Text>
         <View style={{ width: 60 }} />
       </View>
       {renderStep0()}
@@ -427,7 +510,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       <View style={isWebPlatform ? styles.webWizardRoot : { flex: 1 }}>
         {/* Header — title only; navigation lives in the footer */}
         <View style={[styles.wizardHeader, { paddingTop: insets.top + 12 }, isWide && { maxWidth: 700 }]}>
-          <Text style={styles.wizardTitle}>{isEditing ? 'Edit Stuff' : 'Add New Stuff'}</Text>
+          <Text style={styles.wizardTitle}>{isEditing ? 'Edit Stuff' : 'Add to your collection'}</Text>
         </View>
 
         {/* Progress bar */}
@@ -481,17 +564,14 @@ export default function AddInstrumentScreen({ navigation, route }) {
 
             {/* Next step, or Save on the last step */}
             {step < STEPS.length - 1 ? (
-              <TouchableOpacity style={[styles.navButton, styles.nextButton]} onPress={() => {
-                // Block navigation from Category step until required fields are filled
+              <TouchableOpacity style={[styles.navButton, styles.nextButton]} onPress={async () => {
+                // Block navigation from the Category step until the required
+                // fields pass the schema. trigger() sets the red chip errors;
+                // buildBasicsMessage() derives the prompt from the same schema.
                 if (step === 0) {
-                  const missing = [];
-                  const errs = { type: false, brand: false, model: false };
-                  if (!instrument.type) { missing.push('Type'); errs.type = true; }
-                  if (!instrument.brand) { missing.push('Make'); errs.brand = true; }
-                  if (!instrument.model) { missing.push('Model'); errs.model = true; }
-                  if (missing.length > 0) {
-                    setFieldErrors(errs);
-                    setErrorMessage(`Please fill in: ${missing.join(', ')}`);
+                  const ok = await trigger(['type', 'brand', 'model']);
+                  if (!ok) {
+                    setErrorMessage(buildBasicsMessage());
                     if (Platform.OS === 'web') window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                   }
@@ -502,7 +582,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
                 <Text style={styles.nextButtonText}>{STEPS[step + 1]} →</Text>
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity style={[styles.navButton, styles.saveButton]} onPress={saveInstrument}>
+              <TouchableOpacity style={[styles.navButton, styles.saveButton]} onPress={handleSubmit(onSubmit, onInvalid)}>
                 <Text style={styles.saveButtonText}>{isEditing ? '✅ Save' : '➕ Add'}</Text>
               </TouchableOpacity>
             )}
@@ -525,6 +605,17 @@ export default function AddInstrumentScreen({ navigation, route }) {
         />
         {renderMobileWizard()}
       </KeyboardAvoidingView>
+
+      {/* Friendly save confirmation — briefly celebrates the add/edit before
+          navigating back to the dashboard. */}
+      {savedMessage ? (
+        <View style={styles.successOverlay} pointerEvents="none">
+          <View style={styles.successCard}>
+            <Text style={styles.successEmoji}>🎉</Text>
+            <Text style={styles.successText}>{savedMessage}</Text>
+          </View>
+        </View>
+      ) : null}
     </>
   );
 }
@@ -792,4 +883,35 @@ const styles = StyleSheet.create({
     marginBottom: 16, borderWidth: 1, borderColor: '#ffcdd2',
   },
   errorText: { color: '#c62828', textAlign: 'center', fontSize: 14, fontWeight: '600' },
+
+  // ── Save confirmation overlay ────────────────────────────────
+  successOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 31, 61, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 200,
+    ...(Platform.OS === 'web' ? { position: 'fixed' } : {}),
+  },
+  successCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingVertical: 28,
+    paddingHorizontal: 36,
+    marginHorizontal: 32,
+    alignItems: 'center',
+    maxWidth: 340,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  successEmoji: { fontSize: 44, marginBottom: 10 },
+  successText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0a1f3d',
+    textAlign: 'center',
+  },
 });
