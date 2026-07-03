@@ -630,7 +630,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
       {savedMessage ? (
         <View style={styles.successOverlay} pointerEvents="none">
           <View style={styles.successCard}>
-            <Text style={styles.successEmoji}>�</Text>
+            <Text style={styles.successEmoji}>🎵</Text>
             <Text style={styles.successText}>{savedMessage}</Text>
           </View>
         </View>
