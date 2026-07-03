@@ -24,8 +24,8 @@ Your data never leaves your device. Everything is stored locally using AsyncStor
 
 - **Biometric unlock** (Face ID / Touch ID / fingerprint) gates profile access on mobile
 - **Permission-gated media** — the app requests photo library / camera access before use and only reads photos you explicitly choose
-- **Securely delivered** — the web app loads over HTTPS with hardened headers (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy) via `customHttp.yml`, so the app code can't be tampered with in transit
-- **Dependency & code scanning** in CI (npm audit, CodeQL, Checkov)
+- **Served over HTTPS** — the web app is delivered over HTTPS by AWS Amplify. Hardened response headers (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy) via an Amplify `customHttp.yml` are planned but **not yet configured**
+- **Dependency & code scanning** in CI (npm audit, CodeQL)
 
 ### Known limitations (beta)
 
@@ -73,11 +73,15 @@ npx expo start --web
 │   ├── InstrumentDetailScreen.js # Detail view with image gallery
 │   └── PhotoGalleryScreen.js     # All photos across the collection
 ├── utils/
-│   └── storage.js                # localStorage on web, AsyncStorage on mobile
-├── scripts/
-│   └── sync-version.js           # Syncs app.json version with package.json
+│   ├── storage.js                # localStorage on web, AsyncStorage on mobile
+│   └── instrumentSchema.js       # Zod schema + helpers for the Add/Edit form
+├── components/
+│   └── Skeleton.js               # Loading placeholders
+├── docs/
+│   └── auto-versioning.md        # Proposed (not yet built) auto-version setup
+├── babel.config.js               # Babel preset (babel-preset-expo)
+├── jest.setup.js                 # Jest mocks for native modules
 ├── amplify.yml                   # AWS Amplify build config
-├── customHttp.yml                # Security response headers for Amplify Hosting
 └── app.json                      # Expo config (version shown on login screen)
 ```
 
@@ -85,21 +89,21 @@ npx expo start --web
 
 ## Versioning
 
-The app version (shown at the bottom of the login screen) is sourced from `app.json`. Bump it with a single command — `scripts/sync-version.js` keeps `app.json` in sync with `package.json` and bumps native build numbers:
+The app version (shown at the bottom of the login screen) lives in both `package.json` and `app.json` (`expo.version`). Bump `package.json` with:
 
 ```bash
-npm version patch   # bug fixes      (1.0.0 → 1.0.1)
-npm version minor   # new features   (1.0.0 → 1.1.0)
-npm version major   # breaking change (1.0.0 → 2.0.0)
+npm version patch   # bug fixes       (0.1.0 → 0.1.1)
+npm version minor   # new features    (0.1.0 → 0.2.0)
+npm version major   # breaking change (0.1.0 → 1.0.0)
 ```
 
-A GitHub Actions workflow (`Auto Version`) can also bump the version automatically on merges to `main`, based on [conventional commit](https://www.conventionalcommits.org/) prefixes (`feat:`, `fix:`, `BREAKING CHANGE`).
+`npm version` updates `package.json` only, so update `app.json` (and the native build numbers) to match by hand. An optional setup to automate this on merges to `main` — a `sync-version.js` helper plus an "Auto Version" workflow driven by [conventional commits](https://www.conventionalcommits.org/) — is documented in [`docs/auto-versioning.md`](docs/auto-versioning.md) but is **not yet implemented**.
 
 ---
 
 ## Deployment (AWS Amplify)
 
-The web app is built and hosted on AWS Amplify. The build runs `npx expo export --platform web` and serves the `dist/` output (see `amplify.yml`). Security headers are applied via `customHttp.yml`.
+The web app is built and hosted on AWS Amplify. The build runs `npx expo export --platform web` and serves the `dist/` output (see `amplify.yml`). Hardened security response headers (via an Amplify `customHttp.yml`) are planned but not yet added.
 
 ---
 
@@ -144,8 +148,6 @@ npm run test:ci    # CI mode (used by GitHub Actions)
 | **CI** | Push / PR to main, develop | Syntax check + Jest unit tests + web build |
 | **CodeQL** | Push / PR to main, develop | Static security analysis |
 | **Security** | PR to main, develop + weekly | `npm audit` — fails on high/critical |
-| **Checkov** | Push / PR to main, develop | IaC, workflow, and secret scanning |
-| **Auto Version** | Push to main | Bumps version from conventional commits |
 
 Dependabot (`.github/dependabot.yml`) opens weekly PRs for security updates.
 
@@ -159,7 +161,9 @@ Dependabot (`.github/dependabot.yml`) opens weekly PRs for security updates.
 | Navigation | React Navigation (Stack) |
 | Camera / Photos | expo-image-picker |
 | Biometrics | expo-local-authentication |
+| Forms & validation | React Hook Form + Zod |
 | Storage | AsyncStorage (mobile) / localStorage (web) |
+| Testing | Jest + jest-expo + React Native Testing Library |
 | Hosting | AWS Amplify (web) |
 
 ---
