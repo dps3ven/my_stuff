@@ -513,14 +513,33 @@ export default function AddInstrumentScreen({ navigation, route }) {
           <Text style={styles.wizardTitle}>{isEditing ? 'Edit Stuff' : 'Add to your collection'}</Text>
         </View>
 
-        {/* Progress bar */}
-        <View style={styles.progressBar}>
-          {STEPS.map((s, i) => (
-            <TouchableOpacity key={i} style={styles.progressStep} onPress={() => setStep(i)}>
-              <View style={[styles.progressDot, i <= step && styles.progressDotActive]} />
-              <Text style={[styles.progressLabel, i === step && styles.progressLabelActive]}>{s}</Text>
-            </TouchableOpacity>
-          ))}
+        {/* Step navigation — tappable pills with a number/check badge so it's
+            obvious you can jump between steps. */}
+        <View style={styles.stepper}>
+          {STEPS.map((s, i) => {
+            const isActive = i === step;
+            const isDone = i < step;
+            return (
+              <TouchableOpacity
+                key={i}
+                style={[styles.stepPill, isActive && styles.stepPillActive, isDone && styles.stepPillDone]}
+                onPress={() => setStep(i)}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isActive }}
+                accessibilityLabel={`Step ${i + 1}: ${s}`}
+              >
+                <View style={[styles.stepBadge, isActive && styles.stepBadgeActive, isDone && styles.stepBadgeDone]}>
+                  <Text style={[styles.stepBadgeText, (isActive || isDone) && styles.stepBadgeTextActive]}>
+                    {isDone ? '✓' : i + 1}
+                  </Text>
+                </View>
+                <Text style={[styles.stepPillLabel, isActive && styles.stepPillLabelActive]} numberOfLines={1}>
+                  {s}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Error message — pinned above scroll content so it's always visible */}
@@ -675,21 +694,52 @@ const styles = StyleSheet.create({
   wizardBack: { color: '#fff', fontSize: 15, fontWeight: '600', minWidth: 70 },
   wizardTitle: { color: '#fff', fontSize: 17, fontWeight: '700', flex: 1, textAlign: 'center' },
   wizardHeaderSpacer: { minWidth: 70 },
-  progressBar: {
+  stepper: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  stepPill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    justifyContent: 'space-around',
+    paddingHorizontal: 8,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
-  progressStep: { alignItems: 'center', gap: 4 },
-  progressDot: {
-    width: 10, height: 10, borderRadius: 5,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+  stepPillActive: {
+    backgroundColor: '#4ECDC4',
+    borderColor: '#4ECDC4',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  progressDotActive: { backgroundColor: '#28a745' },
-  progressLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 11 },
-  progressLabelActive: { color: '#fff', fontWeight: '700' },
+  stepPillDone: {
+    backgroundColor: 'rgba(78,205,196,0.18)',
+    borderColor: 'rgba(78,205,196,0.55)',
+  },
+  stepBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  stepBadgeActive: { backgroundColor: 'rgba(255,255,255,0.95)' },
+  stepBadgeDone: { backgroundColor: '#4ECDC4' },
+  stepBadgeText: { fontSize: 12, fontWeight: '700', color: 'rgba(255,255,255,0.85)' },
+  stepBadgeTextActive: { color: '#08343f' },
+  stepPillLabel: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.7)' },
+  stepPillLabelActive: { color: '#08343f', fontWeight: '700' },
   wizardContent: {
     padding: 16,
     paddingBottom: Platform.OS === 'web' ? 110 : 20,
