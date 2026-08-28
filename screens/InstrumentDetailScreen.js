@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { estimateValue } from '../utils/valuation';
 
 export default function InstrumentDetailScreen({ navigation, route }) {
   const { item } = route.params;
