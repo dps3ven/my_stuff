@@ -261,13 +261,6 @@ export default function LoginScreen({ navigation }) {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <TouchableOpacity
-              style={styles.setupBack}
-              onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
-            >
-              <Text style={styles.setupBackText}>← Back</Text>
-            </TouchableOpacity>
-
             <Text style={styles.setupEmoji}>🎸</Text>
             <Text style={styles.setupTitle}>Let's get you set up</Text>
             <Text style={styles.setupSubtitle}>Just a name to start — you can change it anytime.</Text>
@@ -303,6 +296,13 @@ export default function LoginScreen({ navigation }) {
 
             <TouchableOpacity style={styles.setupButton} onPress={createProfile}>
               <Text style={styles.setupButtonText}>Let's go</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.setupBack}
+              onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
+            >
+              <Text style={styles.setupBackText}>← Back</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -513,12 +513,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   setupBack: {
-    alignSelf: 'flex-start',
-    paddingVertical: 8,
-    paddingRight: 12,
-    marginBottom: 8,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginTop: 14,
   },
-  setupBackText: { color: 'rgba(255,255,255,0.85)', fontSize: 16, fontWeight: '600' },
+  setupBackText: { color: 'rgba(255,255,255,0.85)', fontSize: 16, fontWeight: '600', textAlign: 'center' },
   setupEmoji: { fontSize: 48, textAlign: 'center', marginBottom: 8 },
   setupTitle: { fontSize: 28, fontWeight: 'bold', color: '#fff', textAlign: 'center', marginBottom: 8 },
   setupSubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.8)', textAlign: 'center', marginBottom: 24, lineHeight: 20 },
