@@ -10,6 +10,37 @@ export default function InstrumentDetailScreen({ navigation, route }) {
   const { width: screenWidth } = useWindowDimensions();
   const imageWidth = Platform.OS === 'web' ? Math.min(700, screenWidth - 32) : screenWidth - 32;
 
+  // Reverb market estimate — fetched on view and kept separate from the
+  // owner's own entered value. Backed by utils/valuation (mock for now).
+  const [estimate, setEstimate] = useState(null);
+  const [estimateLoading, setEstimateLoading] = useState(false);
+  const [estimateError, setEstimateError] = useState('');
+  const hasEnoughInfo = !!(item.type && item.brand && item.model);
+
+  const fetchEstimate = useCallback(async () => {
+    // Not enough info to query Reverb — leave it as N/A rather than erroring.
+    if (!item.type || !item.brand || !item.model) {
+      setEstimate(null);
+      setEstimateError('');
+      return;
+    }
+    setEstimateLoading(true);
+    setEstimateError('');
+    try {
+      const r = await estimateValue({
+        type: item.type, brand: item.brand, model: item.model,
+        year: item.year, condition: item.condition,
+      });
+      setEstimate(r);
+    } catch (e) {
+      setEstimateError(e.message || 'Could not fetch a Reverb estimate.');
+    } finally {
+      setEstimateLoading(false);
+    }
+  }, [item]);
+
+  useEffect(() => { fetchEstimate(); }, [fetchEstimate]);
+
   const handleScroll = useCallback((event) => {
     const offset = event.nativeEvent.contentOffset.x;
     const index = Math.round(offset / imageWidth);
@@ -117,10 +148,40 @@ export default function InstrumentDetailScreen({ navigation, route }) {
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Value:</Text>
+            <Text style={styles.detailLabel}>Your Value:</Text>
             <Text style={styles.detailValue}>${item.value || 'N/A'}</Text>
           </View>
         </View>
+
+          {/* Reverb market estimate — separate from the owner's value above.
+              Shows N/A when there isn't enough info to run a lookup. */}
+          <View style={styles.estimateCard}>
+            <View style={styles.estimateHeader}>
+              <Text style={styles.estimateTitle}>Reverb Estimate</Text>
+              {hasEnoughInfo ? (
+                <TouchableOpacity onPress={fetchEstimate} disabled={estimateLoading} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Text style={styles.estimateRefresh}>{estimateLoading ? '…' : '↻'}</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+            {estimateLoading ? (
+              <Text style={styles.estimateHint}>Checking Reverb…</Text>
+            ) : estimate ? (
+              <>
+                <Text style={styles.estimateRange}>
+                  ${estimate.low.toLocaleString()} – ${estimate.high.toLocaleString()}
+                </Text>
+                <Text style={styles.estimateTypical}>Typical: ${estimate.median.toLocaleString()}</Text>
+                <Text style={styles.estimateMeta}>
+                  {estimate.source} · {estimate.count} listings · {new Date(estimate.asOf).toLocaleDateString()}
+                </Text>
+              </>
+            ) : estimateError ? (
+              <Text style={styles.estimateError}>{estimateError}</Text>
+            ) : (
+              <Text style={styles.estimateRange}>N/A</Text>
+            )}
+          </View>
         </View>{/* end contentLayout */}
 
         {/* Action Buttons - aligned with content */}
@@ -253,6 +314,34 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: '600',
   },
+  estimateCard: {
+    backgroundColor: '#0e2b4d',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 12,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: 'rgba(78,205,196,0.5)',
+  },
+  estimateHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  estimateTitle: {
+    color: '#4ECDC4',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  estimateRefresh: { color: '#4ECDC4', fontSize: 18, fontWeight: 'bold' },
+  estimateRange: { color: '#fff', fontSize: 22, fontWeight: '800' },
+  estimateTypical: { color: '#cfe9e6', fontSize: 14, fontWeight: '600', marginTop: 2 },
+  estimateMeta: { color: 'rgba(255,255,255,0.55)', fontSize: 11, marginTop: 6 },
+  estimateHint: { color: 'rgba(255,255,255,0.7)', fontSize: 14 },
+  estimateError: { color: '#ffb3b3', fontSize: 13 },
   notesSection: {
     paddingTop: 12,
   },
