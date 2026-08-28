@@ -171,7 +171,7 @@ export default function InstrumentDetailScreen({ navigation, route }) {
                 <Text style={styles.estimateRange}>
                   ${estimate.low.toLocaleString()} – ${estimate.high.toLocaleString()}
                 </Text>
-                <Text style={styles.estimateTypical}>Typical: ${estimate.median.toLocaleString()}</Text>
+                <Text style={styles.estimateTypical}>Average: ${(estimate.average ?? estimate.median).toLocaleString()}</Text>
                 <Text style={styles.estimateMeta}>
                   {estimate.source} · {estimate.count} listings · {new Date(estimate.asOf).toLocaleDateString()}
                 </Text>
