@@ -177,9 +177,9 @@ export default function InventoryScreen({ navigation }) {
       />
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>My Stuff</Text>
+          <Text style={[styles.title, !loading && inventory.length === 0 && styles.titleEmpty]}>My Stuff</Text>
         </View>
-        
+
         {loading ? (
           <View>
             {[1, 2, 3].map(i => (
@@ -258,6 +258,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
+    flex: 1,
+    textAlign: 'center',
+  },
+  titleEmpty: {
+    fontSize: 34,
   },
   itemContainer: {
     backgroundColor: 'white',
