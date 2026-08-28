@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from '
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 import { SkeletonLine } from '../components/Skeleton';
+import { PrimaryButton, GhostButton } from '../components/Button';
 
 const HAPPY_MESSAGES = [
   'A great collection deserves a record.',
@@ -187,26 +188,9 @@ export default function DashboardScreen({ navigation }) {
         </View>
 
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('AddInstrument')}
-          >
-            <Text style={styles.buttonText}>Add Stuff</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Inventory')}
-          >
-            <Text style={styles.buttonText}>View Stuff</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={logout}
-          >
-            <Text style={styles.buttonText}>Switch Profile</Text>
-          </TouchableOpacity>
+          <PrimaryButton title="Add Stuff" style={styles.actionBtn} onPress={() => navigation.navigate('AddInstrument')} />
+          <GhostButton title="View Stuff" style={styles.actionBtn} onPress={() => navigation.navigate('Inventory')} />
+          <GhostButton title="Switch Profile" style={styles.actionBtn} onPress={logout} />
         </View>
       </ScrollView>
     </Wrapper>
@@ -339,27 +323,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   actions: {
-    alignItems: 'center',
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 340,
     gap: 10,
   },
-  button: {
-    padding: 12,
-    borderRadius: 10,
-    minWidth: 260,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-    backgroundColor: '#7193c6ff',
-  },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
+  actionBtn: {
+    width: '100%',
   },
 });
