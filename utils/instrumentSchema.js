@@ -17,6 +17,8 @@ export const instrumentSchema = z.object({
   value: z.string().optional(),
   notes: z.string().optional(),
   images: z.array(z.any()).optional(),
+  // Cached market-value estimate (from the Reverb-backed valuation lookup).
+  valueEstimate: z.any().optional(),
 });
 
 // Just the fields required to file an item — used for the per-step gate.
