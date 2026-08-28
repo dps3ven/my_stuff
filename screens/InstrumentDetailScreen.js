@@ -217,13 +217,13 @@ const styles = StyleSheet.create({
     maxWidth: Platform.OS === 'web' ? 900 : '100%',
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 60,
+    padding: 12,
+    paddingBottom: 24,
     alignItems: 'center',
   },
   contentLayout: {
     flexDirection: 'column',
-    gap: 12,
+    gap: 8,
     width: '100%',
     maxWidth: 700,
     alignItems: 'stretch',
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   imageGallery: {
-    marginBottom: 12,
+    marginBottom: 8,
     alignItems: 'center',
     width: '100%',
     maxWidth: '100%',
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
   },
   largeImage: {
-    aspectRatio: 4 / 3,
+    aspectRatio: 16 / 9,
     borderRadius: 12,
     backgroundColor: '#1a3a5c',
   },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   dotContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 6,
     gap: 8,
   },
   dot: {
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   detailsCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 12,
+    padding: 10,
     marginBottom: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     flexDirection: 'row',
-    paddingVertical: 7,
+    paddingVertical: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     alignItems: 'baseline',
@@ -317,8 +317,8 @@ const styles = StyleSheet.create({
   estimateCard: {
     backgroundColor: '#0e2b4d',
     borderRadius: 12,
-    padding: 14,
-    marginTop: 12,
+    padding: 10,
+    marginTop: 4,
     width: '100%',
     borderWidth: 1,
     borderColor: 'rgba(78,205,196,0.5)',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   estimateRefresh: { color: '#4ECDC4', fontSize: 18, fontWeight: 'bold' },
-  estimateRange: { color: '#fff', fontSize: 22, fontWeight: '800' },
+  estimateRange: { color: '#fff', fontSize: 19, fontWeight: '800' },
   estimateTypical: { color: '#cfe9e6', fontSize: 14, fontWeight: '600', marginTop: 2 },
   estimateMeta: { color: 'rgba(255,255,255,0.55)', fontSize: 11, marginTop: 6 },
   estimateHint: { color: 'rgba(255,255,255,0.7)', fontSize: 14 },
@@ -373,12 +373,12 @@ const styles = StyleSheet.create({
     gap: 12,
     width: '100%',
     maxWidth: 700,
-    marginTop: 12,
+    marginTop: 8,
     alignSelf: 'center',
   },
   editButton: {
     backgroundColor: '#ffc107',
-    padding: 14,
+    padding: 11,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     backgroundColor: '#007bff',
-    padding: 14,
+    padding: 11,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
