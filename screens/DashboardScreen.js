@@ -220,11 +220,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 30,
+    paddingBottom: 20,
   },
   header: {
-    marginBottom: 15,
-    marginTop: 10,
+    marginBottom: 8,
+    marginTop: 4,
   },
   appTitle: {
     fontSize: 30,
@@ -235,9 +235,9 @@ const styles = StyleSheet.create({
   },
   welcomeCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 16,
+    padding: 12,
     borderRadius: 12,
-    marginBottom: 15,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
@@ -250,8 +250,8 @@ const styles = StyleSheet.create({
   whyCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
-    padding: 12,
-    marginBottom: 15,
+    padding: 10,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
@@ -264,8 +264,8 @@ const styles = StyleSheet.create({
   instructionsCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 10,
-    padding: 14,
-    marginBottom: 15,
+    padding: 12,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
@@ -306,12 +306,12 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
+    marginBottom: 12,
     gap: 10,
   },
   statCard: {
     backgroundColor: 'white',
-    padding: 12,
+    padding: 10,
     borderRadius: 10,
     alignItems: 'center',
     flex: 1,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   button: {
-    padding: 14,
+    padding: 12,
     borderRadius: 10,
     minWidth: 260,
     flexDirection: 'row',
