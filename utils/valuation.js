@@ -61,12 +61,15 @@ function mockEstimate({ type, brand, model, year, condition }) {
   const median = Math.round((base * condFactor * yearFactor) / 5) * 5;
   const low = Math.round((median * 0.78) / 5) * 5;
   const high = Math.round((median * 1.28) / 5) * 5;
+  // Mean of a right-skewed price spread sits a little above the median.
+  const average = Math.round(((low + median + median + high) / 4) / 5) * 5;
   const count = 6 + (h % 40); // pretend we sampled this many active listings
 
   return {
     currency: 'USD',
     low,
     median,
+    average,
     high,
     count,
     source: 'Reverb (active listings)',
@@ -76,15 +79,32 @@ function mockEstimate({ type, brand, model, year, condition }) {
   };
 }
 
+// When set, the app calls the real Reverb proxy (see functions/reverb-valuation).
+// Left blank until the proxy is deployed, in which case we fall back to the mock.
+const PROXY_URL = process.env.EXPO_PUBLIC_VALUATION_URL || '';
+
 /**
  * Estimate an instrument's market value.
+ * Uses the deployed Reverb proxy when EXPO_PUBLIC_VALUATION_URL is set;
+ * otherwise returns the deterministic local mock.
  * @returns {Promise<{currency,low,median,high,count,source,asOf,query,estimated}>}
  */
 export function estimateValue({ type, brand, model, year, condition } = {}) {
   if (!type || !brand || !model) {
     return Promise.reject(new Error('Add a type, make, and model first.'));
   }
-  // Simulate network latency so the loading state is exercised.
+
+  if (PROXY_URL) {
+    const qs = new URLSearchParams({
+      type, brand, model, year: year || '', condition: condition || '',
+    }).toString();
+    return fetch(`${PROXY_URL}?${qs}`).then((r) => {
+      if (!r.ok) throw new Error('Valuation service is unavailable right now.');
+      return r.json();
+    });
+  }
+
+  // No proxy configured yet — deterministic local mock (simulated latency).
   return new Promise((resolve) => {
     setTimeout(() => resolve(mockEstimate({ type, brand, model, year, condition })), 650);
   });
