@@ -245,38 +245,19 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.versionText}>v{APP_VERSION}</Text>
       </ScrollView>
 
-      {/* Full-screen "set up your profile" flow (slides in like its own screen) */}
       <Modal
         visible={showCreateModal}
-        animationType="slide"
+        transparent={true}
+        animationType="fade"
         onRequestClose={() => setShowCreateModal(false)}
       >
-        <View style={styles.setupContainer}>
-          <LinearGradient
-            colors={['#0a1f3d', '#1e4d8c', '#4ECDC4']}
-            style={Platform.OS === 'web' ? { display: 'none' } : StyleSheet.absoluteFillObject}
-          />
-          <ScrollView
-            contentContainerStyle={styles.setupScroll}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <TouchableOpacity
-              style={styles.setupBack}
-              onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
-            >
-              <Text style={styles.setupBackText}>← Back</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.setupEmoji}>🎸</Text>
-            <Text style={styles.setupTitle}>Let's get you set up</Text>
-            <Text style={styles.setupSubtitle}>Just a name to start — you can change it anytime.</Text>
-
-            <View style={styles.setupCard}>
-              <Text style={styles.prefLabel}>Profile name</Text>
+        <View style={styles.modalOverlay}>
+          <ScrollView contentContainerStyle={styles.modalScrollContent} keyboardShouldPersistTaps="handled">
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>New Profile</Text>
               <TextInput
                 style={styles.modalInput}
-                placeholder="What should we call you?"
+                placeholder="Your profile name"
                 value={newProfileName}
                 onChangeText={setNewProfileName}
                 autoComplete="off"
@@ -285,7 +266,7 @@ export default function LoginScreen({ navigation }) {
                 autoFocus
               />
 
-              <Text style={styles.prefLabel}>What do you mostly collect? (optional)</Text>
+              <Text style={styles.prefLabel}>What do you mostly collect?</Text>
               <View style={styles.chipRow}>
                 {INSTRUMENT_OPTIONS.map(opt => (
                   <TouchableOpacity
@@ -299,11 +280,21 @@ export default function LoginScreen({ navigation }) {
               </View>
 
               {errorMessage ? <Text style={styles.modalError}>{errorMessage}</Text> : null}
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalCancelButton]}
+                  onPress={() => { setShowCreateModal(false); setNewProfileName(''); setNewPrimaryInstrument(''); setErrorMessage(''); }}
+                >
+                  <Text style={styles.modalCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalCreateButton]}
+                  onPress={createProfile}
+                >
+                  <Text style={styles.modalCreateText}>Create</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-
-            <TouchableOpacity style={styles.setupButton} onPress={createProfile}>
-              <Text style={styles.setupButtonText}>Let's go</Text>
-            </TouchableOpacity>
           </ScrollView>
         </View>
       </Modal>
@@ -499,52 +490,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
   },
-  setupContainer: {
-    flex: 1,
-    backgroundColor: '#0e2b4d',
-  },
-  setupScroll: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-    paddingTop: 56,
-    width: '100%',
-    maxWidth: 600,
-    alignSelf: 'center',
-  },
-  setupBack: {
-    alignSelf: 'flex-start',
-    paddingVertical: 8,
-    paddingRight: 12,
-    marginBottom: 8,
-  },
-  setupBackText: { color: 'rgba(255,255,255,0.85)', fontSize: 16, fontWeight: '600' },
-  setupEmoji: { fontSize: 48, textAlign: 'center', marginBottom: 8 },
-  setupTitle: { fontSize: 28, fontWeight: 'bold', color: '#fff', textAlign: 'center', marginBottom: 8 },
-  setupSubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.8)', textAlign: 'center', marginBottom: 24, lineHeight: 20 },
-  setupCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 5,
-  },
-  setupButton: {
-    backgroundColor: '#4ECDC4',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  setupButtonText: { color: '#08343f', fontSize: 17, fontWeight: '800' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
