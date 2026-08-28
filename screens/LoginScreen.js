@@ -263,7 +263,7 @@ export default function LoginScreen({ navigation }) {
           >
             <Text style={styles.setupEmoji}>🎸</Text>
             <Text style={styles.setupTitle}>Let's get you set up</Text>
-            <Text style={styles.setupSubtitle}>Just a name to start — you can change it anytime.</Text>
+            <Text style={styles.setupSubtitle}>Name your collection. You can keep a separate profile for each — say, one for guitars and one for mics.</Text>
 
             <View style={styles.setupCard}>
               <Text style={styles.prefLabel}>Profile name</Text>
