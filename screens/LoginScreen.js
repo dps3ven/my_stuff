@@ -196,7 +196,7 @@ export default function LoginScreen({ navigation }) {
         showsVerticalScrollIndicator={true}
       >
         <Text style={[styles.title, isWide && { fontSize: 48 }]}>My Stuff</Text>
-        <Text style={styles.subtitle}>Who's here?</Text>
+        <Text style={styles.subtitle}>Keep a record of what you own — for insurance, peace of mind, or the pride of the collection.</Text>
 
         <View style={styles.profileGrid}>
           {profiles.map(profile => (
