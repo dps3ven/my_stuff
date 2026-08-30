@@ -269,7 +269,7 @@ export default function LoginScreen({ navigation }) {
               <Text style={styles.prefLabel}>Profile name</Text>
               <TextInput
                 style={styles.modalInput}
-                placeholder="Please enter a profile name for this collection"
+                placeholder="e.g. My Guitars"
                 value={newProfileName}
                 onChangeText={setNewProfileName}
                 autoComplete="off"
