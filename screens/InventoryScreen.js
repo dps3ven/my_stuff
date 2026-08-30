@@ -40,11 +40,13 @@ export default function InventoryScreen({ navigation }) {
         return type + 's';
       };
       
-      // Convert to array format for SectionList
-      const sections = Object.keys(grouped).sort().map(type => ({
-        title: pluralize(type),
-        data: grouped[type]
-      }));
+      // Convert to array format for SectionList — each type is a sub-collection
+      // with its own item count and total value.
+      const sections = Object.keys(grouped).sort().map(type => {
+        const data = grouped[type];
+        const totalValue = data.reduce((s, it) => s + (parseFloat(it.value) || 0), 0);
+        return { title: pluralize(type), data, count: data.length, totalValue };
+      });
       
       setInventory(sections);
     } catch (error) {
@@ -217,9 +219,12 @@ export default function InventoryScreen({ navigation }) {
             style={{ flex: 1 }}
             sections={inventory}
             renderItem={renderItem}
-            renderSectionHeader={({ section: { title } }) => (
+            renderSectionHeader={({ section: { title, count, totalValue } }) => (
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionHeaderText}>{title}</Text>
+                <Text style={styles.sectionHeaderMeta}>
+                  {count} {count === 1 ? 'item' : 'items'}{totalValue > 0 ? ` · $${Math.round(totalValue).toLocaleString()}` : ''}
+                </Text>
               </View>
             )}
             keyExtractor={(item) => item.id.toString()}
@@ -426,6 +431,9 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
     borderRadius: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   sectionHeaderText: {
     color: '#fff',
@@ -433,6 +441,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  sectionHeaderMeta: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    fontWeight: '600',
   },
   footer: {
     backgroundColor: '#1e4976',
