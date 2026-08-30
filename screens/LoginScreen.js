@@ -9,19 +9,6 @@ const APP_VERSION = appConfig.expo.version;
 
 const INSTRUMENT_OPTIONS = ['Guitar', 'Bass', 'Drums', 'Piano', 'Violin', 'Microphone', 'Amplifier', 'Other'];
 
-// Example profile names suggested when a collection type is picked, so the user
-// sees a concrete name before committing (they can still edit it).
-const NAME_SUGGESTIONS = {
-  Guitar: 'My Guitars',
-  Bass: 'My Basses',
-  Drums: 'My Drums',
-  Piano: 'My Pianos',
-  Violin: 'My Violins',
-  Microphone: 'My Mics',
-  Amplifier: 'My Amps',
-  Other: 'My Gear',
-};
-
 export default function LoginScreen({ navigation }) {
   const { width } = useWindowDimensions();
   const isWide = Platform.OS === 'web' && width > 768;
@@ -282,7 +269,7 @@ export default function LoginScreen({ navigation }) {
               <Text style={styles.prefLabel}>Profile name</Text>
               <TextInput
                 style={styles.modalInput}
-s                placeholder="e.g. My Guitars"
+                placeholder="e.g. My Guitars"
                 value={newProfileName}
                 onChangeText={setNewProfileName}
                 autoComplete="off"
@@ -297,16 +284,7 @@ s                placeholder="e.g. My Guitars"
                   <TouchableOpacity
                     key={opt}
                     style={[styles.chip, newPrimaryInstrument === opt && styles.chipActive]}
-                    onPress={() => {
-                      const next = newPrimaryInstrument === opt ? '' : opt;
-                      setNewPrimaryInstrument(next);
-                      // Suggest an example name when picking a type — but never
-                      // clobber a name the user has typed themselves.
-                      const isSuggested = Object.values(NAME_SUGGESTIONS).includes(newProfileName.trim());
-                      if (next && (!newProfileName.trim() || isSuggested)) {
-                        setNewProfileName(NAME_SUGGESTIONS[next] || `My ${next}`);
-                      }
-                    }}
+                    onPress={() => setNewPrimaryInstrument(newPrimaryInstrument === opt ? '' : opt)}
                   >
                     <Text style={[styles.chipText, newPrimaryInstrument === opt && styles.chipTextActive]}>{opt}</Text>
                   </TouchableOpacity>

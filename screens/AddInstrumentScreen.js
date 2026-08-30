@@ -412,33 +412,10 @@ export default function AddInstrumentScreen({ navigation, route }) {
     );
   };
 
-  const renderStep2 = () => {
-    // Summary of the earlier steps so the user can review before saving.
-    const sType = watch('type');
-    const sBrandRaw = watch('brand');
-    const sModelRaw = watch('model');
-    const sBrand = sBrandRaw === 'Other' ? (watch('customBrand') || 'Other') : sBrandRaw;
-    const sModel = sModelRaw === 'Other' ? (watch('customModel') || 'Other') : sModelRaw;
-    const sPhotos = (watch('images') || []).length;
-    const itemSummary = [sType, sBrand, sModel].filter(Boolean).join(' · ') || 'Not set yet';
-    return (
+  const renderStep2 = () => (
     <View style={styles.stepContent}>
       <Text style={styles.stepTitle}>📋 A few more details</Text>
       <Text style={styles.stepHint}>All optional — add what you know, skip the rest.</Text>
-
-      {/* Review of the earlier steps — tap a row to jump back and edit */}
-      <View style={styles.reviewBox}>
-        <TouchableOpacity style={styles.reviewRow} onPress={() => setStep(0)} activeOpacity={0.7}>
-          <Text style={styles.reviewLabel}>Item</Text>
-          <Text style={styles.reviewValue} numberOfLines={1}>{itemSummary}</Text>
-          <Text style={styles.reviewEdit}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.reviewRow, styles.reviewRowLast]} onPress={() => setStep(1)} activeOpacity={0.7}>
-          <Text style={styles.reviewLabel}>Photos</Text>
-          <Text style={styles.reviewValue}>{sPhotos > 0 ? `${sPhotos} added` : 'None yet'}</Text>
-          <Text style={styles.reviewEdit}>Edit</Text>
-        </TouchableOpacity>
-      </View>
 
       <Text style={styles.fieldLabel}>Nickname</Text>
       <Controller
@@ -498,8 +475,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         )}
       />
     </View>
-    );
-  };
+  );
 
   // ── Web desktop: single page ───────────────────────────────────
   const renderWebDesktop = () => (
@@ -825,25 +801,6 @@ const styles = StyleSheet.create({
   stepHint: { fontSize: 13, color: '#888', marginBottom: 14 },
   fieldLabel: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 6, marginTop: 12 },
   required: { color: '#e53935' },
-  reviewBox: {
-    backgroundColor: '#f2f6fa',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#e3e9f0',
-    marginBottom: 6,
-  },
-  reviewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e3e9f0',
-  },
-  reviewRowLast: { borderBottomWidth: 0 },
-  reviewLabel: { fontSize: 11, fontWeight: '700', color: '#8a97a8', textTransform: 'uppercase', letterSpacing: 0.5, width: 56 },
-  reviewValue: { flex: 1, fontSize: 14, color: '#333', fontWeight: '600' },
-  reviewEdit: { fontSize: 13, color: '#0064d2', fontWeight: '700', marginLeft: 8 },
 
   // ── Images ───────────────────────────────────────────────────
   imageRow: { marginBottom: 12 },
