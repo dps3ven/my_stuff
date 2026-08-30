@@ -4,10 +4,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../utils/storage';
 import Skeleton, { SkeletonLine } from '../components/Skeleton';
 
-export default function InventoryScreen({ navigation }) {
+// Turn an instrument type into its collection label (e.g. Guitar -> Guitars).
+const pluralize = (type) => {
+  if (type === 'Other') return 'Other';
+  if (type.endsWith('s')) return type;
+  return type + 's';
+};
+
+export default function InventoryScreen({ navigation, route }) {
   const [inventory, setInventory] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // When arriving from a dashboard collection card, show just that type.
+  const [activeType, setActiveType] = useState(route?.params?.filterType ?? null);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -15,6 +24,16 @@ export default function InventoryScreen({ navigation }) {
     });
     return unsubscribe;
   }, [navigation]);
+
+  // Keep the filter in sync with navigation params (a card tap or "Show all").
+  useEffect(() => {
+    setActiveType(route?.params?.filterType ?? null);
+  }, [route?.params?.filterType]);
+
+  const clearFilter = () => {
+    setActiveType(null);
+    navigation.setParams({ filterType: null });
+  };
 
   const loadInventory = async () => {
     setLoading(true);
@@ -33,19 +52,12 @@ export default function InventoryScreen({ navigation }) {
         return acc;
       }, {});
       
-      // Pluralize instrument types
-      const pluralize = (type) => {
-        if (type === 'Other') return 'Other';
-        if (type.endsWith('s')) return type;
-        return type + 's';
-      };
-      
       // Convert to array format for SectionList — each type is a sub-collection
       // under this profile, with its own item count and total value.
       const sections = Object.keys(grouped).sort().map(type => {
         const data = grouped[type];
         const totalValue = data.reduce((s, it) => s + (parseFloat(it.value) || 0), 0);
-        return { title: pluralize(type), data, count: data.length, totalValue };
+        return { title: pluralize(type), type, data, count: data.length, totalValue };
       });
       
       setInventory(sections);
@@ -168,6 +180,10 @@ export default function InventoryScreen({ navigation }) {
     </TouchableOpacity>
   );
 
+  const visibleSections = activeType
+    ? inventory.filter((s) => s.type === activeType)
+    : inventory;
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -215,22 +231,38 @@ export default function InventoryScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         ) : (
-          <SectionList
-            style={{ flex: 1 }}
-            sections={inventory}
-            renderItem={renderItem}
-            renderSectionHeader={({ section: { title, count, totalValue } }) => (
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionHeaderText}>{title}</Text>
-                <Text style={styles.sectionHeaderMeta}>
-                  {count} {count === 1 ? 'item' : 'items'}{totalValue > 0 ? ` · $${Math.round(totalValue).toLocaleString()}` : ''}
-                </Text>
+          <>
+            {activeType && (
+              <View style={styles.filterBanner}>
+                <Text style={styles.filterBannerText}>Showing {pluralize(activeType)}</Text>
+                <TouchableOpacity onPress={clearFilter} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Text style={styles.filterClear}>Show all</Text>
+                </TouchableOpacity>
               </View>
             )}
-            keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={true}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
+            {visibleSections.length === 0 ? (
+              <View style={styles.filterEmpty}>
+                <Text style={styles.filterEmptyText}>No items in this collection.</Text>
+              </View>
+            ) : (
+              <SectionList
+                style={{ flex: 1 }}
+                sections={visibleSections}
+                renderItem={renderItem}
+                renderSectionHeader={({ section: { title, count, totalValue } }) => (
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionHeaderText}>{title}</Text>
+                    <Text style={styles.sectionHeaderMeta}>
+                      {count} {count === 1 ? 'item' : 'items'}{totalValue > 0 ? ` · $${Math.round(totalValue).toLocaleString()}` : ''}
+                    </Text>
+                  </View>
+                )}
+                keyExtractor={(item) => item.id.toString()}
+                showsVerticalScrollIndicator={true}
+                contentContainerStyle={{ paddingBottom: 20 }}
+              />
+            )}
+          </>
         )}
 
         {/* Persistent back navigation */}
@@ -447,6 +479,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
+  filterBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  filterBannerText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  filterClear: { color: '#4ECDC4', fontSize: 14, fontWeight: '700' },
+  filterEmpty: { flex: 1, alignItems: 'center', paddingTop: 40 },
+  filterEmptyText: { color: 'rgba(255,255,255,0.7)', fontSize: 15 },
   footer: {
     backgroundColor: '#1e4976',
     padding: 20,

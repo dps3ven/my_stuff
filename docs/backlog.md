@@ -23,6 +23,22 @@ The value estimate currently uses a **mock** (`utils/valuation.js`). To go live:
 - `estimateValue()` already falls back to the mock when the URL is unset.
 - Caution: don't present mock numbers as real Reverb data in production.
 
+### Getting a Reverb personal access token
+Source: https://www.reverb-api.com/docs/authentication
+1. Sign in at reverb.com (create an account if needed).
+2. User menu -> **My Profile**.
+3. **API & Integrations** tab -> **Generate New Token**.
+4. Name it and select scopes. For this proxy, **`public`** is all we need
+   (read publicly available data, i.e. active listings). No listings/orders
+   scopes required.
+5. Token is created. Reverb personal tokens **do not expire**.
+
+Then: put the token in the function's `REVERB_TOKEN` env var (server-side only,
+never in the app bundle). Requests use `Authorization: Bearer <token>` and
+`Accept-Version: 3.0` (already handled in `functions/reverb-valuation/index.js`).
+Before relying on it, confirm the intended use fits Reverb's API Terms of
+Service (rate limits / usage).
+
 ## 4. Dependency vulnerabilities (Dependabot)
 `npm audit` reports ~19 findings (16 high / 3 moderate), all **transitive
 dev/build tooling** (metro, postcss, nanoid, js-yaml, etc.), not shipped app

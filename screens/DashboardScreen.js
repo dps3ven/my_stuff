@@ -168,7 +168,7 @@ export default function DashboardScreen({ navigation }) {
         <View style={styles.statsContainer}>
           <TouchableOpacity 
             style={styles.statCard}
-            onPress={() => navigation.navigate('Inventory')}
+            onPress={() => navigation.navigate('Inventory', { filterType: null })}
           >
             <View style={styles.statIcon}>
               <Text style={styles.iconText}>🎸</Text>
@@ -210,7 +210,7 @@ export default function DashboardScreen({ navigation }) {
               <TouchableOpacity
                 key={c.type}
                 style={styles.collectionCard}
-                onPress={() => navigation.navigate('Inventory')}
+                onPress={() => navigation.navigate('Inventory', { filterType: c.type })}
                 activeOpacity={0.7}
               >
                 <Text style={styles.collectionEmoji}>{TYPE_EMOJI[c.type] || '🎵'}</Text>
@@ -236,7 +236,7 @@ export default function DashboardScreen({ navigation }) {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('Inventory')}
+            onPress={() => navigation.navigate('Inventory', { filterType: null })}
           >
             <Text style={styles.buttonText}>View Stuff</Text>
           </TouchableOpacity>
