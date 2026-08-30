@@ -297,8 +297,8 @@ export default function AddInstrumentScreen({ navigation, route }) {
     const images = watch('images') || [];
     return (
       <View style={styles.stepContent}>
-        <Text style={styles.stepTitle}>📸 Add a few photos</Text>
-        <Text style={styles.stepHint}>The first one becomes the cover — show it off!</Text>
+        <Text style={styles.stepTitle}>📸 Add photos (optional)</Text>
+        <Text style={styles.stepHint}>Skip for now or add a few — you can always add them later. The first one becomes the cover.</Text>
 
         {images.length > 0 ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
@@ -318,7 +318,7 @@ export default function AddInstrumentScreen({ navigation, route }) {
         ) : (
           <TouchableOpacity style={styles.emptyImageCard} onPress={pickImage}>
             <Text style={styles.emptyImageEmoji}>📷</Text>
-            <Text style={styles.emptyImageText}>Tap to add a photo or two</Text>
+            <Text style={styles.emptyImageText}>Tap to add a photo — or skip for now</Text>
           </TouchableOpacity>
         )}
 
