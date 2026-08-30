@@ -263,7 +263,7 @@ export default function LoginScreen({ navigation }) {
           >
             <Text style={styles.setupEmoji}>🎸</Text>
             <Text style={styles.setupTitle}>Let's get you set up</Text>
-            <Text style={styles.setupSubtitle}>Tip: make a separate profile for each instrument type, like guitars or mics.</Text>
+            <Text style={styles.setupSubtitle}>This is your profile. We'll sort your gear into collections automatically.</Text>
 
             <View style={styles.setupCard}>
               <Text style={styles.prefLabel}>Profile name</Text>
@@ -278,7 +278,7 @@ export default function LoginScreen({ navigation }) {
                 autoFocus
               />
 
-              <Text style={styles.prefLabel}>What do you mostly collect? (optional)</Text>
+              <Text style={styles.prefLabel}>What do you mostly collect? We'll use it as the default when you add gear. (optional)</Text>
               <View style={styles.chipRow}>
                 {INSTRUMENT_OPTIONS.map(opt => (
                   <TouchableOpacity
