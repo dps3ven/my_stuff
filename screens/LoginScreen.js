@@ -9,6 +9,18 @@ const APP_VERSION = appConfig.expo.version;
 
 const INSTRUMENT_OPTIONS = ['Guitar', 'Bass', 'Drums', 'Piano', 'Violin', 'Microphone', 'Amplifier', 'Other'];
 
+// Pick a collection type and the profile name defaults to it (editable).
+const NAME_SUGGESTIONS = {
+  Guitar: 'My Guitars',
+  Bass: 'My Basses',
+  Drums: 'My Drums',
+  Piano: 'My Pianos',
+  Violin: 'My Violins',
+  Microphone: 'My Mics',
+  Amplifier: 'My Amps',
+  Other: 'My Gear',
+};
+
 export default function LoginScreen({ navigation }) {
   const { width } = useWindowDimensions();
   const isWide = Platform.OS === 'web' && width > 768;
