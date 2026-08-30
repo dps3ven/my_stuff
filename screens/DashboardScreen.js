@@ -17,6 +17,13 @@ const HAPPY_MESSAGES = [
   'Every piece counts.',
 ];
 
+// A profile is the parent; instrument types are its sub-collections.
+const TYPE_EMOJI = {
+  Guitar: '🎸', Bass: '🎸', Drums: '🥁', Piano: '🎹',
+  Violin: '🎻', Microphone: '🎤', Amplifier: '🔊', Other: '🎵',
+};
+const pluralizeType = (t) => (t === 'Other' ? 'Other' : t.endsWith('s') ? t : t + 's');
+
 export default function DashboardScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({ totalItems: 0, totalValue: 0, storageUsed: 0 });
@@ -24,6 +31,7 @@ export default function DashboardScreen({ navigation }) {
   const [happyMessage] = useState(() => HAPPY_MESSAGES[Math.floor(Math.random() * HAPPY_MESSAGES.length)]);
   const [allPhotos, setAllPhotos] = useState([]);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [collections, setCollections] = useState([]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -51,6 +59,16 @@ export default function DashboardScreen({ navigation }) {
       }, 0);
 
       setStats({ totalItems, totalValue, storageUsed: totalBytes });
+
+      // Sub-collections under this profile: count + value grouped by type.
+      const byType = inventory.reduce((acc, item) => {
+        const t = item.type || 'Other';
+        if (!acc[t]) acc[t] = { type: t, count: 0, value: 0 };
+        acc[t].count += 1;
+        acc[t].value += parseFloat(item.value) || 0;
+        return acc;
+      }, {});
+      setCollections(Object.values(byType).sort((a, b) => b.count - a.count));
 
       // Collect all photos with instrument context for the gallery
       const photos = [];
@@ -185,6 +203,31 @@ export default function DashboardScreen({ navigation }) {
             <Text style={styles.statLabel}>Photos</Text>
           </TouchableOpacity>
         </View>
+
+        {!loading && collections.length > 0 && (
+          <View style={styles.collectionsSection}>
+            <Text style={styles.collectionsTitle}>
+              {user?.name ? `${user.name}'s Collections` : 'Your Collections'}
+            </Text>
+            {collections.map(c => (
+              <TouchableOpacity
+                key={c.type}
+                style={styles.collectionCard}
+                onPress={() => navigation.navigate('Inventory')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.collectionEmoji}>{TYPE_EMOJI[c.type] || '🎵'}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.collectionName}>{pluralizeType(c.type)}</Text>
+                  <Text style={styles.collectionMeta}>
+                    {c.count} {c.count === 1 ? 'item' : 'items'}{c.value > 0 ? ` · $${Math.round(c.value).toLocaleString()}` : ''}
+                  </Text>
+                </View>
+                <Text style={styles.collectionChevron}>›</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         <View style={styles.actions}>
           <TouchableOpacity
@@ -338,6 +381,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  collectionsSection: {
+    marginBottom: 12,
+  },
+  collectionsTitle: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 8,
+    marginLeft: 2,
+  },
+  collectionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    padding: 12,
+    marginBottom: 8,
+    gap: 12,
+  },
+  collectionEmoji: { fontSize: 24 },
+  collectionName: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  collectionMeta: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 2 },
+  collectionChevron: { color: 'rgba(255,255,255,0.5)', fontSize: 24, fontWeight: '300' },
   actions: {
     alignItems: 'center',
     gap: 10,
