@@ -206,9 +206,6 @@ export default function DashboardScreen({ navigation }) {
 
         {!loading && collections.length > 0 && (
           <View style={styles.collectionsSection}>
-            <Text style={styles.collectionsTitle}>
-              {user?.name ? `${user.name}'s Collections` : 'Your Collections'}
-            </Text>
             {collections.map(c => (
               <TouchableOpacity
                 key={c.type}
@@ -383,13 +380,6 @@ const styles = StyleSheet.create({
   },
   collectionsSection: {
     marginBottom: 12,
-  },
-  collectionsTitle: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 8,
-    marginLeft: 2,
   },
   collectionCard: {
     flexDirection: 'row',
