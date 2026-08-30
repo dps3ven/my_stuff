@@ -171,7 +171,7 @@ export default function DashboardScreen({ navigation }) {
             onPress={() => navigation.navigate('Inventory', { filterType: null })}
           >
             <View style={styles.statIcon}>
-              <Text style={styles.iconText}>🎸</Text>
+              <Text style={styles.iconText}>🎵</Text>
             </View>
             {loading ? (
               <SkeletonLine width={40} height={20} style={{ marginBottom: 5 }} />
